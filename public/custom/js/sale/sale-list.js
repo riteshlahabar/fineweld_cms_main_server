@@ -69,6 +69,14 @@ $(function() {
 
                                                           </a>)
                                         </div>`;
+                        } else if (statusText === 'Converted from Proforma Invoice') {
+                            statusBadge = `<div class="badge bg-light-info text-info p-2 text-uppercase px-3">
+                                            ${statusText} (<a href="${statusUrl}" target="_blank" data-bs-toggle="tooltip"
+                                                              data-bs-placement="top" title="View Proforma Invoice Details">
+                                                              ${statusCode} <i class="fadeIn animated bx bx-link-external bx-tada-hover"></i>
+
+                                                          </a>)
+                                        </div>`;
                         }
 
                         if (data.is_return_raised?.status === 'Return Raised') {

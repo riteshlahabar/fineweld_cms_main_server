@@ -1021,10 +1021,13 @@ $this->partyService->updateShippingAddress(
                         'url' => route('sale.order.details', ['id' => $row->saleOrder->id]), // Sale Order link
                     ];
                 } elseif ($row->quotation) {
+                    $isProformaInvoice = ! empty($row->quotation->sale_order_id);
                     return [
-                        'text' => 'Converted from Proforma Invoice',
+                        'text' => $isProformaInvoice ? 'Converted from Proforma Invoice' : 'Converted from Quotation',
                         'code' => $row->quotation->quotation_code,
-                        'url' => route('sale.quotation.details', ['id' => $row->quotation->id]), // Quotation link
+                        'url' => $isProformaInvoice
+                            ? route('sale.proforma.details', ['id' => $row->quotation->id])
+                            : route('sale.quotation.details', ['id' => $row->quotation->id]),
                     ];
                 }
 
