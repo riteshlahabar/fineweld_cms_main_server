@@ -127,43 +127,18 @@ if (config('demo.enabled')) {
 Route::get('/migrate/db', [AppSettingsController::class, 'migrate'])->name('migrate');
 
 Route::get('/noimage', function () {
-    $fallbackImagePaths = [
-        Storage::path('public/images/noimages/no-image-found.jpg'),
-        Storage::path('public/images/noimages/camera.jpg'),
-    ];
+    $imagePath = 'public/images/noimages/no-image-found.jpg';
 
-    foreach ($fallbackImagePaths as $imagePath) {
-        if (is_file($imagePath)) {
-            return response()->file($imagePath);
-        }
-    }
-
-    // Last fallback: transparent 1x1 image
-    $transparentGif = base64_decode('R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==');
-
-    return response($transparentGif, 200)->header('Content-Type', 'image/gif');
+    return response()->file(Storage::path($imagePath));
 });
 
 Route::get('/fevicon/{image_name?}', function ($image_name = null) {
-    $possiblePaths = [];
-    if (! empty($image_name)) {
-        $possiblePaths[] = 'public/images/fevicon/' . $image_name;
+    $imagePath = 'public/images/fevicon/' . $image_name;
+    if ($image_name == null || !Storage::exists($imagePath)) {
+        $imagePath = 'public/images/fevicon/default/favicon-32x32.png';
     }
 
-    $possiblePaths[] = 'public/images/fevicon/default/favicon-32x32.png';
-
-    foreach ($possiblePaths as $imagePath) {
-        if (Storage::exists($imagePath)) {
-            return response()->file(Storage::path($imagePath));
-        }
-    }
-
-    // Final safe fallback: transparent 1x1 gif to avoid 500 errors.
-    return response(
-        base64_decode('R0lGODlhAQABAIABAP///wAAACwAAAAAAQABAAACAkQBADs='),
-        200,
-        ['Content-Type' => 'image/gif']
-    );
+    return response()->file(Storage::path($imagePath));
 });
 
 Route::get('/app/getimage/{image_name?}', function ($image_name = null) {
