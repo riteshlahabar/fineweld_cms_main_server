@@ -11,10 +11,8 @@
         <div class="invoice">
             <table class="header">
                 <tr>
-                    @include('print.common.header')
-
-                    <td class="bill-info">
-                        <span class="bill-number">{{ __('app.bill') }} #: {{ $order->order_code }}</span><br>
+                    <td class="bill-info" colspan="2">
+                        <span class="bill-number">Sales Order No.: {{ $order->order_code }}</span><br>
                         <span class="cu-fs-16">{{ __('order.date') }}: {{ $order->formatted_order_date  }}</span><br>
                         <span class="cu-fs-16">{{ __('app.time') }}: {{ $order->format_created_time }}</span><br>
                         @if($order->due_date)
@@ -32,12 +30,13 @@
                         <span class="fw-bold cu-fs-18">{{ __('app.order_from') }}</span><br>
                         <span>{{ $order->party->company_name }}<br>
                         {{ $order->party->billing_address }}</span>
-                        {{-- Party Tax/GST Number --}}
-                        @include('print.common.party-tax-details', ['model' => $order])
+                        @if(!empty($order->party->tax_number))
+                            <br><b>GSTN:</b> {{ $order->party->tax_number }}
+                        @endif
                     </td>
                     <td class="address">
-                        <span class="fw-bold cu-fs-18">{{ __('sale.order_status') }}</span> : <span>{{ $order->order_status }}</span>
-
+                        <span class="fw-bold cu-fs-18">{{ __('app.ship_to') }}</span><br>
+                        <span>{{ $order->party->shipping_address }}</span>
                     </td>
                 </tr>
             </table>
@@ -444,11 +443,6 @@
             </tbody>
         </table>
         @endif
-
-        @include('print.common.terms-conditions')
-
-        @include('print.common.bank-signature')
-
 
     </div>
     </div>
