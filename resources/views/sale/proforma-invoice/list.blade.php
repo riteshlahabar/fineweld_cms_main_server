@@ -21,9 +21,9 @@
                             <h5 class="mb-0 text-uppercase">{{ __('sale.quotation.list') }}</h5>
                         </div>
 
-                        @can('sale.quotation.create')
+                        @can('sale.order.create')
                         <!-- Button pushed to the right side -->
-                        <x-anchor-tag href="{{ route('sale.quotation.create') }}" text="{{ __('sale.quotation.create') }}" class="btn btn-primary px-5" />
+                        <x-anchor-tag href="{{ route('sale.proforma.create') }}" text="Create Proforma Invoice" class="btn btn-primary px-5" />
                         @endcan
                     </div>
                     <div class="card-body">
@@ -37,7 +37,7 @@
                             </div>
                             <div class="col-md-3">
                                 <x-label for="user_id" name="{{ __('user.user') }}" />
-                                <x-dropdown-user selected="" :showOnlyUsername='true' :canViewAllUsers="auth()->user()->can('sale.quotation.can.view.other.users.sale.quotations')" />
+                                <x-dropdown-user selected="" :showOnlyUsername='true' :canViewAllUsers="auth()->user()->can('sale.order.can.view.other.users.sale.orders')" />
                             </div>
                             <div class="col-md-3">
                                 <x-label for="from_date" name="{{ __('app.from_date') }}" />
@@ -57,7 +57,7 @@
                             </div>
                         </div>
 
-                        <form class="row g-3 needs-validation" id="datatableForm" action="{{ route('sale.quotation.delete') }}" enctype="multipart/form-data">
+                        <form class="row g-3 needs-validation" id="datatableForm" action="{{ route('sale.proforma.delete') }}" enctype="multipart/form-data">
                             {{-- CSRF Protection --}}
                             @csrf
                             @method('POST')
@@ -91,14 +91,14 @@
 
         @include("modals.email.send")
         @include("modals.sms.send")
-        @include("modals.status-history.view", ['history_of' => 'quotation' ])
+        @include("modals.status-history.view", ['history_of' => 'proforma-invoice' ])
 
         @endsection
 @section('js')
 <script src="{{ versionedAsset('assets/plugins/datatable/js/jquery.dataTables.min.js') }}"></script>
 <script src="{{ versionedAsset('assets/plugins/datatable/js/dataTables.bootstrap5.min.js') }}"></script>
 <script src="{{ versionedAsset('custom/js/common/common.js') }}"></script>
-<script src="{{ versionedAsset('custom/js/sale/quotation-list.js') }}"></script>
+<script src="{{ versionedAsset('custom/js/sale/proforma-invoice-list.js') }}"></script>
 <script src="{{ versionedAsset('custom/js/modals/email/send.js') }}"></script>
 <script src="{{ versionedAsset('custom/js/sms/sms.js') }}"></script>
 <script src="{{ versionedAsset('custom/js/modals/status-history/status-history.js') }}"></script>

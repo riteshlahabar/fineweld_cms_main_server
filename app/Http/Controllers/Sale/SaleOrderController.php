@@ -24,6 +24,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Mpdf\Mpdf;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -181,13 +182,21 @@ class SaleOrderController extends Controller
      */
     public function details($id): View
     {
-        $order = SaleOrder::with(['party',
+        $hasProformaColumn = Schema::hasColumn('quotations', 'sale_order_id');
+
+        $relationships = ['party',
             'itemTransaction' => [
                 'item',
                 'tax',
                 'batch.itemBatchMaster',
                 'itemSerialTransaction.itemSerialMaster',
-            ]])->find($id);
+            ]];
+
+        if ($hasProformaColumn) {
+            $relationships[] = 'quotation';
+        }
+
+        $order = SaleOrder::with($relationships)->find($id);
 
         // Payment Details
         $selectedPaymentTypesArray = json_encode($this->paymentTransactionService->getPaymentRecordsArray($order));
@@ -195,7 +204,7 @@ class SaleOrderController extends Controller
         // Batch Tracking Row count for invoice columns setting
         $batchTrackingRowCount = (new GeneralDataService)->getBatchTranckingRowCount();
 
-        return view('sale.order.details', compact('order', 'selectedPaymentTypesArray', 'batchTrackingRowCount'));
+        return view('sale.order.details', compact('order', 'selectedPaymentTypesArray', 'batchTrackingRowCount', 'hasProformaColumn'));
     }
 
     /**
@@ -565,8 +574,14 @@ class SaleOrderController extends Controller
      * */
     public function datatableList(Request $request)
     {
+        $hasProformaColumn = Schema::hasColumn('quotations', 'sale_order_id');
 
-        $data = SaleOrder::with('user', 'party', 'sale', 'quotation')
+        $relationships = ['user', 'party', 'sale'];
+        if ($hasProformaColumn) {
+            $relationships[] = 'quotation';
+        }
+
+        $data = SaleOrder::with($relationships)
             ->when($request->party_id, function ($query) use ($request) {
                 return $query->where('party_id', $request->party_id);
             })
@@ -626,12 +641,12 @@ class SaleOrderController extends Controller
             ->addColumn('balance', function ($row) {
                 return $this->formatWithPrecision($row->grand_total - $row->paid_amount);
             })
-            ->addColumn('status', function ($row) {
-                if ($row->quotation) {
+            ->addColumn('status', function ($row) use ($hasProformaColumn) {
+                if ($hasProformaColumn && $row->quotation) {
                     return [
                         'text' => 'Converted to Proforma',
                         'code' => $row->quotation->quotation_code,
-                        'url' => route('sale.quotation.details', ['id' => $row->quotation->id]),
+                        'url' => route('sale.proforma.details', ['id' => $row->quotation->id]),
                     ];
                 }
 
@@ -656,14 +671,14 @@ class SaleOrderController extends Controller
                 return collect($saleOrderStatus)->firstWhere('id', $row->order_status)['color'];
 
             })
-            ->addColumn('action', function ($row) {
+            ->addColumn('action', function ($row) use ($hasProformaColumn) {
                 $id = $row->id;
 
                 $editUrl = route('sale.order.edit', ['id' => $id]);
 
                 // Verify conversion path
-                if ($row->quotation) {
-                    $convertToSale = route('sale.quotation.details', ['id' => $row->quotation->id]);
+                if ($hasProformaColumn && $row->quotation) {
+                    $convertToSale = route('sale.proforma.details', ['id' => $row->quotation->id]);
                     $convertToSaleText = __('app.view_bill');
                     $convertToSaleIcon = 'check-double';
                 } elseif ($row->sale) {
@@ -671,8 +686,12 @@ class SaleOrderController extends Controller
                     $convertToSaleText = __('app.view_bill');
                     $convertToSaleIcon = 'check-double';
                 } else {
-                    $convertToSale = route('sale.proforma.convert', ['id' => $id]);
-                    $convertToSaleText = __('sale.convert_to_proforma_invoice');
+                    $convertToSale = $hasProformaColumn
+                        ? route('sale.proforma.convert', ['id' => $id])
+                        : route('sale.invoice.convert', ['id' => $id]);
+                    $convertToSaleText = $hasProformaColumn
+                        ? __('sale.convert_to_proforma_invoice')
+                        : __('sale.convert_to_sale');
                     $convertToSaleIcon = 'transfer-alt';
                 }
 

@@ -11,7 +11,7 @@
                                             'sale.quotation.create',
                                         ]"/>
                 <div class="row">
-                    <form class="g-3 needs-validation" id="invoiceForm" action="{{ route('sale.quotation.store') }}" enctype="multipart/form-data">
+                    <form class="g-3 needs-validation" id="invoiceForm" action="{{ route('sale.proforma.store') }}" enctype="multipart/form-data">
                         {{-- CSRF Protection --}}
                         @csrf
                         @method('POST')
@@ -302,7 +302,7 @@
 
 @section('js')
 <script src="{{ versionedAsset('custom/js/autocomplete-item.js') }}"></script>
-<script src="{{ versionedAsset('custom/js/sale/quotation.js') }}"></script>
+<script src="{{ versionedAsset('custom/js/sale/proforma-invoice.js') }}"></script>
 
 <script src="{{ versionedAsset('custom/js/currency-exchange.js') }}"></script>
 <script src="{{ versionedAsset('custom/js/items/serial-tracking.js') }}"></script>

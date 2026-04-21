@@ -50,6 +50,7 @@ use App\Http\Controllers\Reports\StockReportController;
 use App\Http\Controllers\Reports\StockTransferReportController;
 use App\Http\Controllers\Reports\SupplierReportController;
 use App\Http\Controllers\Sale\QuotationController;
+use App\Http\Controllers\Sale\ProformaInvoiceController;
 use App\Http\Controllers\Sale\SaleController;
 use App\Http\Controllers\Sale\SaleOrderController;
 use App\Http\Controllers\Sale\SaleReturnController;
@@ -126,10 +127,21 @@ if (config('demo.enabled')) {
 Route::get('/migrate/db', [AppSettingsController::class, 'migrate'])->name('migrate');
 
 Route::get('/noimage', function () {
-    // If image doesn't exist, show empty image
-    $imagePath = Storage::path('public/images/noimages/no-image-found.jpg');
+    $fallbackImagePaths = [
+        Storage::path('public/images/noimages/no-image-found.jpg'),
+        Storage::path('public/images/noimages/camera.jpg'),
+    ];
 
-    return response()->file($imagePath);
+    foreach ($fallbackImagePaths as $imagePath) {
+        if (is_file($imagePath)) {
+            return response()->file($imagePath);
+        }
+    }
+
+    // Last fallback: transparent 1x1 image
+    $transparentGif = base64_decode('R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==');
+
+    return response($transparentGif, 200)->header('Content-Type', 'image/gif');
 });
 
 Route::get('/fevicon/{image_name?}', function ($image_name = null) {
@@ -725,10 +737,7 @@ Route::middleware('auth')->group(function () {
             return response()->file(Storage::path($imagePath));
         });
         Route::get('/noimage', function () {
-            // If image doesn't exist, show empty image
-            $imagePath = base_path('storage/app/public/images/noimages/no-image-found.jpg');
-
-            return response()->file($imagePath);
+            return redirect('/noimage');
         });
 
         /* Ajax Returns */
@@ -763,10 +772,12 @@ Route::middleware('auth')->group(function () {
             return response()->file(Storage::path($imagePath));
         });
         Route::get('/noimage', function () {
-            // If image doesn't exist, show empty image
             $imagePath = base_path('storage/app/public/images/avatar/noimage/default.png');
+            if (is_file($imagePath)) {
+                return response()->file($imagePath);
+            }
 
-            return response()->file($imagePath);
+            return redirect('/noimage');
         });
 
     });
@@ -1670,6 +1681,12 @@ Route::middleware('auth')->group(function () {
         // Route::post('/convert-quotation-to-sale/save', [SaleController::class, 'store'])->name('quotation.to.sale.save'); //save
         /* Quotation to Sale : End */
 
+        /* Proforma to Sale : Start */
+        Route::get('/convert-proforma-to-sale/{id}', [SaleController::class, 'convertQuotationToSale'])
+            ->middleware('can:sale.invoice.create')
+            ->name('convert.proforma.to.sale.invoice'); // View
+        /* Proforma to Sale : End */
+
         Route::get('/create', [SaleController::class, 'create'])
             ->middleware('can:sale.invoice.create')
             ->name('sale.invoice.create'); // View
@@ -1786,6 +1803,12 @@ Route::middleware('auth')->group(function () {
             ->middleware('can:sale.quotation.delete');
 
         /**
+         * Proforma Invoice
+         * */
+        Route::get('/proforma-invoice/delete/{id}', [QuotationPaymentController::class, 'deleteQuotationPayment'])
+            ->middleware('can:sale.order.delete');
+
+        /**
          * Sale Bill
          *
          * */
@@ -1888,6 +1911,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/sale-order/{id}', [SaleOrderController::class, 'getStatusHistory'])->middleware('can:sale.order.view');
         Route::get('/purchase-order/{id}', [PurchaseOrderController::class, 'getStatusHistory'])->middleware('can:purchase.order.view');
         Route::get('/quotation/{id}', [QuotationController::class, 'getStatusHistory'])->middleware('can:sale.quotation.view');
+        Route::get('/proforma-invoice/{id}', [ProformaInvoiceController::class, 'getStatusHistory'])->middleware('can:sale.order.view');
 
     });
 
@@ -1932,6 +1956,52 @@ Route::middleware('auth')->group(function () {
             ->middleware('can:sale.quotation.create');
 
     }); // Quotation
+
+    /**
+     * Proforma Invoice
+     * */
+    Route::group(['prefix' => 'proforma-invoice'], function () {
+
+        Route::get('/convert/{id}', [ProformaInvoiceController::class, 'convertSaleOrderToProforma'])
+            ->middleware('can:sale.order.create')
+            ->name('sale.proforma.convert'); // View
+
+        Route::get('/create', [ProformaInvoiceController::class, 'create'])
+            ->middleware('can:sale.order.create')
+            ->name('sale.proforma.create'); // View
+        Route::get('/edit/{id}', [ProformaInvoiceController::class, 'edit'])
+            ->middleware('can:sale.order.edit')
+            ->name('sale.proforma.edit'); // Edit
+        Route::put('/update', [ProformaInvoiceController::class, 'store'])->name('sale.proforma.update'); // Update
+        Route::get('/list', [ProformaInvoiceController::class, 'list'])
+            ->middleware('can:sale.order.view')
+            ->name('sale.proforma.list'); // List
+        Route::get('/details/{id}', [ProformaInvoiceController::class, 'details'])
+            ->middleware('can:sale.order.view')
+            ->name('sale.proforma.details');
+        Route::get('/print/{id}', [ProformaInvoiceController::class, 'print'])
+            ->middleware('can:sale.order.view')
+            ->name('sale.proforma.print');
+        Route::get('/pdf/{id}', [ProformaInvoiceController::class, 'generatePdf'])
+            ->middleware('can:sale.order.view')
+            ->name('sale.proforma.pdf');
+        Route::get('/datatable-list', [ProformaInvoiceController::class, 'datatableList'])->name('sale.proforma.datatable.list'); // Datatable List
+        Route::post('/store', [ProformaInvoiceController::class, 'store'])->name('sale.proforma.store'); // Save operation
+        Route::post('/delete/', [ProformaInvoiceController::class, 'delete'])->middleware('can:sale.order.delete')->name('sale.proforma.delete'); // delete operation
+
+        /**
+         * Email
+         * */
+        Route::get('/email/get-content/{id}', [ProformaInvoiceController::class, 'getEmailContent'])
+            ->middleware('can:sale.order.create');
+
+        /**
+         * SMS
+         * */
+        Route::get('/sms/get-content/{id}', [ProformaInvoiceController::class, 'getSMSContent'])
+            ->middleware('can:sale.order.create');
+
+    }); // Proforma Invoice
 
     /**
      * Currencies

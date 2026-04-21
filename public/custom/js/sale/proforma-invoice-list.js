@@ -19,7 +19,7 @@ $(function() {
             serverSide: true,
             method:'get',
             ajax: {
-                    url: baseURL+'/quotation/datatable-list',
+                    url: baseURL+'/proforma-invoice/datatable-list',
                     data:{
                             party_id : $('#party_id').val(),
                             user_id : $('#user_id').val(),

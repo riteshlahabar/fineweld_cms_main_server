@@ -10,17 +10,25 @@
                                             'sale.quotation.list',
                                             'sale.quotation.update',
                                         ]"/>
+                @php
+                    $isConvertOperation = (($quotation->operation ?? 'update') === 'convert');
+                @endphp
                 <div class="row">
-                    <form class="g-3 needs-validation" id="invoiceForm" action="{{ route('sale.quotation.update') }}" enctype="multipart/form-data">
+                    <form class="g-3 needs-validation" id="invoiceForm" action="{{ $isConvertOperation ? route('sale.proforma.store') : route('sale.proforma.update') }}" enctype="multipart/form-data">
                         {{-- CSRF Protection --}}
                         @csrf
-                        @method('PUT')
+                        @if(! $isConvertOperation)
+                            @method('PUT')
+                        @endif
 
-                        <input type="hidden" name="quotation_id" value="{{ $quotation->id }}">
+                        @if(! $isConvertOperation)
+                            <input type="hidden" name="quotation_id" value="{{ $quotation->id }}">
+                        @endif
+                        <input type="hidden" name="sale_order_id" value="{{ $quotation->sale_order_id ?? ($isConvertOperation ? $quotation->id : '') }}">
                         <input type="hidden" name="row_count" value="0">
                         <input type="hidden" name="row_count_payments" value="0">
                         <input type="hidden" id="base_url" value="{{ url('/') }}">
-                        <input type="hidden" id="operation" name="operation" value="update">
+                        <input type="hidden" id="operation" name="operation" value="{{ $quotation->operation ?? 'update' }}">
                         <input type="hidden" id="selectedPaymentTypesArray" value="{{ $selectedPaymentTypesArray }}">
                         <div class="row">
                             <div class="col-12 col-lg-12">
@@ -376,7 +384,7 @@ value="{{ $terms['courier'] ?? '' }}">
 <script src="{{ versionedAsset('custom/js/payment-types/payment-type-select2-ajax.js') }}"></script>
 
 <script src="{{ versionedAsset('custom/js/autocomplete-item.js') }}"></script>
-<script src="{{ versionedAsset('custom/js/sale/quotation.js') }}"></script>
+<script src="{{ versionedAsset('custom/js/sale/proforma-invoice.js') }}"></script>
 
 <script src="{{ versionedAsset('custom/js/currency-exchange.js') }}"></script>
 <script src="{{ versionedAsset('custom/js/items/serial-tracking.js') }}"></script>

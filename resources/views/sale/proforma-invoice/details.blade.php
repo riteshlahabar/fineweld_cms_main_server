@@ -25,22 +25,22 @@
                                     @if($quotation->sale)
                                         <a href="{{ route('sale.invoice.details', ['id' => $quotation->sale->id]) }}" class="btn btn-outline-success"><i class="bx bx-check-double"></i>{{ __('app.view_invoice') }}</a>
                                     @else
-                                        <a href="{{ route('convert.quotation.to.sale.invoice', ['id' => $quotation->id]) }}" class="btn btn-outline-success"><i class="bx bx-transfer-alt"></i>{{ __('sale.convert_to_sale') }}</a>
+                                        <a href="{{ route('convert.proforma.to.sale.invoice', ['id' => $quotation->id]) }}" class="btn btn-outline-success"><i class="bx bx-transfer-alt"></i>{{ __('sale.convert_to_sale') }}</a>
                                     @endif
 
-                                    @can(['sale.quotation.edit'])
-                                    <a href="{{ route('sale.quotation.edit', ['id' => $quotation->id]) }}" class="btn btn-outline-primary"><i class="bx bx-edit"></i>{{ __('app.edit') }}</a>
+                                    @can(['sale.order.edit'])
+                                    <a href="{{ route('sale.proforma.edit', ['id' => $quotation->id]) }}" class="btn btn-outline-primary"><i class="bx bx-edit"></i>{{ __('app.edit') }}</a>
                                     @endcan
 
-                                     <a class="btn btn-outline-dark px-4 notify-through-email" data-model="quotation" data-id="{{$quotation->id}}" role="button">
+                                     <a class="btn btn-outline-dark px-4 notify-through-email" data-model="proforma-invoice" data-id="{{$quotation->id}}" role="button">
                                     </i><i class="bx bx-envelope"></i>{{ __('app.email') }}</a>
 
-                                    <a class="btn btn-outline-info px-4 notify-through-sms" data-model="quotation" data-id="{{$quotation->id}}" role="button">
+                                    <a class="btn btn-outline-info px-4 notify-through-sms" data-model="proforma-invoice" data-id="{{$quotation->id}}" role="button">
                                     </i><i class="bx bx-envelope"></i>{{ __('message.sms') }}</a>
 
-                                    <a href="{{ route('sale.quotation.print', ['id' => $quotation->id]) }}" target="_blank" class="btn btn-outline-secondary px-4"><i class="bx bx-printer mr-1"></i>{{ __("app.print") }}</a>
+                                    <a href="{{ route('sale.proforma.print', ['id' => $quotation->id]) }}" target="_blank" class="btn btn-outline-secondary px-4"><i class="bx bx-printer mr-1"></i>{{ __("app.print") }}</a>
 
-                                    <a href="{{ route('sale.quotation.pdf', ['id' => $quotation->id]) }}" target="_blank" class="btn btn-outline-danger px-4"><i class="bx bxs-file-pdf mr-1"></i>{{ __("app.pdf") }}</a>
+                                    <a href="{{ route('sale.proforma.pdf', ['id' => $quotation->id]) }}" target="_blank" class="btn btn-outline-danger px-4"><i class="bx bxs-file-pdf mr-1"></i>{{ __("app.pdf") }}</a>
 
                                 </div>
                                 <hr/>

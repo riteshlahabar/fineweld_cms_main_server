@@ -86,6 +86,12 @@
 										</li>
 						@endcan
 
+                        @can('sale.order.view')
+						<li class="{{ request()->is('proforma-invoice/*') ? 'mm-active' : '' }}">
+											<a href="{{ route('sale.proforma.list') }}"><i class='bx bx-radio-circle'></i>Proforma Invoice</a>
+										</li>
+						@endcan
+
 						@can('sale.order.view')
 						<li class="{{ request()->is('sale/order/*') ? 'mm-active' : '' }}">
 											<a href="{{ route('sale.order.list') }}"><i class='bx bx-radio-circle'></i>{{ __('sale.order.order') }}</a>

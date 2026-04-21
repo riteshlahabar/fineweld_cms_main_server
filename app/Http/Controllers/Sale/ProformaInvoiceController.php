@@ -657,7 +657,7 @@ class ProformaInvoiceController extends Controller
             ->when($request->to_date, function ($query) use ($request) {
                 return $query->where('quotation_date', '<=', $this->toSystemDateFormat($request->to_date));
             })
-            ->when(! auth()->user()->can('sale.quotation.can.view.other.users.sale.quotations'), function ($query) {
+            ->when(! auth()->user()->can('sale.order.can.view.other.users.sale.orders'), function ($query) {
                 return $query->where('created_by', auth()->user()->id);
             });
 
