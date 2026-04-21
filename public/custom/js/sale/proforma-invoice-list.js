@@ -60,6 +60,14 @@ $(function() {
 
                                                           </a>)
                                         </div>`;
+                        } else if (data.status?.text === 'Converted from Sale Order') {
+                            statusBadge = `<div class="badge text-primary bg-light-primary p-2 text-uppercase px-3">
+                                            ${statusText} (<a href="${statusUrl}" target="_blank" data-bs-toggle="tooltip"
+                                                              data-bs-placement="top" title="View Sale Order Details">
+                                                              ${data.status.code} <i class="fadeIn animated bx bx-link-external bx-tada-hover"></i>
+
+                                                          </a>)
+                                        </div>`;
                         }
 
                         // Combine quotation_code and status badge

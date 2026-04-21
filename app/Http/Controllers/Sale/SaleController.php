@@ -240,6 +240,7 @@ class SaleController extends Controller
         $sale->count_id = ($lastCountId + 1);
 
         $sale->formatted_sale_date = $this->toUserDateFormat(date('Y-m-d'));
+        $sale->note = $this->formatConvertedSaleNote($sale->note);
 
         // Item Details
         // Prepare item transactions with associated units
@@ -279,6 +280,58 @@ class SaleController extends Controller
         $paymentHistory = [];
 
         return view('sale.invoice.edit', compact('taxList', 'sale', 'itemTransactionsJson', 'selectedPaymentTypesArray', 'paymentHistory'));
+    }
+
+    /**
+     * Convert JSON terms note (from proforma/quotation) to readable multiline text.
+     */
+    private function formatConvertedSaleNote($note): string
+    {
+        if (! is_string($note) || trim($note) === '') {
+            return '';
+        }
+
+        $decoded = json_decode($note, true);
+        if (json_last_error() !== JSON_ERROR_NONE || ! is_array($decoded)) {
+            return $note;
+        }
+
+        $labelMap = [
+            'taxes' => 'Taxes',
+            'payment' => 'Payment',
+            'for' => 'F.O.R',
+            'validity' => 'Validity',
+            'delivery' => 'Delivery',
+            'courier' => 'Courier Charges',
+            'other' => 'Other',
+        ];
+
+        $lines = [];
+
+        foreach ($labelMap as $key => $label) {
+            $value = $decoded[$key] ?? null;
+            if (is_scalar($value)) {
+                $text = trim((string) $value);
+                if ($text !== '') {
+                    $lines[] = $label.': '.$text;
+                }
+            }
+        }
+
+        foreach ($decoded as $key => $value) {
+            if (array_key_exists($key, $labelMap)) {
+                continue;
+            }
+            if (is_scalar($value)) {
+                $text = trim((string) $value);
+                if ($text !== '') {
+                    $label = ucwords(str_replace(['_', '-'], ' ', (string) $key));
+                    $lines[] = $label.': '.$text;
+                }
+            }
+        }
+
+        return implode(PHP_EOL, $lines);
     }
 
     /**

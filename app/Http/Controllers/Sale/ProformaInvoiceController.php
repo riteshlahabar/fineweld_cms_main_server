@@ -644,7 +644,7 @@ class ProformaInvoiceController extends Controller
     public function datatableList(Request $request)
     {
 
-        $data = Quotation::with('user', 'party', 'sale')
+        $data = Quotation::with('user', 'party', 'sale', 'saleOrder')
             ->whereNotNull('sale_order_id')
             ->when($request->party_id, function ($query) use ($request) {
                 return $query->where('party_id', $request->party_id);
@@ -708,6 +708,14 @@ class ProformaInvoiceController extends Controller
                         'text' => 'Converted to Sale',
                         'code' => $row->sale->sale_code,
                         'url' => route('sale.invoice.details', ['id' => $row->sale->id]),
+                    ];
+                }
+
+                if ($row->saleOrder) {
+                    return [
+                        'text' => 'Converted from Sale Order',
+                        'code' => $row->saleOrder->order_code,
+                        'url' => route('sale.order.details', ['id' => $row->saleOrder->id]),
                     ];
                 }
 
