@@ -3,6 +3,18 @@
 
 @section('css')
 <link href="{{ asset('assets/plugins/datatable/css/dataTables.bootstrap5.min.css') }}" rel="stylesheet">
+<style>
+    .company-address-wrap {
+        white-space: normal;
+        line-height: 1.3;
+        max-width: 320px;
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        word-break: break-word;
+    }
+</style>
 @endsection
 
 @section('content')

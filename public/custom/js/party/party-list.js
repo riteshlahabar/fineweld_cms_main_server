@@ -6,6 +6,15 @@ $(function () {
     const partyType = $('input[name="party_type"]').val();
     let partyPaymentHistoryModal = $('#partyPaymentHistoryModal');
 
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
     /**
      * Server-side Datatable
      */
@@ -41,7 +50,13 @@ $(function () {
                 },
 
                 { data: 'company_name' },
-                { data: 'company_address' },
+                {
+                    data: 'company_address',
+                    render: function(data) {
+                        const safeAddress = escapeHtml(data || '');
+                        return `<div class="company-address-wrap" title="${safeAddress}">${safeAddress}</div>`;
+                    }
+                },
                 { data: 'vendor_type' },
                 { data: 'primary_name' },
                 { data: 'primary_email' },
