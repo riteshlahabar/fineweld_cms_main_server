@@ -17,10 +17,13 @@
                         </div>
                         <div class="col-md-12">
                             <div class="input-group mb-3">
+                                <input type="text" class="form-control bg-light text-primary cu_numeric text-center fw-bold" name='base_unit_value' value="1" placeholder="1">
                                 <span class="input-group-text" id="base-text"></span>
-                                <input type="text" class="form-control bg-light text-primary cu_numeric text-center fw-bold" name='conversion_rate' placeholder="Greater then 0" >
+                                <span class="input-group-text fw-bold">=</span>
+                                <input type="text" class="form-control bg-light text-success cu_numeric text-center fw-bold" name='secondary_unit_value' value="1" placeholder="1">
                                 <span class="input-group-text text-success" id="secondary-text"></span>
                             </div>
+                            <input type="hidden" name='conversion_rate' value="1">
                         </div>
 
                         <div class="alert alert-info mt-3" role="alert">

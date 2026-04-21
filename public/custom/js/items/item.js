@@ -212,7 +212,7 @@
     /**
      * Avoid form submit
      * */
-    $('#itemForm input[name="conversion_rate"]').on('keypress', function(e) {
+    $('#itemForm input[name="conversion_rate"], #itemForm input[name="base_unit_value"], #itemForm input[name="secondary_unit_value"]').on('keypress', function(e) {
         var keyCode = e.keyCode || e.which;
         if (keyCode === 13) {  // 13 is the Enter key code
             e.preventDefault();
