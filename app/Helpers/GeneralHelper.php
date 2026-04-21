@@ -67,7 +67,15 @@ if (! function_exists('versionedAsset')) {
      */
     function versionedAsset($link)
     {
-        return global_asset($link).'?v='.getAssetVersion(); // Asset version if not set in .env
+        $version = (string) getAssetVersion();
+        $assetPath = public_path(ltrim($link, '/'));
+
+        // Add file modified time so updated JS/CSS is reflected without manual cache bumps.
+        if (is_file($assetPath)) {
+            $version .= '-'.filemtime($assetPath);
+        }
+
+        return global_asset($link).'?v='.$version;
     }
 }
 

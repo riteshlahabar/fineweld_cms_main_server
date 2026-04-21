@@ -3,6 +3,7 @@
     const tableId = $('#invoiceItemsTable');
 
     let originalButtonText;
+    let submitSafetyTimeout = null;
 
     let submitButton = 'button[id="submit_form"]';
 
@@ -81,9 +82,21 @@
         form.find(submitButton)
             .prop('disabled', true)
             .html('  <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...');
+
+        // Failsafe unlock to prevent stuck loading in case of unexpected JS/runtime errors.
+        if (submitSafetyTimeout) {
+            clearTimeout(submitSafetyTimeout);
+        }
+        submitSafetyTimeout = setTimeout(function () {
+            enableSubmitButton(form);
+        }, 15000);
     }
 
     function enableSubmitButton(form) {
+        if (submitSafetyTimeout) {
+            clearTimeout(submitSafetyTimeout);
+            submitSafetyTimeout = null;
+        }
         form.find(submitButton)
             .prop('disabled', false)
             .html(originalButtonText);
@@ -114,6 +127,15 @@
     }
 
     function ajaxRequest(formArray){
+        function handleSuccessResponse(data) {
+            formArray.formObject.response = data || {};
+            iziToast.success({title: 'Success', layout: 2, message: (data && data.message) ? data.message : 'Saved successfully'});
+
+            if (typeof afterSeccessOfAjaxRequest === 'function') {
+                afterSeccessOfAjaxRequest(formArray.formObject);
+            }
+        }
+
         var formData = new FormData(document.getElementById(formArray.formId));
         var jqxhr = $.ajax({
             type: 'POST',
@@ -133,14 +155,33 @@
             },
         });
         jqxhr.done(function(data) {
-            formArray.formObject.response = data;
-            iziToast.success({title: 'Success', layout: 2, message: data.message});
-            // Actions to be performed after response from the AJAX request
-            if (typeof afterSeccessOfAjaxRequest === 'function') {
-                afterSeccessOfAjaxRequest(formArray.formObject);
-            }
+            handleSuccessResponse(data);
         });
         jqxhr.fail(function(response) {
+                // Some environments may return parsererror/non-JSON while DB save already succeeds.
+                // Try to recover JSON payload from response text and continue success flow.
+                var recovered = null;
+                try {
+                    if (response && response.responseText) {
+                        recovered = JSON.parse(response.responseText);
+                    }
+                } catch (e1) {
+                    try {
+                        var raw = response && response.responseText ? response.responseText : '';
+                        var match = raw.match(/\{[\s\S]*\}/);
+                        if (match && match[0]) {
+                            recovered = JSON.parse(match[0]);
+                        }
+                    } catch (e2) {
+                        recovered = null;
+                    }
+                }
+
+                if (recovered && (recovered.id !== undefined || recovered.status === true)) {
+                    handleSuccessResponse(recovered);
+                    return;
+                }
+
                 var message = response?.responseJSON?.message || 'Something went wrong. Please try again.';
                 iziToast.error({title: 'Error', layout: 2, message: message});
         });
