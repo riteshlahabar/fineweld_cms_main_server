@@ -1,0 +1,13 @@
+{
+    "name": "Partnership",
+    "alias": "partnership",
+    "description": "Partnership Management Module for Delta POS",
+    "version": "1.0.0",
+    "author": "Delta POS",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Partnership\\Providers\\PartnershipServiceProvider"
+    ],
+    "files": []
+}

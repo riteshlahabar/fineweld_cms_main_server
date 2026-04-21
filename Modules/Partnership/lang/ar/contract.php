@@ -1,0 +1,30 @@
+<?php
+
+return [
+    'name' => 'اسم العقد',
+    'contract' => 'عقد',
+    'contracts' => 'عقود',
+    'list' => 'قائمة العقود',
+    'create' => 'إنشاء عقد',
+    'add_contract' => 'إضافة عقد',
+    'details' => 'تفاصيل العقد',
+    'update' => 'تحديث العقد',
+    'share_holder' => 'مساهم',
+    'share_holders' => 'مساهمون',
+    'share_type' => 'نوع السهم',
+    'share_value' => 'قيمة السهم',
+    'effective_from' => 'فعال من',
+    'effective_to' => 'فعال إلى',
+    'code' => 'رمز العقد',
+    'invalid_share_value' => 'قيمة سهم غير صالحة للعنصر :item',
+    'effective_from_greater_than_effective_to' => 'تاريخ الفعالية من لا يمكن أن يكون أكبر من تاريخ الفعالية إلى للعنصر :item',
+    'print' => 'طباعة العقد',
+    'report' => 'تقرير العقد',
+    'items_report' => 'تقرير عناصر العقد',
+    'total_items' => 'إجمالي العناصر',
+    'total_partners' => 'إجمالي الشركاء',
+    'edit' => 'تعديل العقد',
+    'view' => 'عرض العقد',
+    'delete' => 'حذف العقد',
+
+];

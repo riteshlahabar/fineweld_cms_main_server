@@ -1,0 +1,33 @@
+{
+    "name": "nwidart/partnership",
+    "description": "Partnership Management Module for Delta POS",
+    "authors": [
+        {
+            "name": "webmagics",
+            "email": "support@creatantech.com"
+        }
+    ],
+    "providers": [
+        "Modules\\Partnership\\Providers\\PartnershipServiceProvider"
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Partnership\\": "",
+            "Modules\\Partnership\\Database\\Factories\\": "database/factories/",
+            "Modules\\Partnership\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Partnership\\Tests\\": "tests/"
+        }
+    }
+}

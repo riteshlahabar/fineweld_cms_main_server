@@ -1,0 +1,68 @@
+Website:
+
+https://laravelmodules.com/docs/1/getting-started/introduction
+
+
+
+
+
+
+#Create a Module
+php artisan module:make Blog
+
+
+#Get module path from helper function
+module_path('Blog');
+
+
+#List the modules
+php artisan module:list
+
+
+#Migrate Moduel
+php artisan module:migrate Blog
+
+#Mirgate-Rollback Module
+php artisan module:migrate-rollback Blog
+
+#Refresh
+php artisan module:migrate-refresh Blog
+
+
+#Reset
+php artisan module:migrate-reset Blog
+
+#seed
+php artisan module:seed Blog
+
+
+#Enable module
+php artisan module:enable Blog
+
+#disable Module
+php artisan module:disable Blog
+
+#Update module
+php artisan module:update Blog
+
+#make a command
+php artisan module:make-command CreatePostCommand Blog
+
+#make migration
+php artisan module:make-migration create_posts_table Blog
+
+#make seed
+php artisan module:make-seed seed_fake_blog_posts Blog
+
+#make controller
+php artisan module:make-controller PostsController Blog
+
+
+#make model
+php artisan module:make-model Post Blog
+
+#Notification
+php artisan module:make-notification NotifyAdminOfNewComment Blog
+
+
+

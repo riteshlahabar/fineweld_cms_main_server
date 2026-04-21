@@ -1,0 +1,30 @@
+<?php
+
+return [
+    'name' => 'संविदा का नाम',
+    'contract' => 'संविदा',
+    'contracts' => 'संविदाएं',
+    'list' => 'संविदा सूची',
+    'create' => 'संविदा बनाएं',
+    'add_contract' => 'संविदा जोड़ें',
+    'details' => 'संविदा विवरण',
+    'update' => 'संविदा अपडेट',
+    'share_holder' => 'शेयर धारक',
+    'share_holders' => 'शेयर धारक',
+    'share_type' => 'शेयर प्रकार',
+    'share_value' => 'शेयर मूल्य',
+    'effective_from' => 'प्रभावी से',
+    'effective_to' => 'प्रभावी तक',
+    'code' => 'संविदा कोड',
+    'invalid_share_value' => 'आइटम के लिए अमान्य शेयर मूल्य :item',
+    'effective_from_greater_than_effective_to' => 'आइटम के लिए प्रभावी से दिनांक प्रभावी तक दिनांक से अधिक नहीं हो सकती :item',
+    'print' => 'संविदा प्रिंट',
+    'report' => 'संविदा रिपोर्ट',
+    'items_report' => 'संविदा आइटम रिपोर्ट',
+    'total_items' => 'कुल आइटम',
+    'total_partners' => 'कुल साझेदार',
+    'edit' => 'संविदा संपादित करें',
+    'view' => 'संविदा देखें',
+    'delete' => 'संविदा हटाएं',
+
+];

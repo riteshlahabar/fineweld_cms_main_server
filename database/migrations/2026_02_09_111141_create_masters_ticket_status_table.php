@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+
+    public function up()
+    {
+        Schema::create('masters_ticket_status', function (Blueprint $table) {
+            $table->id();
+
+            // priority | status | service_type
+            $table->string('type');
+
+            // High, Open, Repair, etc.
+            $table->string('name');
+
+            // high, open, repair (optional)
+            $table->string('slug')->nullable();
+
+            // Bootstrap class: danger, success, warning, info
+            $table->string('ui_class')->nullable();
+
+            $table->boolean('is_active')->default(true);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('masters_ticket_status');
+    }
+};

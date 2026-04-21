@@ -1,0 +1,30 @@
+<?php
+
+return [
+    'name' => 'Contract Name',
+    'contract' => 'Contract',
+    'contracts' => 'Contracts',
+    'list' => 'Contract List',
+    'create' => 'Create Contract',
+    'add_contract' => 'Add Contract',
+    'details' => 'Contract Details',
+    'update' => 'Contract Update ',
+    'share_holder' => 'Share Holder',
+    'share_holders' => 'Share Holders',
+    'share_type' => 'Share Type',
+    'share_value' => 'Share Value',
+    'effective_from' => 'Effective From',
+    'effective_to' => 'Effective To',
+    'code' => 'Contract Code',
+    'invalid_share_value' => 'Invalid Share Value for Item :item',
+    'effective_from_greater_than_effective_to' => 'Effective From date cannot be greater than Effective To date for Item :item',
+    'print' => 'Contract Print',
+    'report' => 'Contract Report',
+    'items_report' => 'Contract Items Report',
+    'total_items' => 'Total Items',
+    'total_partners' => 'Total Partners',
+    'edit' => 'Edit Contract',
+    'view' => 'View Contract',
+    'delete' => 'Delete Contract',
+
+];
