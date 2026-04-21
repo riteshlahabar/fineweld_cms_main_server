@@ -12,14 +12,14 @@ $(function() {
         //Delete previous data
         tableId.DataTable().destroy();
 
-        var exportColumns = [2,3,4,5,6,7,8,9,10];//Index Starts from 0
+        var exportColumns = [2,3,4,5,6,7,8];//Index Starts from 0
 
         var table = tableId.DataTable({
             processing: true,
             serverSide: true,
             method:'get',
             ajax: {
-                    url: baseURL+'/sale/order/datatable-list',
+                    url: baseURL+'/quotation/datatable-list',
                     data:{
                             party_id : $('#party_id').val(),
                             user_id : $('#user_id').val(),
@@ -40,27 +40,29 @@ $(function() {
                 },
 
                 {
-                    data: null, // Combine order_code and status in this column
-                    name: 'order_code',
+                    data: null, // Combine quotation_code and status in this column
+                    name: 'quotation_code',
                     orderable: false,
                     className: 'text-center',
                     render: function(data, type, full, meta) {
+
                         let statusText = data.status?.text || ''; // Get text from status object
-                        let orderCode = data.order_code || ''; // Default if order_code is null
+                        let orderCode = data.quotation_code || ''; // Default if quotation_code is null
                         let statusUrl = data.status?.url || '';
                         let statusBadge = '';
 
-                        if (statusText) {
+                        // Check if status text is available and append sale code if it exists
+                        if (data.status?.text === 'Converted to Sale') {
                             statusBadge = `<div class="badge text-success bg-light-success p-2 text-uppercase px-3">
                                             ${statusText} (<a href="${statusUrl}" target="_blank" data-bs-toggle="tooltip"
-                                                              data-bs-placement="top" title="View Details">
+                                                              data-bs-placement="top" title="View Sale Invoice Details">
                                                               ${data.status.code} <i class="fadeIn animated bx bx-link-external bx-tada-hover"></i>
 
                                                           </a>)
                                         </div>`;
                         }
 
-                        // Combine order_code and status badge
+                        // Combine quotation_code and status badge
                         return `<div>
                                     <strong>${orderCode}</strong><br>
                                     ${statusBadge}
@@ -68,20 +70,18 @@ $(function() {
                     }
                 },
 
-
-                {data: 'order_date', name: 'order_date'},
-                {data: 'due_date', name: 'due_date'},
+                {data: 'quotation_date', name: 'quotation_date'},
                 {data: 'party_name', name: 'party_name'},
                 {data: 'grand_total', name: 'grand_total', className: 'text-end'},
-                {data: 'balance', name: 'balance', className: 'text-end'},
+
                 {
                     data: null,
-                    name: 'order_status',
+                    name: 'quotation_status',
                     orderable: false,
                     className: 'text-center',
                     render: function(data, type, full, meta) {
 
-                        return `<div class="badge text-${data.color} bg-light-${data.color} p-2 text-uppercase px-3">${data.order_status}</div>`;
+                        return `<div class="badge text-${data.color} bg-light-${data.color} p-2 text-uppercase px-3">${data.quotation_status}</div>`;
 
                     }
                 },

@@ -9,6 +9,7 @@ use App\Http\Requests\QuotationRequest;
 use App\Models\Items\Item;
 use App\Models\Prefix;
 use App\Models\Sale\Quotation;
+use App\Models\Sale\SaleOrder;
 use App\Services\AccountTransactionService;
 use App\Services\CacheService;
 use App\Services\Communication\Email\QuotationEmailNotificationService;
@@ -22,6 +23,7 @@ use App\Traits\FormatNumber;
 use App\Traits\FormatsDateInputs;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mpdf\Mpdf;
@@ -104,6 +106,80 @@ class QuotationController extends Controller
     public function list(): View
     {
         return view('sale.quotation.list');
+    }
+
+    /**
+     * Convert Sale Order to Proforma Invoice (Quotation).
+     */
+    public function convertSaleOrderToProforma($id): View|RedirectResponse
+    {
+        $alreadyConverted = Quotation::where('sale_order_id', $id)->first();
+
+        if ($alreadyConverted) {
+            session(['record' => [
+                'type' => 'success',
+                'status' => __('sale.already_converted'),
+            ]]);
+
+            return redirect()->route('sale.quotation.details', ['id' => $alreadyConverted->id]);
+        }
+
+        $saleOrder = SaleOrder::with(['party',
+            'itemTransaction' => [
+                'item.brand',
+                'warehouse',
+                'tax',
+                'batch.itemBatchMaster',
+                'itemSerialTransaction.itemSerialMaster',
+            ]])->findOrFail($id);
+
+        $saleOrder->itemTransaction->each(function ($transaction) {
+            if (! $transaction->batch?->itemBatchMaster) {
+                return;
+            }
+            $batchMaster = $transaction->batch->itemBatchMaster;
+            $batchMaster->mfg_date = $batchMaster->getFormattedMfgDateAttribute();
+            $batchMaster->exp_date = $batchMaster->getFormattedExpDateAttribute();
+        });
+
+        // Use Sale Order as source and prepare it like proforma form-data.
+        $quotation = $saleOrder;
+        $quotation->operation = 'convert';
+        $quotation->converting_from = 'Sale Order';
+        $quotation->quotation_date = now()->toDateString();
+        $quotation->formatted_quotation_date = $this->toUserDateFormat($quotation->quotation_date);
+        $quotation->quotation_status = data_get(collect($this->generalDataService->getQuotationStatus())->first(), 'id', '');
+
+        $prefix = Prefix::findOrNew($this->companyId);
+        $lastCountId = $this->getLastCountId();
+        $quotation->prefix_code = $prefix->quotation;
+        $quotation->count_id = ($lastCountId + 1);
+        $quotation->quotation_code = $quotation->prefix_code.$quotation->count_id;
+
+        $allUnits = CacheService::get('unit');
+        $itemTransactions = $quotation->itemTransaction->map(function ($transaction) use ($allUnits) {
+            $itemData = $transaction->toArray();
+
+            $selectedUnits = getOnlySelectedUnits(
+                $allUnits,
+                $transaction->item->base_unit_id,
+                $transaction->item->secondary_unit_id
+            );
+
+            $itemData['unitList'] = $selectedUnits->toArray();
+            $itemData['itemSerialTransactions'] = $transaction->itemSerialTransaction
+                ->map(fn ($serialTransaction) => $serialTransaction->itemSerialMaster->toArray())
+                ->toArray();
+
+            return $itemData;
+        })->toArray();
+
+        $itemTransactionsJson = json_encode($itemTransactions);
+        $selectedPaymentTypesArray = json_encode($this->paymentTypeService->selectedPaymentTypesArray());
+        $paymentHistory = [];
+        $taxList = CacheService::get('tax')->toJson();
+
+        return view('sale.quotation.edit', compact('taxList', 'quotation', 'itemTransactionsJson', 'selectedPaymentTypesArray', 'paymentHistory'));
     }
 
     /**
@@ -268,7 +344,7 @@ class QuotationController extends Controller
             $validatedData = $request->validated();
             $validatedData['note'] = json_encode($request->terms);
 
-            if ($request->operation == 'save') {
+            if (in_array($request->operation, ['save', 'convert'])) {
                 // Create a new expense record using Eloquent and save it
                 $newQuotation = Quotation::create($validatedData);
 
@@ -277,6 +353,7 @@ class QuotationController extends Controller
             } else {
                 $fillableColumns = [
                     'party_id' => $validatedData['party_id'],
+                    'sale_order_id' => $validatedData['sale_order_id'] ?? null,
                     'quotation_date' => $validatedData['quotation_date'],
                     'prefix_code' => $validatedData['prefix_code'],
                     'count_id' => $validatedData['count_id'],
@@ -660,8 +737,8 @@ class QuotationController extends Controller
                     $convertToSaleText = __('app.view_bill');
                     $convertToSaleIcon = 'check-double';
                 } else {
-                    $convertToSale = route('convert.quotation.to.sale.invoice', ['id' => $id]);
-                    $convertToSaleText = __('sale.convert_to_sale');
+                    $convertToSale = route('convert.proforma.to.sale.invoice', ['id' => $id]);
+                    $convertToSaleText = __('sale.convert_to_invoice');
                     $convertToSaleIcon = 'transfer-alt';
                 }
 

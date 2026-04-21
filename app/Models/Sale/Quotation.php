@@ -30,6 +30,7 @@ class Quotation extends Model
      */
     protected $fillable = [
         'quotation_date',
+        'sale_order_id',
         'prefix_code',
         'count_id',
         'quotation_code',
@@ -120,9 +121,9 @@ class Quotation extends Model
         return $this->hasOne(Sale::class);
     }
 
-    public function saleOrder(): HasOne
+    public function saleOrder(): BelongsTo
     {
-        return $this->hasOne(SaleOrder::class);
+        return $this->belongsTo(SaleOrder::class);
     }
 
     /**

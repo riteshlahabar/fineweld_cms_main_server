@@ -137,9 +137,19 @@ class SaleController extends Controller
      *
      * @return \Illuminate\Http\View | RedirectResponse
      */
-    public function convertQuotationToSale($id, $convertingFrom = 'Quotation'): View|RedirectResponse
+    public function convertQuotationToSale($id, $convertingFrom = 'Proforma Invoice'): View|RedirectResponse
     {
         return $this->convertToSale($id, $convertingFrom);
+    }
+
+    /**
+     * Convert Proforma Invoice to Sale
+     *
+     * @return \Illuminate\Http\View | RedirectResponse
+     */
+    public function convertProformaToSale($id): View|RedirectResponse
+    {
+        return $this->convertToSale($id, 'Proforma Invoice');
     }
 
     /**
@@ -175,7 +185,7 @@ class SaleController extends Controller
                     'itemSerialTransaction.itemSerialMaster',
                 ]])->findOrFail($id);
 
-        } elseif ($convertingFrom == 'Quotation') {
+        } elseif (in_array($convertingFrom, ['Quotation', 'Proforma Invoice'])) {
 
             $convertedQuotation = Sale::where('quotation_id', $id)->first();
 
@@ -1005,7 +1015,7 @@ $this->partyService->updateShippingAddress(
                     ];
                 } elseif ($row->quotation) {
                     return [
-                        'text' => 'Converted from Quotation',
+                        'text' => 'Converted from Proforma Invoice',
                         'code' => $row->quotation->quotation_code,
                         'url' => route('sale.quotation.details', ['id' => $row->quotation->id]), // Quotation link
                     ];

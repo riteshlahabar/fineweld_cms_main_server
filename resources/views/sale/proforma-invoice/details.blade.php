@@ -1,13 +1,13 @@
 @extends('layouts.app')
-@section('title', __('sale.order.print'))
+@section('title', __('sale.quotation.print'))
 
 		@section('content')
 		<!--start page wrapper -->
 		<div class="page-wrapper">
 			<div class="page-content">
 				<x-breadcrumb :langArray="[
-											'sale.order.order',
-                                            'sale.order.list',
+											'sale.sale',
+                                            'sale.quotation.list',
                                             'app.print',
 										]"/>
 				<div class="row">
@@ -22,27 +22,25 @@
                         <div class="toolbar hidden-print">
                                 <div class="text-end">
 
-                                    @if($order->quotation)
-                                        <a href="{{ route('sale.quotation.details', ['id' => $order->quotation->id]) }}" class="btn btn-outline-success"><i class="bx bx-check-double"></i>{{ __('app.view_invoice') }}</a>
-                                    @elseif($order->sale)
-                                        <a href="{{ route('sale.invoice.details', ['id' => $order->sale->id]) }}" class="btn btn-outline-success"><i class="bx bx-check-double"></i>{{ __('app.view_invoice') }}</a>
+                                    @if($quotation->sale)
+                                        <a href="{{ route('sale.invoice.details', ['id' => $quotation->sale->id]) }}" class="btn btn-outline-success"><i class="bx bx-check-double"></i>{{ __('app.view_invoice') }}</a>
                                     @else
-                                        <a href="{{ route('sale.proforma.convert', ['id' => $order->id]) }}" class="btn btn-outline-success"><i class="bx bx-transfer-alt"></i>{{ __('sale.convert_to_proforma_invoice') }}</a>
+                                        <a href="{{ route('convert.quotation.to.sale.invoice', ['id' => $quotation->id]) }}" class="btn btn-outline-success"><i class="bx bx-transfer-alt"></i>{{ __('sale.convert_to_sale') }}</a>
                                     @endif
 
-                                    @can(['sale.order.edit'])
-                                    <a href="{{ route('sale.order.edit', ['id' => $order->id]) }}" class="btn btn-outline-primary"><i class="bx bx-edit"></i>{{ __('app.edit') }}</a>
+                                    @can(['sale.quotation.edit'])
+                                    <a href="{{ route('sale.quotation.edit', ['id' => $quotation->id]) }}" class="btn btn-outline-primary"><i class="bx bx-edit"></i>{{ __('app.edit') }}</a>
                                     @endcan
 
-                                     <a class="btn btn-outline-dark px-4 notify-through-email" data-model="sale/order" data-id="{{$order->id}}" role="button">
+                                     <a class="btn btn-outline-dark px-4 notify-through-email" data-model="quotation" data-id="{{$quotation->id}}" role="button">
                                     </i><i class="bx bx-envelope"></i>{{ __('app.email') }}</a>
 
-                                    <a class="btn btn-outline-info px-4 notify-through-sms" data-model="sale/order" data-id="{{$order->id}}" role="button">
+                                    <a class="btn btn-outline-info px-4 notify-through-sms" data-model="quotation" data-id="{{$quotation->id}}" role="button">
                                     </i><i class="bx bx-envelope"></i>{{ __('message.sms') }}</a>
 
-                                    <a href="{{ route('sale.order.print', ['id' => $order->id]) }}" target="_blank" class="btn btn-outline-secondary px-4"><i class="bx bx-printer mr-1"></i>{{ __("app.print") }}</a>
+                                    <a href="{{ route('sale.quotation.print', ['id' => $quotation->id]) }}" target="_blank" class="btn btn-outline-secondary px-4"><i class="bx bx-printer mr-1"></i>{{ __("app.print") }}</a>
 
-                                    <a href="{{ route('sale.order.pdf', ['id' => $order->id]) }}" target="_blank" class="btn btn-outline-danger px-4"><i class="bx bxs-file-pdf mr-1"></i>{{ __("app.pdf") }}</a>
+                                    <a href="{{ route('sale.quotation.pdf', ['id' => $quotation->id]) }}" target="_blank" class="btn btn-outline-danger px-4"><i class="bx bxs-file-pdf mr-1"></i>{{ __("app.pdf") }}</a>
 
                                 </div>
                                 <hr/>
@@ -70,22 +68,27 @@
                                     <main>
                                         <div class="row contacts">
                                             <div class="col invoice-to">
-                                                <div class="text-gray-light fw-bold text-uppercase">{{ __('app.order_from') }}:</div>
-                                                <h2 class="to">{{ $order->party->company_name ?? '' }}</h2>
-                                                <div class="address">{{ $order->party->invoiceing_address }}</div>
+                                                <div class="text-gray-light fw-bold text-uppercase">{{ __('sale.quotation.for') }}:</div>
+                                                <h2 class="to">{{ $quotation->party?->company_name ?? '-' }}</h2>
+                                                <div class="address">{{ $quotation->party->invoiceing_address }}</div>
+                                            </div>
+
+                                            <div class="col invoice-to">
+                                                <div class="text-gray-light fw-bold text-uppercase">{{ __('app.ship_to') }}:</div>
+                                                <div class="address">{{ $quotation->party->shipping_address }}</div>
                                             </div>
 
                                             <div class="col invoice-details">
-                                                <h1 class="invoice-id">{{ __('sale.order.order') }} #{{ $order->order_code }}</h1>
-                                                <div class="date">{{ __('app.date') }}: {{ $order->formatted_order_date  }}</div>
-                                                @if($order->due_date)
-                                                <div class="date">{{ __('app.due_date') }}: {{ $formatDate->toUserDateFormat($order->due_date)  }}</div>
+                                                <h1 class="invoice-id">{{ __('sale.quotation.quotation') }} #{{ $quotation->quotation_code }}</h1>
+                                                <div class="date">{{ __('app.date') }}: {{ $quotation->formatted_quotation_date  }}</div>
+                                                @if($quotation->due_date)
+                                                <div class="date">{{ __('app.due_date') }}: {{ $formatDate->toUserDateFormat($quotation->due_date)  }}</div>
                                                 @endif
-                                                <div class="text-gray-light fw-bold">{{ __('app.status') }}: {{ $order->order_status  }}</div>
+                                                <div class="text-gray-light fw-bold">{{ __('app.status') }}: {{ $quotation->quotation_status  }}</div>
                                             </div>
                                         </div>
                                         @php
-                                            $isHasBatchItem = ($order->itemTransaction->where('tracking_type', 'batch')->count() > 0) ? true : false;
+                                            $isHasBatchItem = ($quotation->itemTransaction->where('tracking_type', 'batch')->count() > 0) ? true : false;
 
                                             //Return from Controller
                                             $totalBatchTrackingRowCount = ($isHasBatchItem) ? $batchTrackingRowCount : 0;
@@ -99,6 +102,7 @@
                                                     <th class="text-left {{ !app('company')['show_hsn'] ? 'd-none':'' }}">{{ __('item.hsn') }}</th>
                                                     <th class="{{ !app('company')['show_mrp'] ? 'd-none':'' }}">{{ __('item.mrp') }}</th>
                                                     @if($isHasBatchItem)
+
                                                         <th class="{{ !app('company')['enable_batch_tracking'] ? 'd-none':'' }}">{{ __('item.batch_no') }}</th>
                                                         <th class="{{ !app('company')['enable_mfg_date'] ? 'd-none':'' }}">{{ __('item.mfg_date') }}</th>
                                                         <th class="{{ !app('company')['enable_exp_date'] ? 'd-none':'' }}">{{ __('item.exp_date') }}</th>
@@ -118,7 +122,7 @@
                                                     $i=1;
                                                 @endphp
 
-                                                @foreach($order->itemTransaction as $transaction)
+                                                @foreach($quotation->itemTransaction as $transaction)
                                                 <tr>
                                                     <td class="no">{{ $i++ }}</td>
                                                     <td class="text-left">
@@ -186,7 +190,7 @@
                                             </tbody>
                                             <tfoot>
                                                 @php
-                                                $subtotal = $order->itemTransaction->sum(function ($transaction) {
+                                                $subtotal = $quotation->itemTransaction->sum(function ($transaction) {
                                                             /*if($transaction->tax_type == 'inclusive'){
                                                                 $unitPrice = calculatePrice($transaction->unit_price, $transaction->tax->rate, needInclusive: true);
                                                             }else{
@@ -195,11 +199,11 @@
                                                             $unitPrice = $transaction->unit_price;
                                                             return $unitPrice * $transaction->quantity;
                                                         });
-                                                $discount = $order->itemTransaction->sum(function ($transaction) {
+                                                $discount = $quotation->itemTransaction->sum(function ($transaction) {
                                                             return $transaction->discount_amount;
                                                         });
 
-                                                $taxAmount = $order->itemTransaction->sum(function ($transaction) {
+                                                $taxAmount = $quotation->itemTransaction->sum(function ($transaction) {
                                                             return $transaction->tax_amount;
                                                         });
 
@@ -221,26 +225,23 @@
                                                 </tr>
                                                 <tr>
                                                     <td colspan="{{ $columnCount }}" class="tfoot-first-td">{{ __('app.round_off') }}</td>
-                                                    <td>{{ $formatNumber->formatWithPrecision($order->round_off) }}</td>
+                                                    <td>{{ $formatNumber->formatWithPrecision($quotation->round_off) }}</td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="{{ $columnCount }}" class="tfoot-first-td">{{ __('app.grand_total') }}</td>
-                                                    <td>{{ $formatNumber->formatWithPrecision($order->grand_total) }}</td>
+                                                    <td>{{ $formatNumber->formatWithPrecision($quotation->grand_total) }}</td>
                                                 </tr>
                                                 @if(app('company')['is_enable_secondary_currency'])
                                                     <tr>
-                                                        <td colspan="{{ $columnCount }}" class="tfoot-first-td">{{ __('currency.converted_to').'-'.$order->currency->code }}</td>
-                                                        <td>{{ $formatNumber->formatWithPrecision($order->grand_total * $order->exchange_rate) }}</td>
+                                                        <td colspan="{{ $columnCount }}" class="tfoot-first-td">{{ __('currency.converted_to').'-'.$quotation->currency->code }}</td>
+                                                        <td>{{ $formatNumber->formatWithPrecision($quotation->grand_total * $quotation->exchange_rate) }}</td>
                                                     </tr>
                                                 @endif
-                                                <tr>
+                                                <tr class="d-none">
                                                     <td colspan="{{ $columnCount }}" class="tfoot-first-td">{{ __('payment.paid_amount') }}</td>
-                                                    <td>{{$formatNumber->formatWithPrecision($order->paid_amount)}}</td>
+                                                    <td>{{$formatNumber->formatWithPrecision($quotation->paid_amount)}}</td>
                                                 </tr>
-                                                <tr>
-                                                    <td colspan="{{ $columnCount }}" class="tfoot-first-td">{{ __('payment.balance') }}</td>
-                                                    <td>{{$formatNumber->formatWithPrecision($order->grand_total - $order->paid_amount)}}</td>
-                                                </tr>
+
                                             </tfoot>
                                         </table>
                                     </main>

@@ -5,14 +5,15 @@ namespace App\Http\Controllers\Sale;
 use App\Enums\App;
 use App\Enums\ItemTransactionUniqueCode;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\SaleOrderRequest;
+use App\Http\Requests\QuotationRequest;
 use App\Models\Items\Item;
 use App\Models\Prefix;
+use App\Models\Sale\Quotation;
 use App\Models\Sale\SaleOrder;
 use App\Services\AccountTransactionService;
 use App\Services\CacheService;
-use App\Services\Communication\Email\SaleOrderEmailNotificationService;
-use App\Services\Communication\Sms\SaleOrderSmsNotificationService;
+use App\Services\Communication\Email\QuotationEmailNotificationService;
+use App\Services\Communication\Sms\QuotationSmsNotificationService;
 use App\Services\GeneralDataService;
 use App\Services\ItemTransactionService;
 use App\Services\PaymentTransactionService;
@@ -22,12 +23,13 @@ use App\Traits\FormatNumber;
 use App\Traits\FormatsDateInputs;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mpdf\Mpdf;
 use Yajra\DataTables\Facades\DataTables;
 
-class SaleOrderController extends Controller
+class ProformaInvoiceController extends Controller
 {
     use FormatNumber;
     use FormatsDateInputs;
@@ -42,9 +44,9 @@ class SaleOrderController extends Controller
 
     private $itemTransactionService;
 
-    public $saleOrderEmailNotificationService;
+    public $quotationEmailNotificationService;
 
-    public $saleOrderSmsNotificationService;
+    public $quotationSmsNotificationService;
 
     public $generalDataService;
 
@@ -54,8 +56,8 @@ class SaleOrderController extends Controller
         PaymentTransactionService $paymentTransactionService,
         AccountTransactionService $accountTransactionService,
         ItemTransactionService $itemTransactionService,
-        SaleOrderEmailNotificationService $saleOrderEmailNotificationService,
-        SaleOrderSmsNotificationService $saleOrderSmsNotificationService,
+        QuotationEmailNotificationService $quotationEmailNotificationService,
+        QuotationSmsNotificationService $quotationSmsNotificationService,
         GeneralDataService $generalDataService,
         StatusHistoryService $statusHistoryService
     ) {
@@ -64,8 +66,8 @@ class SaleOrderController extends Controller
         $this->paymentTransactionService = $paymentTransactionService;
         $this->accountTransactionService = $accountTransactionService;
         $this->itemTransactionService = $itemTransactionService;
-        $this->saleOrderEmailNotificationService = $saleOrderEmailNotificationService;
-        $this->saleOrderSmsNotificationService = $saleOrderSmsNotificationService;
+        $this->quotationEmailNotificationService = $quotationEmailNotificationService;
+        $this->quotationSmsNotificationService = $quotationSmsNotificationService;
         $this->generalDataService = $generalDataService;
         $this->statusHistoryService = $statusHistoryService;
     }
@@ -81,11 +83,11 @@ class SaleOrderController extends Controller
         $lastCountId = $this->getLastCountId();
         $selectedPaymentTypesArray = json_encode($this->paymentTypeService->selectedPaymentTypesArray());
         $data = [
-            'prefix_code' => $prefix->sale_order,
+            'prefix_code' => $prefix->quotation,
             'count_id' => ($lastCountId + 1),
         ];
 
-        return view('sale.order.create', compact('data', 'selectedPaymentTypesArray'));
+        return view('sale.proforma-invoice.create', compact('data', 'selectedPaymentTypesArray'));
     }
 
     /**
@@ -93,7 +95,7 @@ class SaleOrderController extends Controller
      * */
     public function getLastCountId()
     {
-        return SaleOrder::select('count_id')->orderBy('id', 'desc')->first()?->count_id ?? 0;
+        return Quotation::select('count_id')->orderBy('id', 'desc')->first()?->count_id ?? 0;
     }
 
     /**
@@ -103,7 +105,81 @@ class SaleOrderController extends Controller
      */
     public function list(): View
     {
-        return view('sale.order.list');
+        return view('sale.proforma-invoice.list');
+    }
+
+    /**
+     * Convert Sale Order to Proforma Invoice (Quotation).
+     */
+    public function convertSaleOrderToProforma($id): View|RedirectResponse
+    {
+        $alreadyConverted = Quotation::where('sale_order_id', $id)->first();
+
+        if ($alreadyConverted) {
+            session(['record' => [
+                'type' => 'success',
+                'status' => __('sale.already_converted'),
+            ]]);
+
+            return redirect()->route('sale.proforma.details', ['id' => $alreadyConverted->id]);
+        }
+
+        $saleOrder = SaleOrder::with(['party',
+            'itemTransaction' => [
+                'item.brand',
+                'warehouse',
+                'tax',
+                'batch.itemBatchMaster',
+                'itemSerialTransaction.itemSerialMaster',
+            ]])->findOrFail($id);
+
+        $saleOrder->itemTransaction->each(function ($transaction) {
+            if (! $transaction->batch?->itemBatchMaster) {
+                return;
+            }
+            $batchMaster = $transaction->batch->itemBatchMaster;
+            $batchMaster->mfg_date = $batchMaster->getFormattedMfgDateAttribute();
+            $batchMaster->exp_date = $batchMaster->getFormattedExpDateAttribute();
+        });
+
+        // Use Sale Order as source and prepare it like proforma form-data.
+        $quotation = $saleOrder;
+        $quotation->operation = 'convert';
+        $quotation->converting_from = 'Sale Order';
+        $quotation->quotation_date = now()->toDateString();
+        $quotation->formatted_quotation_date = $this->toUserDateFormat($quotation->quotation_date);
+        $quotation->quotation_status = data_get(collect($this->generalDataService->getQuotationStatus())->first(), 'id', '');
+
+        $prefix = Prefix::findOrNew($this->companyId);
+        $lastCountId = $this->getLastCountId();
+        $quotation->prefix_code = $prefix->quotation;
+        $quotation->count_id = ($lastCountId + 1);
+        $quotation->quotation_code = $quotation->prefix_code.$quotation->count_id;
+
+        $allUnits = CacheService::get('unit');
+        $itemTransactions = $quotation->itemTransaction->map(function ($transaction) use ($allUnits) {
+            $itemData = $transaction->toArray();
+
+            $selectedUnits = getOnlySelectedUnits(
+                $allUnits,
+                $transaction->item->base_unit_id,
+                $transaction->item->secondary_unit_id
+            );
+
+            $itemData['unitList'] = $selectedUnits->toArray();
+            $itemData['itemSerialTransactions'] = $transaction->itemSerialTransaction
+                ->map(fn ($serialTransaction) => $serialTransaction->itemSerialMaster->toArray())
+                ->toArray();
+
+            return $itemData;
+        })->toArray();
+
+        $itemTransactionsJson = json_encode($itemTransactions);
+        $selectedPaymentTypesArray = json_encode($this->paymentTypeService->selectedPaymentTypesArray());
+        $paymentHistory = [];
+        $taxList = CacheService::get('tax')->toJson();
+
+        return view('sale.proforma-invoice.edit', compact('taxList', 'quotation', 'itemTransactionsJson', 'selectedPaymentTypesArray', 'paymentHistory'));
     }
 
     /**
@@ -114,16 +190,17 @@ class SaleOrderController extends Controller
      */
     public function edit($id): View
     {
-        $order = SaleOrder::with(['party',
+        $quotation = Quotation::with(['party',
             'itemTransaction' => [
                 'item.brand',
-                'tax',
                 'warehouse',
+                'tax',
                 'batch.itemBatchMaster',
                 'itemSerialTransaction.itemSerialMaster',
             ]])->findOrFail($id);
+
         // Add formatted dates from ItemBatchMaster model
-        $order->itemTransaction->each(function ($transaction) {
+        $quotation->itemTransaction->each(function ($transaction) {
             if (! $transaction->batch?->itemBatchMaster) {
                 return;
             }
@@ -131,12 +208,11 @@ class SaleOrderController extends Controller
             $batchMaster->mfg_date = $batchMaster->getFormattedMfgDateAttribute();
             $batchMaster->exp_date = $batchMaster->getFormattedExpDateAttribute();
         });
-
         // Item Details
         // Prepare item transactions with associated units
         $allUnits = CacheService::get('unit');
 
-        $itemTransactions = $order->itemTransaction->map(function ($transaction) use ($allUnits) {
+        $itemTransactions = $quotation->itemTransaction->map(function ($transaction) use ($allUnits) {
             $itemData = $transaction->toArray();
 
             // Use the getOnlySelectedUnits helper function
@@ -166,11 +242,11 @@ class SaleOrderController extends Controller
         $selectedPaymentTypesArray = json_encode($this->paymentTypeService->selectedPaymentTypesArray());
 
         // Get the previous payments
-        $paymentHistory = $this->paymentTransactionService->getPaymentRecordsArray($order);
+        $paymentHistory = $this->paymentTransactionService->getPaymentRecordsArray($quotation);
 
         $taxList = CacheService::get('tax')->toJson();
 
-        return view('sale.order.edit', compact('taxList', 'order', 'itemTransactionsJson', 'selectedPaymentTypesArray', 'paymentHistory'));
+        return view('sale.proforma-invoice.edit', compact('taxList', 'quotation', 'itemTransactionsJson', 'selectedPaymentTypesArray', 'paymentHistory'));
     }
 
     /**
@@ -181,7 +257,7 @@ class SaleOrderController extends Controller
      */
     public function details($id): View
     {
-        $order = SaleOrder::with(['party',
+        $quotation = Quotation::with(['party',
             'itemTransaction' => [
                 'item',
                 'tax',
@@ -190,23 +266,23 @@ class SaleOrderController extends Controller
             ]])->find($id);
 
         // Payment Details
-        $selectedPaymentTypesArray = json_encode($this->paymentTransactionService->getPaymentRecordsArray($order));
+        $selectedPaymentTypesArray = json_encode($this->paymentTransactionService->getPaymentRecordsArray($quotation));
 
         // Batch Tracking Row count for invoice columns setting
         $batchTrackingRowCount = (new GeneralDataService)->getBatchTranckingRowCount();
 
-        return view('sale.order.details', compact('order', 'selectedPaymentTypesArray', 'batchTrackingRowCount'));
+        return view('sale.proforma-invoice.details', compact('quotation', 'selectedPaymentTypesArray', 'batchTrackingRowCount'));
     }
 
     /**
      * Print Sale Order
      *
-     * @param  int  $id,  the ID of the order
+     * @param  int  $id,  the ID of the quotation
      * @return \Illuminate\View\View
      */
     public function print($id, $isPdf = false): View
     {
-        $order = SaleOrder::with(['party',
+        $quotation = Quotation::with(['party',
             'itemTransaction' => [
                 'item',
                 'tax',
@@ -215,17 +291,17 @@ class SaleOrderController extends Controller
             ]])->find($id);
 
         // Payment Details
-        $selectedPaymentTypesArray = json_encode($this->paymentTransactionService->getPaymentRecordsArray($order));
+        $selectedPaymentTypesArray = json_encode($this->paymentTransactionService->getPaymentRecordsArray($quotation));
 
         // Batch Tracking Row count for invoice columns setting
         $batchTrackingRowCount = (new GeneralDataService)->getBatchTranckingRowCount();
 
         $invoiceData = [
-            'name' => __('sale.order.order'),
+            'name' => __('sale.quotation.quotation'),
         ];
 
-        return view('print.sale-order.print', compact('isPdf', 'invoiceData', 'order', 'selectedPaymentTypesArray', 'batchTrackingRowCount'));
-        // return view('sale.order.unused-print', compact('order','selectedPaymentTypesArray','batchTrackingRowCount'));
+        return view('print.proforma-invoice.print', compact('isPdf', 'invoiceData', 'quotation', 'selectedPaymentTypesArray', 'batchTrackingRowCount'));
+        // return view('sale.proforma-invoice.unused-print', compact('order','selectedPaymentTypesArray','batchTrackingRowCount'));
     }
 
     /**
@@ -259,42 +335,44 @@ class SaleOrderController extends Controller
     /**
      * Store Records
      * */
-    public function store(SaleOrderRequest $request): JsonResponse
+    public function store(QuotationRequest $request): JsonResponse
     {
         try {
+
             DB::beginTransaction();
             // Get the validated data from the expenseRequest
             $validatedData = $request->validated();
+            $validatedData['note'] = json_encode($request->terms);
 
-            if ($request->operation == 'save') {
+            if (in_array($request->operation, ['save', 'convert'])) {
                 // Create a new expense record using Eloquent and save it
-                $newSaleOrder = SaleOrder::create($validatedData);
+                $newQuotation = Quotation::create($validatedData);
 
-                $request->request->add(['sale_order_id' => $newSaleOrder->id]);
+                $request->request->add(['quotation_id' => $newQuotation->id]);
 
             } else {
                 $fillableColumns = [
                     'party_id' => $validatedData['party_id'],
-                    'order_date' => $validatedData['order_date'],
-                    'due_date' => $validatedData['due_date'],
+                    'sale_order_id' => $validatedData['sale_order_id'] ?? null,
+                    'quotation_date' => $validatedData['quotation_date'],
                     'prefix_code' => $validatedData['prefix_code'],
                     'count_id' => $validatedData['count_id'],
-                    'order_code' => $validatedData['order_code'],
+                    'quotation_code' => $validatedData['quotation_code'],
                     'note' => $validatedData['note'],
                     'round_off' => $validatedData['round_off'],
                     'grand_total' => $validatedData['grand_total'],
                     'state_id' => $validatedData['state_id'],
-                    'order_status' => $validatedData['order_status'],
+                    'quotation_status' => $validatedData['quotation_status'],
                     'currency_id' => $validatedData['currency_id'],
                     'exchange_rate' => $validatedData['exchange_rate'],
                 ];
 
-                $newSaleOrder = SaleOrder::findOrFail($validatedData['sale_order_id']);
-                $newSaleOrder->update($fillableColumns);
-                $newSaleOrder->itemTransaction()->delete();
-                // $newSaleOrder->accountTransaction()->delete();
+                $newQuotation = Quotation::findOrFail($validatedData['quotation_id']);
+                $newQuotation->update($fillableColumns);
+                $newQuotation->itemTransaction()->delete();
+                // $newQuotation->accountTransaction()->delete();
                 // // Check if paymentTransactions exist
-                // $paymentTransactions = $newSaleOrder->paymentTransaction;
+                // $paymentTransactions = $newQuotation->paymentTransaction;
                 // if ($paymentTransactions->isNotEmpty()) {
                 //     foreach ($paymentTransactions as $paymentTransaction) {
                 //         $accountTransactions = $paymentTransaction->accountTransaction;
@@ -306,21 +384,21 @@ class SaleOrderController extends Controller
                 //         }
                 //     }
                 // }
-                // $newSaleOrder->paymentTransaction()->delete();
+                // $newQuotation->paymentTransaction()->delete();
 
             }
 
             /**
              * Record Status Update History
              */
-            $this->statusHistoryService->RecordStatusHistory($newSaleOrder);
+            $this->statusHistoryService->RecordStatusHistory($newQuotation);
 
-            $request->request->add(['modelName' => $newSaleOrder]);
+            $request->request->add(['modelName' => $newQuotation]);
 
             /**
              * Save Table Items in Sale Order Items Table
              * */
-            $saleOrderItemsArray = $this->saveSaleOrderItems($request);
+            $saleOrderItemsArray = $this->saveQuotationItems($request);
             if (! $saleOrderItemsArray['status']) {
                 throw new \Exception($saleOrderItemsArray['message']);
             }
@@ -328,33 +406,33 @@ class SaleOrderController extends Controller
             /**
              * Save Expense Payment Records
              * */
-            $saleOrderPaymentsArray = $this->saveSaleOrderPayments($request);
-            if (! $saleOrderPaymentsArray['status']) {
-                throw new \Exception($saleOrderPaymentsArray['message']);
-            }
+            // $saleOrderPaymentsArray = $this->saveQuotationPayments($request);
+            // if(!$saleOrderPaymentsArray['status']){
+            //     throw new \Exception($saleOrderPaymentsArray['message']);
+            // }
 
             /**
              * Payment Should not be less than 0
              * */
-            $paidAmount = $newSaleOrder->refresh('paymentTransaction')->paymentTransaction->sum('amount');
-            if ($paidAmount < 0) {
-                throw new \Exception(__('payment.paid_amount_should_not_be_less_than_zero'));
-            }
+            // $paidAmount = $newQuotation->refresh('paymentTransaction')->paymentTransaction->sum('amount');
+            // if($paidAmount < 0){
+            //     throw new \Exception(__('payment.paid_amount_should_not_be_less_than_zero'));
+            // }
 
             /**
              * Paid amount should not be greater than grand total
              * */
-            if ($paidAmount > $newSaleOrder->grand_total) {
-                throw new \Exception(__('payment.payment_should_not_be_greater_than_grand_total').'<br>Paid Amount : '.$this->formatWithPrecision($paidAmount).'<br>Grand Total : '.$this->formatWithPrecision($newSaleOrder->grand_total).'<br>Difference : '.$this->formatWithPrecision($paidAmount - $newSaleOrder->grand_total));
-            }
+            // if($paidAmount > $newQuotation->grand_total){
+            //     throw new \Exception(__('payment.payment_should_not_be_greater_than_grand_total')."<br>Paid Amount : ". $this->formatWithPrecision($paidAmount)."<br>Grand Total : ". $this->formatWithPrecision($newQuotation->grand_total). "<br>Difference : ".$this->formatWithPrecision($paidAmount-$newQuotation->grand_total));
+            // }
 
             /**
              * Update Sale Order Model
              * Total Paid Amunt
              * */
-            if (! $this->paymentTransactionService->updateTotalPaidAmountInModel($request->modelName)) {
-                throw new \Exception(__('payment.failed_to_update_paid_amount'));
-            }
+            // if(!$this->paymentTransactionService->updateTotalPaidAmountInModel($request->modelName)){
+            //     throw new \Exception(__('payment.failed_to_update_paid_amount'));
+            // }
 
             /**
              * Update Account Transaction entry
@@ -375,7 +453,7 @@ class SaleOrderController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => __('app.record_saved_successfully'),
-                'id' => $request->sale_order_id,
+                'id' => $request->quotation_id,
 
             ]);
 
@@ -391,7 +469,7 @@ class SaleOrderController extends Controller
 
     }
 
-    public function saveSaleOrderPayments($request)
+    public function saveQuotationPayments($request)
     {
         $paymentCount = $request->row_count_payments;
 
@@ -418,7 +496,7 @@ class SaleOrderController extends Controller
                 }
 
                 $paymentsArray = [
-                    'transaction_date' => $request->order_date,
+                    'transaction_date' => $request->quotation_date,
                     'amount' => $amount,
                     'payment_type_id' => $request->payment_type_id[$i],
                     'note' => $request->payment_note[$i],
@@ -434,7 +512,7 @@ class SaleOrderController extends Controller
         return ['status' => true];
     }
 
-    public function saveSaleOrderItems($request)
+    public function saveQuotationItems($request)
     {
         $itemsCount = $request->row_count;
 
@@ -466,7 +544,7 @@ class SaleOrderController extends Controller
              * */
             $transaction = $this->itemTransactionService->recordItemTransactionEntry($request->modelName, [
                 'warehouse_id' => $request->warehouse_id[$i],
-                'transaction_date' => $request->order_date,
+                'transaction_date' => $request->quotation_date,
                 'item_id' => $request->item_id[$i],
                 'description' => $request->description[$i],
 
@@ -566,7 +644,7 @@ class SaleOrderController extends Controller
     public function datatableList(Request $request)
     {
 
-        $data = SaleOrder::with('user', 'party', 'sale', 'quotation')
+        $data = Quotation::with('user', 'party', 'sale')
             ->when($request->party_id, function ($query) use ($request) {
                 return $query->where('party_id', $request->party_id);
             })
@@ -574,12 +652,12 @@ class SaleOrderController extends Controller
                 return $query->where('created_by', $request->user_id);
             })
             ->when($request->from_date, function ($query) use ($request) {
-                return $query->where('order_date', '>=', $this->toSystemDateFormat($request->from_date));
+                return $query->where('quotation_date', '>=', $this->toSystemDateFormat($request->from_date));
             })
             ->when($request->to_date, function ($query) use ($request) {
-                return $query->where('order_date', '<=', $this->toSystemDateFormat($request->to_date));
+                return $query->where('quotation_date', '<=', $this->toSystemDateFormat($request->to_date));
             })
-            ->when(! auth()->user()->can('sale.order.can.view.other.users.sale.orders'), function ($query) {
+            ->when(! auth()->user()->can('sale.quotation.can.view.other.users.sale.quotations'), function ($query) {
                 return $query->where('created_by', auth()->user()->id);
             });
 
@@ -588,9 +666,9 @@ class SaleOrderController extends Controller
                 if ($request->has('search') && $request->search['value']) {
                     $searchTerm = $request->search['value'];
                     $query->where(function ($q) use ($searchTerm) {
-                        $q->where('order_code', 'like', "%{$searchTerm}%")
+                        $q->where('quotation_code', 'like', "%{$searchTerm}%")
                             ->orWhere('grand_total', 'like', "%{$searchTerm}%")
-                            ->orWhere('order_status', 'like', "%{$searchTerm}%")
+                            ->orWhere('quotation_status', 'like', "%{$searchTerm}%")
                             ->orWhereHas('party', function ($partyQuery) use ($searchTerm) {
                                 $partyQuery->where('first_name', 'like', "%{$searchTerm}%")
                                     ->orWhere('last_name', 'like', "%{$searchTerm}%");
@@ -608,18 +686,15 @@ class SaleOrderController extends Controller
             ->addColumn('username', function ($row) {
                 return $row->user->username ?? '';
             })
-            ->addColumn('order_date', function ($row) {
-                return $row->formatted_order_date;
+            ->addColumn('quotation_date', function ($row) {
+                return $row->formatted_quotation_date;
             })
-            ->addColumn('due_date', function ($row) {
-                return $row->formatted_due_date;
-            })
-            ->addColumn('order_code', function ($row) {
-                return $row->order_code;
+            ->addColumn('quotation_code', function ($row) {
+                return $row->quotation_code;
             })
             ->addColumn('party_name', function ($row) {
-    return $row->party->company_name ?? '';
-})
+                return $row->party->getFullName();
+            })
             ->addColumn('grand_total', function ($row) {
                 return $this->formatWithPrecision($row->grand_total);
             })
@@ -627,14 +702,6 @@ class SaleOrderController extends Controller
                 return $this->formatWithPrecision($row->grand_total - $row->paid_amount);
             })
             ->addColumn('status', function ($row) {
-                if ($row->quotation) {
-                    return [
-                        'text' => 'Converted to Proforma',
-                        'code' => $row->quotation->quotation_code,
-                        'url' => route('sale.quotation.details', ['id' => $row->quotation->id]),
-                    ];
-                }
-
                 if ($row->sale) {
                     return [
                         'text' => 'Converted to Sale',
@@ -649,36 +716,35 @@ class SaleOrderController extends Controller
                     'url' => '',
                 ];
             })
+            ->addColumn('quotation_status', function ($row) {
+                return $row->quotation_status;
+            })
             ->addColumn('color', function ($row) {
-                $saleOrderStatus = $this->generalDataService->getSaleOrderStatus();
+                $saleOrderStatus = $this->generalDataService->getQuotationStatus();
 
                 // Find the status matching the given id
-                return collect($saleOrderStatus)->firstWhere('id', $row->order_status)['color'];
+                return collect($saleOrderStatus)->firstWhere('id', $row->quotation_status)['color'];
 
             })
             ->addColumn('action', function ($row) {
                 $id = $row->id;
 
-                $editUrl = route('sale.order.edit', ['id' => $id]);
+                $editUrl = route('sale.proforma.edit', ['id' => $id]);
 
-                // Verify conversion path
-                if ($row->quotation) {
-                    $convertToSale = route('sale.quotation.details', ['id' => $row->quotation->id]);
-                    $convertToSaleText = __('app.view_bill');
-                    $convertToSaleIcon = 'check-double';
-                } elseif ($row->sale) {
+                // Verify is it converted or not
+                if ($row->sale) {
                     $convertToSale = route('sale.invoice.details', ['id' => $row->sale->id]);
                     $convertToSaleText = __('app.view_bill');
                     $convertToSaleIcon = 'check-double';
                 } else {
-                    $convertToSale = route('sale.proforma.convert', ['id' => $id]);
-                    $convertToSaleText = __('sale.convert_to_proforma_invoice');
+                    $convertToSale = route('convert.proforma.to.sale.invoice', ['id' => $id]);
+                    $convertToSaleText = __('sale.convert_to_invoice');
                     $convertToSaleIcon = 'transfer-alt';
                 }
 
-                $detailsUrl = route('sale.order.details', ['id' => $id]);
-                $printUrl = route('sale.order.print', ['id' => $id]);
-                $pdfUrl = route('sale.order.pdf', ['id' => $id]);
+                $detailsUrl = route('sale.proforma.details', ['id' => $id]);
+                $printUrl = route('sale.proforma.print', ['id' => $id]);
+                $pdfUrl = route('sale.proforma.pdf', ['id' => $id]);
 
                 $actionBtn = '<div class="dropdown ms-auto">
                             <a class="dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded font-22 text-option"></i>
@@ -700,10 +766,10 @@ class SaleOrderController extends Controller
                                     <a target="_blank" class="dropdown-item" href="'.$pdfUrl.'"></i><i class="bx bxs-file-pdf"></i> '.__('app.pdf').'</a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item notify-through-email" data-model="sale/order" data-id="'.$id.'" role="button"></i><i class="bx bx-envelope"></i> '.__('app.send_email').'</a>
+                                    <a class="dropdown-item notify-through-email" data-model="proforma-invoice" data-id="'.$id.'" role="button"></i><i class="bx bx-envelope"></i> '.__('app.send_email').'</a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item notify-through-sms" data-model="sale/order" data-id="'.$id.'" role="button"></i><i class="bx bx-envelope"></i> '.__('app.send_sms').'</a>
+                                    <a class="dropdown-item notify-through-sms" data-model="proforma-invoice" data-id="'.$id.'" role="button"></i><i class="bx bx-envelope"></i> '.__('app.send_sms').'</a>
                                 </li>
 
                                 <li>
@@ -734,7 +800,7 @@ class SaleOrderController extends Controller
 
         // Perform validation for each selected record ID
         foreach ($selectedRecordIds as $recordId) {
-            $record = SaleOrder::find($recordId);
+            $record = Quotation::find($recordId);
             if (! $record) {
                 // Invalid record ID, handle the error (e.g., show a message, log, etc.)
                 return response()->json([
@@ -752,7 +818,7 @@ class SaleOrderController extends Controller
          * */
         try {
             // Attempt deletion (as in previous responses)
-            // SaleOrder::whereIn('id', $selectedRecordIds)->chunk(100, function ($orders) {
+            // Quotation::whereIn('id', $selectedRecordIds)->chunk(100, function ($orders) {
             //     foreach ($orders as $order) {
             //         $order->accountTransaction()->delete();
             //         //Load Sale Order Payment Transactions
@@ -768,10 +834,10 @@ class SaleOrderController extends Controller
             // });
 
             // //Delete Sale Order
-            // $deletedCount = SaleOrder::whereIn('id', $selectedRecordIds)->delete();
+            // $deletedCount = Quotation::whereIn('id', $selectedRecordIds)->delete();
 
             // Attempt deletion (as in previous responses)
-            SaleOrder::whereIn('id', $selectedRecordIds)->chunk(100, function ($orders) {
+            Quotation::whereIn('id', $selectedRecordIds)->chunk(100, function ($orders) {
                 foreach ($orders as $order) {
                     // Sale Account Update
                     foreach ($order->accountTransaction as $orderAccount) {
@@ -839,9 +905,9 @@ class SaleOrderController extends Controller
      * */
     public function getEmailContent($id)
     {
-        $model = SaleOrder::with('party')->find($id);
+        $model = Quotation::with('party')->find($id);
 
-        $emailData = $this->saleOrderEmailNotificationService->saleOrderCreatedEmailNotification($id);
+        $emailData = $this->quotationEmailNotificationService->quotationCreatedEmailNotification($id);
 
         $subject = ($emailData['status']) ? $emailData['data']['subject'] : '';
         $content = ($emailData['status']) ? $emailData['data']['content'] : '';
@@ -860,9 +926,9 @@ class SaleOrderController extends Controller
      * */
     public function getSMSContent($id)
     {
-        $model = SaleOrder::with('party')->find($id);
+        $model = Quotation::with('party')->find($id);
 
-        $emailData = $this->saleOrderSmsNotificationService->saleOrderCreatedSmsNotification($id);
+        $emailData = $this->quotationSmsNotificationService->quotationCreatedSmsNotification($id);
 
         $mobile = ($emailData['status']) ? $emailData['data']['mobile'] : '';
         $content = ($emailData['status']) ? $emailData['data']['content'] : '';
@@ -882,7 +948,7 @@ class SaleOrderController extends Controller
     public function getStatusHistory($id): JsonResponse
     {
 
-        $data = $this->statusHistoryService->getStatusHistoryData(SaleOrder::find($id));
+        $data = $this->statusHistoryService->getStatusHistoryData(Quotation::find($id));
 
         return response()->json([
             'status' => true,
@@ -892,3 +958,4 @@ class SaleOrderController extends Controller
 
     }
 }
+

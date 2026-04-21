@@ -133,6 +133,11 @@ class SaleOrder extends Model
         return $this->hasOne(Sale::class);
     }
 
+    public function quotation(): HasOne
+    {
+        return $this->hasOne(Quotation::class);
+    }
+
     /**
      * Define the relationship between Item Transaction & Items table.
      */

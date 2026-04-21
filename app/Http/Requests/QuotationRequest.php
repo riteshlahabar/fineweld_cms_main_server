@@ -35,6 +35,7 @@ class QuotationRequest extends FormRequest
     {
         $rulesArray = [
             'party_id' => ['required', 'integer', Rule::exists('parties', 'id')->where('party_type', 'vendor')],
+            'sale_order_id' => ['nullable', 'integer', Rule::exists('sale_orders', 'id')],
             'quotation_date' => ['required', 'date_format:'.implode(',', $this->getDateFormats())],
             'prefix_code' => ['nullable', 'string', 'max:250'],
             'quotation_code' => ['required', 'string', 'max:50'],
