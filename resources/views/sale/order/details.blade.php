@@ -29,7 +29,7 @@
                                     @else
                                         <a href="{{ route('sale.invoice.convert', ['id' => $order->id]) }}" class="btn btn-outline-success"><i class="bx bx-transfer-alt"></i>{{ __('sale.convert_to_sale') }}</a>
                                         @if($hasProformaColumn ?? false)
-                                            <a href="{{ route('sale.proforma.convert', ['id' => $order->id]) }}" class="btn btn-outline-primary"><i class="bx bx-transfer-alt"></i>{{ __('sale.convert_to_proforma_invoice') }}</a>
+                                            <a href="{{ route('sale.proforma.convert', ['id' => $order->id]) }}" class="btn btn-outline-primary"><i class="bx bx-transfer-alt"></i>Convert to Proforma Invoice</a>
                                         @endif
                                     @endif
 

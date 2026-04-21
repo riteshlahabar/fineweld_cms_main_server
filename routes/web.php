@@ -1682,7 +1682,7 @@ Route::middleware('auth')->group(function () {
         /* Quotation to Sale : End */
 
         /* Proforma to Sale : Start */
-        Route::get('/convert-proforma-to-sale/{id}', [SaleController::class, 'convertQuotationToSale'])
+        Route::get('/convert-proforma-to-sale/{id}', [SaleController::class, 'convertProformaToSale'])
             ->middleware('can:sale.invoice.create')
             ->name('convert.proforma.to.sale.invoice'); // View
         /* Proforma to Sale : End */

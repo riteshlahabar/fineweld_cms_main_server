@@ -297,7 +297,7 @@ class ProformaInvoiceController extends Controller
         $batchTrackingRowCount = (new GeneralDataService)->getBatchTranckingRowCount();
 
         $invoiceData = [
-            'name' => __('sale.quotation.quotation'),
+            'name' => 'Proforma Invoice',
         ];
 
         return view('print.proforma-invoice.print', compact('isPdf', 'invoiceData', 'quotation', 'selectedPaymentTypesArray', 'batchTrackingRowCount'));

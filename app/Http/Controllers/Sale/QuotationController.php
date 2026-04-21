@@ -190,7 +190,7 @@ class QuotationController extends Controller
      */
     public function edit($id): View
     {
-        $quotation = Quotation::with(['party',
+        $quotation = Quotation::whereNull('sale_order_id')->with(['party',
             'itemTransaction' => [
                 'item.brand',
                 'warehouse',
@@ -257,13 +257,13 @@ class QuotationController extends Controller
      */
     public function details($id): View
     {
-        $quotation = Quotation::with(['party',
+        $quotation = Quotation::whereNull('sale_order_id')->with(['party',
             'itemTransaction' => [
                 'item',
                 'tax',
                 'batch.itemBatchMaster',
                 'itemSerialTransaction.itemSerialMaster',
-            ]])->find($id);
+            ]])->findOrFail($id);
 
         // Payment Details
         $selectedPaymentTypesArray = json_encode($this->paymentTransactionService->getPaymentRecordsArray($quotation));
@@ -282,13 +282,13 @@ class QuotationController extends Controller
      */
     public function print($id, $isPdf = false): View
     {
-        $quotation = Quotation::with(['party',
+        $quotation = Quotation::whereNull('sale_order_id')->with(['party',
             'itemTransaction' => [
                 'item',
                 'tax',
                 'batch.itemBatchMaster',
                 'itemSerialTransaction.itemSerialMaster',
-            ]])->find($id);
+            ]])->findOrFail($id);
 
         // Payment Details
         $selectedPaymentTypesArray = json_encode($this->paymentTransactionService->getPaymentRecordsArray($quotation));
@@ -644,7 +644,7 @@ class QuotationController extends Controller
     public function datatableList(Request $request)
     {
 
-        $data = Quotation::with('user', 'party', 'sale')
+        $data = Quotation::whereNull('sale_order_id')->with('user', 'party', 'sale')
             ->when($request->party_id, function ($query) use ($request) {
                 return $query->where('party_id', $request->party_id);
             })
@@ -737,7 +737,7 @@ class QuotationController extends Controller
                     $convertToSaleText = __('app.view_bill');
                     $convertToSaleIcon = 'check-double';
                 } else {
-                    $convertToSale = route('convert.proforma.to.sale.invoice', ['id' => $id]);
+                    $convertToSale = route('convert.quotation.to.sale.invoice', ['id' => $id]);
                     $convertToSaleText = __('sale.convert_to_invoice');
                     $convertToSaleIcon = 'transfer-alt';
                 }
@@ -800,7 +800,7 @@ class QuotationController extends Controller
 
         // Perform validation for each selected record ID
         foreach ($selectedRecordIds as $recordId) {
-            $record = Quotation::find($recordId);
+            $record = Quotation::whereNull('sale_order_id')->find($recordId);
             if (! $record) {
                 // Invalid record ID, handle the error (e.g., show a message, log, etc.)
                 return response()->json([
@@ -837,7 +837,7 @@ class QuotationController extends Controller
             // $deletedCount = Quotation::whereIn('id', $selectedRecordIds)->delete();
 
             // Attempt deletion (as in previous responses)
-            Quotation::whereIn('id', $selectedRecordIds)->chunk(100, function ($orders) {
+            Quotation::whereNull('sale_order_id')->whereIn('id', $selectedRecordIds)->chunk(100, function ($orders) {
                 foreach ($orders as $order) {
                     // Sale Account Update
                     foreach ($order->accountTransaction as $orderAccount) {
@@ -905,7 +905,7 @@ class QuotationController extends Controller
      * */
     public function getEmailContent($id)
     {
-        $model = Quotation::with('party')->find($id);
+        $model = Quotation::whereNull('sale_order_id')->with('party')->findOrFail($id);
 
         $emailData = $this->quotationEmailNotificationService->quotationCreatedEmailNotification($id);
 
@@ -926,7 +926,7 @@ class QuotationController extends Controller
      * */
     public function getSMSContent($id)
     {
-        $model = Quotation::with('party')->find($id);
+        $model = Quotation::whereNull('sale_order_id')->with('party')->findOrFail($id);
 
         $emailData = $this->quotationSmsNotificationService->quotationCreatedSmsNotification($id);
 
@@ -947,8 +947,8 @@ class QuotationController extends Controller
      * */
     public function getStatusHistory($id): JsonResponse
     {
-
-        $data = $this->statusHistoryService->getStatusHistoryData(Quotation::find($id));
+        $quotation = Quotation::whereNull('sale_order_id')->findOrFail($id);
+        $data = $this->statusHistoryService->getStatusHistoryData($quotation);
 
         return response()->json([
             'status' => true,

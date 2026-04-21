@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', __('sale.quotation.print'))
+@section('title', 'Proforma Invoice')
 
 		@section('content')
 		<!--start page wrapper -->
@@ -7,7 +7,7 @@
 			<div class="page-content">
 				<x-breadcrumb :langArray="[
 											'sale.sale',
-                                            'sale.quotation.list',
+                                            'Proforma Invoice List',
                                             'app.print',
 										]"/>
 				<div class="row">
@@ -68,7 +68,7 @@
                                     <main>
                                         <div class="row contacts">
                                             <div class="col invoice-to">
-                                                <div class="text-gray-light fw-bold text-uppercase">{{ __('sale.quotation.for') }}:</div>
+                                                <div class="text-gray-light fw-bold text-uppercase">For:</div>
                                                 <h2 class="to">{{ $quotation->party?->company_name ?? '-' }}</h2>
                                                 <div class="address">{{ $quotation->party->invoiceing_address }}</div>
                                             </div>
@@ -79,7 +79,7 @@
                                             </div>
 
                                             <div class="col invoice-details">
-                                                <h1 class="invoice-id">{{ __('sale.quotation.quotation') }} #{{ $quotation->quotation_code }}</h1>
+                                                <h1 class="invoice-id">Proforma Invoice #{{ $quotation->quotation_code }}</h1>
                                                 <div class="date">{{ __('app.date') }}: {{ $quotation->formatted_quotation_date  }}</div>
                                                 @if($quotation->due_date)
                                                 <div class="date">{{ __('app.due_date') }}: {{ $formatDate->toUserDateFormat($quotation->due_date)  }}</div>

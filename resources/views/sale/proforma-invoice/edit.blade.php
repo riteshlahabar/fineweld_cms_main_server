@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', __('sale.quotation.quotation'))
+@section('title', 'Edit Proforma Invoice')
 
         @section('content')
         <!--start page wrapper -->
@@ -7,8 +7,8 @@
             <div class="page-content">
                 <x-breadcrumb :langArray="[
                                             'sale.sale',
-                                            'sale.quotation.list',
-                                            'sale.quotation.update',
+                                            'Proforma Invoice List',
+                                            'Edit Proforma Invoice',
                                         ]"/>
                 @php
                     $isConvertOperation = (($quotation->operation ?? 'update') === 'convert');
@@ -34,7 +34,7 @@
                             <div class="col-12 col-lg-12">
                                 <div class="card">
                                     <div class="card-header px-4 py-3">
-                                        <h5 class="mb-0">{{ __('sale.quotation.details') }}</h5>
+                                        <h5 class="mb-0">Proforma Invoice Details</h5>
                                     </div>
                                     <div class="card-body p-4 row g-3">
                                             <div class="col-md-4">
@@ -60,7 +60,7 @@
                                             </div>
 
                                             <div class="col-md-4">
-                                                <x-label for="order_code" name="{{ __('sale.quotation.code') }}" />
+                                                <x-label for="order_code" name="Proforma Invoice ID" />
                                                 <!--  -->
                                                 <div class="input-group mb-3">
                                                     <x-input type="text" name="prefix_code" :required="true" placeholder="Prefix Code" value="{{ $quotation->prefix_code }}"/>

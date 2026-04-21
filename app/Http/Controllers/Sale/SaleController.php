@@ -137,7 +137,7 @@ class SaleController extends Controller
      *
      * @return \Illuminate\Http\View | RedirectResponse
      */
-    public function convertQuotationToSale($id, $convertingFrom = 'Proforma Invoice'): View|RedirectResponse
+    public function convertQuotationToSale($id, $convertingFrom = 'Quotation'): View|RedirectResponse
     {
         return $this->convertToSale($id, $convertingFrom);
     }
@@ -199,7 +199,14 @@ class SaleController extends Controller
                 return redirect()->route('sale.invoice.details', ['id' => $convertedQuotation->id]);
             }
 
-            $sale = Quotation::with(['party',
+            $quotationQuery = Quotation::query();
+            if ($convertingFrom === 'Quotation') {
+                $quotationQuery->whereNull('sale_order_id');
+            } else {
+                $quotationQuery->whereNotNull('sale_order_id');
+            }
+
+            $sale = $quotationQuery->with(['party',
                 'itemTransaction' => [
                     'item.brand',
                     'warehouse',

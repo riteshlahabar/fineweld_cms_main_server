@@ -140,7 +140,9 @@
             }
         });
         jqxhr.fail(function(response) {
-                var message = response.responseJSON.message;
+                var message = (response.responseJSON && response.responseJSON.message)
+                    ? response.responseJSON.message
+                    : 'Failed to submit proforma invoice.';
                 iziToast.error({title: 'Error', layout: 2, message: message});
         });
         jqxhr.always(function() {
@@ -152,9 +154,9 @@
     }
 
     function formAdjustIfSaveOperation(formObject){
-        const _method = formObject.find('input[name="_method"]').val();
+        const _method = (formObject.find('input[name="_method"]').val() || 'POST').toUpperCase();
         /* Only if Save Operation called*/
-        if(_method.toUpperCase() == 'POST' ){
+        if(_method == 'POST' ){
             var formId = formObject.attr("id");
             $("#"+formId)[0].reset();
         }

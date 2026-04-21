@@ -37,7 +37,7 @@
 <tr>
 <td colspan="2" style="text-align:center; padding:8px 0; font-size:14px;">
 
-<b>Quotation No :</b> {{ $quotation->quotation_code }}
+<b>Proforma Invoice No :</b> {{ $quotation->quotation_code }}
 &nbsp;&nbsp; | &nbsp;&nbsp;
 
 <b>Date :</b> {{ $quotation->formatted_quotation_date }}
