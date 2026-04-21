@@ -29,7 +29,7 @@
 						<div class="card-body">
 							<div class="d-flex align-items-center">
 								<div>
-									<p class="mb-0 text-secondary">{{ __('sale.order.pending') }}</p>
+									<p class="mb-0 text-secondary">{{ __('sale.sale_invoices') }}</p>
 									<h4 class="my-1 text-info">{{ $pendingSaleOrders }}</h4>
 
 								</div>
@@ -44,7 +44,7 @@
 					   <div class="card-body">
 						   <div class="d-flex align-items-center">
 							   <div>
-								   <p class="mb-0 text-secondary">{{ __('sale.order.completed') }}</p>
+								   <p class="mb-0 text-secondary">{{ __('sale.sale_total') }}</p>
 									<h4 class="my-1 text-success">{{ $totalCompletedSaleOrders }}</h4>
 
 							   </div>
@@ -97,7 +97,7 @@
 						<div class="card-body">
 							<div class="d-flex align-items-center">
 								<div>
-									<p class="mb-0 text-secondary">{{ __('purchase.order.pending') }}</p>
+									<p class="mb-0 text-secondary">{{ __('purchase.purchase_bills') }}</p>
 									<h4 class="my-1 text-info">{{ $pendingPurchaseOrders }}</h4>
 
 								</div>
@@ -112,7 +112,7 @@
 					   <div class="card-body">
 						   <div class="d-flex align-items-center">
 							   <div>
-								   <p class="mb-0 text-secondary">{{ __('purchase.order.completed') }}</p>
+								   <p class="mb-0 text-secondary">{{ __('purchase.purchase_total') }}</p>
 									<h4 class="my-1 text-success">{{ $totalCompletedPurchaseOrders }}</h4>
 
 							   </div>

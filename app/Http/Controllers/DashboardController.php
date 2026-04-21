@@ -7,11 +7,10 @@ use App\Models\Items\Item;
 use App\Models\Items\ItemTransaction;
 use App\Models\Party\Party;
 use App\Models\Purchase\Purchase;
-use App\Models\Purchase\PurchaseOrder;
 use App\Models\Sale\Sale;
-use App\Models\Sale\SaleOrder;
 use App\Services\PartyService;
 use App\Traits\FormatNumber;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -26,47 +25,50 @@ class DashboardController extends Controller
     public function index()
     {
 
-        $pendingSaleOrders = SaleOrder::whereDoesntHave('sale')
-            ->when(auth()->user()->can('dashboard.can.view.self.dashboard.details.only'), function ($query) {
-                return $query->where('created_by', auth()->user()->id);
-            })
-            ->count();
-        $totalCompletedSaleOrders = SaleOrder::whereHas('sale')
-            ->when(auth()->user()->can('dashboard.can.view.self.dashboard.details.only'), function ($query) {
-                return $query->where('created_by', auth()->user()->id);
-            })
-            ->count();
+        $pendingSaleOrders = $this->applyDashboardOwnershipFilter(
+            Sale::query(),
+            'sale.invoice.can.view.other.users.sale.invoices'
+        )->count();
+
+        $totalCompletedSaleOrders = $this->applyDashboardOwnershipFilter(
+            Sale::query(),
+            'sale.invoice.can.view.other.users.sale.invoices'
+        )->sum('grand_total');
+
+        $totalCompletedSaleOrders = $this->formatWithPrecision($totalCompletedSaleOrders);
 
         $partyBalance = $this->paymentReceivables();
         $totalPaymentReceivables = $this->formatWithPrecision($partyBalance['receivable']);
         $totalPaymentPaybles = $this->formatWithPrecision($partyBalance['payable']);
 
-        $pendingPurchaseOrders = PurchaseOrder::whereDoesntHave('purchase')
-            ->when(auth()->user()->can('dashboard.can.view.self.dashboard.details.only'), function ($query) {
-                return $query->where('created_by', auth()->user()->id);
-            })
-            ->count();
-        $totalCompletedPurchaseOrders = PurchaseOrder::whereHas('purchase')
-            ->when(auth()->user()->can('dashboard.can.view.self.dashboard.details.only'), function ($query) {
-                return $query->where('created_by', auth()->user()->id);
-            })
-            ->count();
+        $pendingPurchaseOrders = $this->applyDashboardOwnershipFilter(
+            Purchase::query(),
+            'purchase.bill.can.view.other.users.purchase.bills'
+        )->count();
 
-        $totalCustomers = Party::where('party_type', 'customer')
-            ->when(auth()->user()->can('dashboard.can.view.self.dashboard.details.only'), function ($query) {
-                return $query->where('created_by', auth()->user()->id);
-            })
-            ->count();
+        $totalCompletedPurchaseOrders = $this->applyDashboardOwnershipFilter(
+            Purchase::query(),
+            'purchase.bill.can.view.other.users.purchase.bills'
+        )->sum('grand_total');
 
-        $totalExpense = Expense::when(auth()->user()->can('dashboard.can.view.self.dashboard.details.only'), function ($query) {
-            return $query->where('created_by', auth()->user()->id);
-        })
+        $totalCompletedPurchaseOrders = $this->formatWithPrecision($totalCompletedPurchaseOrders);
+
+        $totalCustomers = $this->applyDashboardOwnershipFilter(
+            Party::query()->where('party_type', 'customer')
+        )->count();
+
+        $totalExpense = $this->applyDashboardOwnershipFilter(
+            Expense::query(),
+            'expense.can.view.other.users.expenses'
+        )
             ->sum('grand_total');
+
         $totalExpense = $this->formatWithPrecision($totalExpense);
 
-        $recentInvoices = Sale::when(auth()->user()->can('dashboard.can.view.self.dashboard.details.only'), function ($query) {
-            return $query->where('created_by', auth()->user()->id);
-        })
+        $recentInvoices = $this->applyDashboardOwnershipFilter(
+            Sale::query(),
+            'sale.invoice.can.view.other.users.sale.invoices'
+        )
             ->orderByDesc('id')
             ->limit(10)
             ->get();
@@ -102,23 +104,52 @@ class DashboardController extends Controller
 
         $now = now();
         for ($i = 0; $i < 6; $i++) {
-            $month = $now->copy()->subMonths($i)->format('M Y');
+            $monthDate = $now->copy()->subMonths($i);
+            $month = $monthDate->format('M Y');
             $labels[] = $month;
 
             // Get value for this month, e.g. from database
-            $sales[] = Sale::whereMonth('sale_date', $now->copy()->subMonths($i)->month)
-                ->whereYear('sale_date', $now->copy()->subMonths($i)->year)
-                ->when(auth()->user()->can('dashboard.can.view.self.dashboard.details.only'), function ($query) {
-                    return $query->where('created_by', auth()->user()->id);
-                })
-                ->count();
+            $saleQuery = Sale::query()
+                ->where(function ($query) use ($monthDate) {
+                    $query->where(function ($subQuery) use ($monthDate) {
+                        $subQuery->whereNotNull('sale_date')
+                            ->whereMonth('sale_date', $monthDate->month)
+                            ->whereYear('sale_date', $monthDate->year);
+                    })
+                        ->orWhere(function ($subQuery) use ($monthDate) {
+                            $subQuery->whereNull('sale_date')
+                                ->whereMonth('created_at', $monthDate->month)
+                                ->whereYear('created_at', $monthDate->year);
+                        });
+                });
 
-            $purchases[] = Purchase::whereMonth('purchase_date', $now->copy()->subMonths($i)->month)
-                ->whereYear('purchase_date', $now->copy()->subMonths($i)->year)
-                ->when(auth()->user()->can('dashboard.can.view.self.dashboard.details.only'), function ($query) {
-                    return $query->where('created_by', auth()->user()->id);
-                })
-                ->count();
+            $saleQuery = $this->applyDashboardOwnershipFilter(
+                $saleQuery,
+                'sale.invoice.can.view.other.users.sale.invoices'
+            );
+
+            $sales[] = $saleQuery->count();
+
+            $purchaseQuery = Purchase::query()
+                ->where(function ($query) use ($monthDate) {
+                    $query->where(function ($subQuery) use ($monthDate) {
+                        $subQuery->whereNotNull('purchase_date')
+                            ->whereMonth('purchase_date', $monthDate->month)
+                            ->whereYear('purchase_date', $monthDate->year);
+                    })
+                        ->orWhere(function ($subQuery) use ($monthDate) {
+                            $subQuery->whereNull('purchase_date')
+                                ->whereMonth('created_at', $monthDate->month)
+                                ->whereYear('created_at', $monthDate->year);
+                        });
+                });
+
+            $purchaseQuery = $this->applyDashboardOwnershipFilter(
+                $purchaseQuery,
+                'purchase.bill.can.view.other.users.purchase.bills'
+            );
+
+            $purchases[] = $purchaseQuery->count();
 
         }
 
@@ -142,16 +173,21 @@ class DashboardController extends Controller
     public function trendingItems(): array
     {
         // Get top 4 trending items (adjust limit as needed)
-        return ItemTransaction::query()
+        $query = ItemTransaction::query()
             ->select([
                 'items.name',
                 DB::raw('SUM(item_transactions.quantity) as total_quantity'),
             ])
             ->join('items', 'items.id', '=', 'item_transactions.item_id')
-            ->where('item_transactions.transaction_type', getMorphedModelName(Sale::class))
-            ->when(auth()->user()->can('dashboard.can.view.self.dashboard.details.only'), function ($query) {
-                return $query->where('item_transactions.created_by', auth()->user()->id);
-            })
+            ->where('item_transactions.transaction_type', getMorphedModelName(Sale::class));
+
+        $query = $this->applyDashboardOwnershipFilter(
+            $query,
+            'sale.invoice.can.view.other.users.sale.invoices',
+            'item_transactions.created_by'
+        );
+
+        return $query
             ->groupBy('item_transactions.item_id', 'items.name')
             ->orderByDesc('total_quantity')
             ->limit(4)
@@ -161,8 +197,13 @@ class DashboardController extends Controller
 
     public function paymentReceivables()
     {
-        $customerIds = Party::where('party_type', 'customer')->pluck('id');
-        $supplierIds = Party::where('party_type', 'supplier')->pluck('id');
+        $customerIds = $this->applyDashboardOwnershipFilter(
+            Party::query()->where('party_type', 'customer')
+        )->pluck('id');
+
+        $supplierIds = $this->applyDashboardOwnershipFilter(
+            Party::query()->where('party_type', 'supplier')
+        )->pluck('id');
 
         $customerIds = $customerIds->toArray();
         $supplierIds = $supplierIds->toArray();
@@ -184,5 +225,34 @@ class DashboardController extends Controller
             ->where('min_stock', '>', 0)
             ->orderByDesc('current_stock')
             ->limit(10)->get();
+    }
+
+    private function applyDashboardOwnershipFilter(
+        Builder $query,
+        ?string $viewOthersPermission = null,
+        string $createdByColumn = 'created_by'
+    ): Builder {
+        if (! $this->shouldApplyDashboardSelfOnlyFilter($viewOthersPermission)) {
+            return $query;
+        }
+
+        return $query->where(function (Builder $subQuery) use ($createdByColumn) {
+            $subQuery->where($createdByColumn, auth()->id())
+                ->orWhereNull($createdByColumn);
+        });
+    }
+
+    private function shouldApplyDashboardSelfOnlyFilter(?string $viewOthersPermission = null): bool
+    {
+        $user = auth()->user();
+        if (! $user || ! $user->can('dashboard.can.view.self.dashboard.details.only')) {
+            return false;
+        }
+
+        if ($viewOthersPermission && $user->can($viewOthersPermission)) {
+            return false;
+        }
+
+        return true;
     }
 }
