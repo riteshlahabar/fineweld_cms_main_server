@@ -15,6 +15,7 @@ return [
     'invoice_no' => 'Invoice No.',
     'print' => 'Sale Print',
     'convert_to_sale' => 'Convert to Sale',
+    'convert_to_proforma_invoice' => 'Convert to Proforma Invoice',
     'already_converted' => 'Sale Order Already Converted to Sale Invoice',
     'return_to' => 'Return To',
     'sale_invoice_number' => 'Sale Invoice Number',
