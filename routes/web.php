@@ -145,12 +145,25 @@ Route::get('/noimage', function () {
 });
 
 Route::get('/fevicon/{image_name?}', function ($image_name = null) {
-    $imagePath = 'public/images/fevicon/' . $image_name;
-    if ($image_name == null || !Storage::exists($imagePath)) {
-        $imagePath = 'public/images/fevicon/default/favicon-32x32.png';
+    $possiblePaths = [];
+    if (! empty($image_name)) {
+        $possiblePaths[] = 'public/images/fevicon/' . $image_name;
     }
 
-    return response()->file(Storage::path($imagePath));
+    $possiblePaths[] = 'public/images/fevicon/default/favicon-32x32.png';
+
+    foreach ($possiblePaths as $imagePath) {
+        if (Storage::exists($imagePath)) {
+            return response()->file(Storage::path($imagePath));
+        }
+    }
+
+    // Final safe fallback: transparent 1x1 gif to avoid 500 errors.
+    return response(
+        base64_decode('R0lGODlhAQABAIABAP///wAAACwAAAAAAQABAAACAkQBADs='),
+        200,
+        ['Content-Type' => 'image/gif']
+    );
 });
 
 Route::get('/app/getimage/{image_name?}', function ($image_name = null) {

@@ -342,7 +342,7 @@ class ProformaInvoiceController extends Controller
             DB::beginTransaction();
             // Get the validated data from the expenseRequest
             $validatedData = $request->validated();
-            $validatedData['note'] = json_encode($request->terms);
+            $validatedData['note'] = json_encode($request->input('terms', []));
 
             if (in_array($request->operation, ['save', 'convert'])) {
                 // Create a new expense record using Eloquent and save it
@@ -451,9 +451,9 @@ class ProformaInvoiceController extends Controller
             // Session::regenerateToken();
 
             return response()->json([
-                'status' => false,
+                'status' => true,
                 'message' => __('app.record_saved_successfully'),
-                'id' => $request->quotation_id,
+                'id' => $newQuotation->id,
 
             ]);
 

@@ -10,6 +10,23 @@ $(function() {
 
   var paymentNoteLang = $('#payment_note_lang').text().trim();
 
+  function getOperationValue() {
+    return ($('#operation').val() || '').toString().toLowerCase();
+  }
+
+  function parseSelectedPaymentTypes() {
+    var jsonString = $("#selectedPaymentTypesArray").val();
+    if (!jsonString) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(jsonString);
+    } catch (error) {
+      return null;
+    }
+  }
+
 
 
   // Function to add a new payment type row
@@ -81,18 +98,22 @@ $(function() {
   $(document).ready(function() {
     initSelect2PaymentType();
 
-    /**
-     * save operation
-     * */
-    if(operation == 'save' || operation == 'update'){
-        autoSetDefaultPayment();
+    var operationValue = getOperationValue();
+    var parsedPaymentData = parseSelectedPaymentTypes();
+
+    // Default record is used by create/update where selectedPaymentTypesArray is a single object.
+    if (operationValue == 'save' || operationValue == 'update') {
+      autoSetDefaultPayment(parsedPaymentData);
+      return;
     }
 
-    /**
-     * update operation
-     * */
-    if(operation == 'convert' || operation =='update-expense'){
-        autoAddPaymentRecordsInTable();
+    // Convert/update-expense can carry payment history array, but for safety fallback to default object.
+    if (operationValue == 'convert' || operationValue == 'update-expense') {
+      if (Array.isArray(parsedPaymentData)) {
+        autoAddPaymentRecordsInTable(parsedPaymentData);
+      } else {
+        autoSetDefaultPayment(parsedPaymentData);
+      }
     }
 
   });
@@ -111,24 +132,40 @@ $(function() {
     return parseFloat(total);
   }
 
-  function autoSetDefaultPayment(){
-    var jsonString = $("#selectedPaymentTypesArray").val();
+  function autoSetDefaultPayment(paymentData){
+    var jsonObject = paymentData ?? parseSelectedPaymentTypes();
+    if (!jsonObject) {
+      return;
+    }
 
-    var jsonObject = JSON.parse(jsonString);
+    // If array is passed accidentally, use first record.
+    if (Array.isArray(jsonObject)) {
+      jsonObject = jsonObject[0] || null;
+    }
+    if (!jsonObject) {
+      return;
+    }
+
+    var optionId = jsonObject.id ?? jsonObject.payment_type_id ?? null;
+    var optionText = jsonObject.name ?? jsonObject.type ?? '';
+    if (!optionId || !optionText) {
+      return;
+    }
 
     var data = {
-         id: jsonObject.id,
-         text: jsonObject.name,
+         id: optionId,
+         text: optionText,
      };
 
     var newOption = new Option(data.text, data.id, false, false);
     $('select[name="payment_type_id[0]"]').append(newOption).trigger('change');
   }
 
-function autoAddPaymentRecordsInTable(){
-    var jsonString = $("#selectedPaymentTypesArray").val();
-
-    var jsonObject = JSON.parse(jsonString);
+function autoAddPaymentRecordsInTable(paymentRecords){
+    var jsonObject = paymentRecords ?? parseSelectedPaymentTypes();
+    if (!Array.isArray(jsonObject)) {
+      return;
+    }
 
     jsonObject.forEach((data, index) => {
           if($(`select[name="payment_type_id[${index}]"]`).length == 0){

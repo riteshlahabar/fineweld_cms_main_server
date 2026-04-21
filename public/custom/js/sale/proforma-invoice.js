@@ -96,14 +96,15 @@
         enableSubmitButton(formObject);
     }
     function afterSeccessOfAjaxRequest(formObject){
-        formAdjustIfSaveOperation(formObject);
         pageRedirect(formObject);
+        formAdjustIfSaveOperation(formObject);
     }
 
     function pageRedirect(formObject){
         var redirectTo = '';
-        if(formObject.response.id !== undefined){
-            redirectTo = '/proforma-invoice/details/'+formObject.response.id;
+        const responseId = formObject.response?.id;
+        if(responseId !== undefined && responseId !== null && responseId !== ''){
+            redirectTo = '/proforma-invoice/details/'+responseId;
         }else{
             redirectTo = '/proforma-invoice/list';
         }
@@ -140,9 +141,7 @@
             }
         });
         jqxhr.fail(function(response) {
-                var message = (response.responseJSON && response.responseJSON.message)
-                    ? response.responseJSON.message
-                    : 'Failed to submit proforma invoice.';
+                var message = response?.responseJSON?.message || 'Something went wrong. Please try again.';
                 iziToast.error({title: 'Error', layout: 2, message: message});
         });
         jqxhr.always(function() {
@@ -154,9 +153,9 @@
     }
 
     function formAdjustIfSaveOperation(formObject){
-        const _method = (formObject.find('input[name="_method"]').val() || 'POST').toUpperCase();
+        const currentOperation = (formObject.find('input[name="operation"]').val() || '').toLowerCase();
         /* Only if Save Operation called*/
-        if(_method == 'POST' ){
+        if(currentOperation == 'save'){
             var formId = formObject.attr("id");
             $("#"+formId)[0].reset();
         }
