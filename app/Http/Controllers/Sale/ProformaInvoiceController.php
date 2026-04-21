@@ -645,6 +645,7 @@ class ProformaInvoiceController extends Controller
     {
 
         $data = Quotation::with('user', 'party', 'sale')
+            ->whereNotNull('sale_order_id')
             ->when($request->party_id, function ($query) use ($request) {
                 return $query->where('party_id', $request->party_id);
             })

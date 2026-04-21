@@ -26,10 +26,11 @@
                                         <a href="{{ route('sale.proforma.details', ['id' => $order->quotation->id]) }}" class="btn btn-outline-success"><i class="bx bx-check-double"></i>{{ __('app.view_invoice') }}</a>
                                     @elseif($order->sale)
                                         <a href="{{ route('sale.invoice.details', ['id' => $order->sale->id]) }}" class="btn btn-outline-success"><i class="bx bx-check-double"></i>{{ __('app.view_invoice') }}</a>
-                                    @elseif(!($hasProformaColumn ?? false))
-                                        <a href="{{ route('sale.invoice.convert', ['id' => $order->id]) }}" class="btn btn-outline-success"><i class="bx bx-transfer-alt"></i>{{ __('sale.convert_to_sale') }}</a>
                                     @else
-                                        <a href="{{ route('sale.proforma.convert', ['id' => $order->id]) }}" class="btn btn-outline-success"><i class="bx bx-transfer-alt"></i>{{ __('sale.convert_to_proforma_invoice') }}</a>
+                                        <a href="{{ route('sale.invoice.convert', ['id' => $order->id]) }}" class="btn btn-outline-success"><i class="bx bx-transfer-alt"></i>{{ __('sale.convert_to_sale') }}</a>
+                                        @if($hasProformaColumn ?? false)
+                                            <a href="{{ route('sale.proforma.convert', ['id' => $order->id]) }}" class="btn btn-outline-primary"><i class="bx bx-transfer-alt"></i>{{ __('sale.convert_to_proforma_invoice') }}</a>
+                                        @endif
                                     @endif
 
                                     @can(['sale.order.edit'])

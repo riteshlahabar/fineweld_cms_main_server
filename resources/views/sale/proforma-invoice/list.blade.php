@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', __('sale.quotation.list'))
+@section('title', 'Proforma Invoice List')
 
 @section('css')
 <link href="{{ asset('assets/plugins/datatable/css/dataTables.bootstrap5.min.css') }}" rel="stylesheet">
@@ -10,7 +10,7 @@
             <div class="page-content">
                     <x-breadcrumb :langArray="[
                                             'sale.sale',
-                                            'sale.quotation.list',
+                                            'Proforma Invoice List',
                                         ]"/>
 
                     <div class="card">
@@ -18,7 +18,7 @@
                     <div class="card-header px-4 py-3 d-flex justify-content-between">
                         <!-- Other content on the left side -->
                         <div>
-                            <h5 class="mb-0 text-uppercase">{{ __('sale.quotation.list') }}</h5>
+                            <h5 class="mb-0 text-uppercase">Proforma Invoice List</h5>
                         </div>
 
                         @can('sale.order.create')
