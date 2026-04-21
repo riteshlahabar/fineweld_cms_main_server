@@ -701,6 +701,14 @@ $this->partyService->updateShippingAddress(
                 \Modules\Partnership\Events\SalePaymentCreated::dispatch($newSale);
             }
 
+            /**
+             * If this sale is created from Sale Order (directly or via Proforma),
+             * mark the source sale order as completed.
+             */
+            if ($request->operation === 'convert') {
+                $this->markRelatedSaleOrderAsCompleted($validatedData);
+            }
+
             DB::commit();
 
             // Regenerate the CSRF token
@@ -723,6 +731,27 @@ $this->partyService->updateShippingAddress(
 
         }
 
+    }
+
+    /**
+     * Mark source sale order as Completed for converted invoices.
+     */
+    private function markRelatedSaleOrderAsCompleted(array $validatedData): void
+    {
+        $saleOrderId = $validatedData['sale_order_id'] ?? null;
+
+        // Conversion from Proforma/Quotation carries quotation_id.
+        if (! $saleOrderId && ! empty($validatedData['quotation_id'])) {
+            $saleOrderId = Quotation::whereKey($validatedData['quotation_id'])->value('sale_order_id');
+        }
+
+        if (! $saleOrderId) {
+            return;
+        }
+
+        SaleOrder::whereKey($saleOrderId)->update([
+            'order_status' => 'Completed',
+        ]);
     }
 
     public function saveSalePayments($request)
