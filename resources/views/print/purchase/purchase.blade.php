@@ -14,14 +14,11 @@
                     @include('print.common.header')
 
                     <td class="bill-info">
-                        <span class="bill-number">{{ __('app.bill') }} #: {{ $purchase->purchase_code }}</span><br>
-                        <span class="cu-fs-16">{{ __('app.date') }}: {{ $purchase->formatted_purchase_date  }}</span><br>
+                        <span class="bill-number">PO. No.: {{ $purchase->purchaseOrder?->order_code ?? $purchase->purchase_code }}</span><br>
+                        <span class="cu-fs-16">PO Date: {{ $purchase->purchaseOrder?->formatted_order_date ?? $purchase->formatted_purchase_date }}</span><br>
                         <span class="cu-fs-16">{{ __('app.time') }}: {{ $purchase->format_created_time }}</span><br>
                         @if($purchase->reference_no)
                         <span class="cu-fs-16">{{ __('supplier.supplier_invoice_number') }}: {{ $purchase->reference_no  }}</span><br>
-                        @endif
-                        @if($purchase->purchase_order_id)
-                        <span class="cu-fs-16">{{ __('purchase.order.order') }}: {{ $purchase->purchaseOrder->order_code  }}</span><br>
                         @endif
                     </td>
                 </tr>
@@ -29,14 +26,14 @@
             <table class="addresses">
                 <tr>
                     <td class="address">
-                        <span class="fw-bold cu-fs-18">{{ __('app.bill_from') }}</span><br>
+                        <span class="fw-bold cu-fs-18">{{ __('app.bill_to') }}</span><br>
                         <span>{{ $purchase->party->company_name ?? '' }}<br>
                         {{ $purchase->party->billing_address }}</span>
                         {{-- Party Tax/GST Number --}}
                         @include('print.common.party-tax-details', ['model' => $purchase])
                     </td>
                     <td class="address">
-                        <span class="fw-bold cu-fs-18">{{ __('app.ship_from') }}</span><br>
+                        <span class="fw-bold cu-fs-18">{{ __('app.ship_to') }}</span><br>
                         <span>{{ $purchase->party->shipping_address }}</span>
                     </td>
                 </tr>
@@ -454,11 +451,6 @@
             </tbody>
         </table>
         @endif
-
-        @include('print.common.terms-conditions')
-
-        @include('print.common.bank-signature')
-
 
     </div>
     </div>
