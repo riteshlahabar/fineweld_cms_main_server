@@ -20,7 +20,6 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class AppSettingsController extends Controller
@@ -58,63 +57,19 @@ class AppSettingsController extends Controller
         $mappings = collect();
         $editMapping = null;
         $connectionSettings = null;
-        $mappingDefinitions = $this->tallyMappingDefinitions();
-        $selectedMappingEntity = old('entity', 'item');
-        $selectedProjectFieldKey = old('project_field_key', '');
-        $selectedTallyFieldKey = old('tally_field_key', '');
 
         if (Schema::hasTable('tally_field_mappings')) {
             $mappings = TallyFieldMapping::orderByDesc('id')->get();
             if ($request->filled('edit')) {
                 $editMapping = TallyFieldMapping::find($request->integer('edit'));
             }
-
-            $mappings = $mappings->map(function (TallyFieldMapping $mapping) use ($mappingDefinitions) {
-                [$entityKey, $tallyFieldKey] = $this->splitTallyFieldWithEntity($mapping->tally_field);
-                if (! $entityKey || ! isset($mappingDefinitions[$entityKey])) {
-                    $entityKey = $this->detectEntityByTallyField($mappingDefinitions, $tallyFieldKey) ?? 'item';
-                }
-
-                $mapping->entity_key = $entityKey;
-                $mapping->entity_label = $mappingDefinitions[$entityKey]['label'] ?? Str::title($entityKey);
-                $mapping->project_field_label = $this->resolveFieldLabel($mappingDefinitions, $entityKey, 'project_fields', (string) $mapping->project_field);
-                $mapping->tally_field_key = $tallyFieldKey;
-                $mapping->tally_field_label = $this->resolveFieldLabel($mappingDefinitions, $entityKey, 'tally_fields', (string) $tallyFieldKey);
-
-                return $mapping;
-            });
         }
 
         if (Schema::hasTable('tally_integration_settings')) {
             $connectionSettings = TallyIntegrationSetting::query()->latest('id')->first();
         }
 
-        if ($editMapping) {
-            [$entityKey, $tallyFieldKey] = $this->splitTallyFieldWithEntity($editMapping->tally_field);
-            if (! $entityKey || ! isset($mappingDefinitions[$entityKey])) {
-                $entityKey = $this->detectEntityByTallyField($mappingDefinitions, $tallyFieldKey) ?? 'item';
-            }
-
-            if (! old('entity')) {
-                $selectedMappingEntity = $entityKey;
-            }
-            if (! old('project_field_key')) {
-                $selectedProjectFieldKey = (string) $editMapping->project_field;
-            }
-            if (! old('tally_field_key')) {
-                $selectedTallyFieldKey = (string) $tallyFieldKey;
-            }
-        }
-
-        return view('app.tally-integration', compact(
-            'mappings',
-            'editMapping',
-            'connectionSettings',
-            'mappingDefinitions',
-            'selectedMappingEntity',
-            'selectedProjectFieldKey',
-            'selectedTallyFieldKey'
-        ));
+        return view('app.tally-integration', compact('mappings', 'editMapping', 'connectionSettings'));
     }
 
     public function tallyIntegrationConnectionStore(Request $request)
@@ -329,7 +284,10 @@ class AppSettingsController extends Controller
             return redirect()->back()->withErrors(['migration' => 'Please run migration first for Tally Integration table.'])->withInput();
         }
 
-        $validatedData = $this->validateTallyMappingSelection($request);
+        $validatedData = $request->validate([
+            'project_field' => ['required', 'string', 'max:255'],
+            'tally_field' => ['required', 'string', 'max:255'],
+        ]);
 
         TallyFieldMapping::create($validatedData);
 
@@ -342,7 +300,10 @@ class AppSettingsController extends Controller
             return redirect()->back()->withErrors(['migration' => 'Please run migration first for Tally Integration table.'])->withInput();
         }
 
-        $validatedData = $this->validateTallyMappingSelection($request);
+        $validatedData = $request->validate([
+            'project_field' => ['required', 'string', 'max:255'],
+            'tally_field' => ['required', 'string', 'max:255'],
+        ]);
 
         $mapping = TallyFieldMapping::findOrFail($id);
         $mapping->update($validatedData);
@@ -360,178 +321,6 @@ class AppSettingsController extends Controller
         $mapping->delete();
 
         return redirect()->route('settings.tally.integration')->with('success', 'Mapping deleted successfully.');
-    }
-
-    private function tallyMappingDefinitions(): array
-    {
-        return [
-            'item' => [
-                'label' => 'Item',
-                'project_fields' => [
-                    ['value' => 'name', 'label' => 'Item Name'],
-                    ['value' => 'item_code', 'label' => 'Item Code'],
-                    ['value' => 'category.name', 'label' => 'Category Name'],
-                    ['value' => 'baseUnit.short_code', 'label' => 'Base Unit Short Code'],
-                    ['value' => 'secondaryUnit.short_code', 'label' => 'Secondary Unit Short Code'],
-                    ['value' => 'conversion_rate', 'label' => 'Conversion Rate'],
-                    ['value' => 'hsn', 'label' => 'HSN Code'],
-                    ['value' => 'description', 'label' => 'Description'],
-                ],
-                'tally_fields' => [
-                    ['value' => 'NAME', 'label' => 'NAME'],
-                    ['value' => 'PARENT', 'label' => 'PARENT (Stock Group)'],
-                    ['value' => 'BASEUNITS', 'label' => 'BASEUNITS'],
-                    ['value' => 'ADDITIONALUNITS', 'label' => 'ADDITIONALUNITS'],
-                    ['value' => 'CONVERSION', 'label' => 'CONVERSION'],
-                    ['value' => 'HSNCODE', 'label' => 'HSNCODE'],
-                ],
-            ],
-            'party' => [
-                'label' => 'Party',
-                'project_fields' => [
-                    ['value' => 'company_name', 'label' => 'Company Name'],
-                    ['value' => 'primary_name', 'label' => 'Primary Name'],
-                    ['value' => 'vendor_type', 'label' => 'Vendor Type'],
-                    ['value' => 'primary_mobile', 'label' => 'Primary Mobile'],
-                    ['value' => 'primary_email', 'label' => 'Primary Email'],
-                    ['value' => 'company_gst', 'label' => 'GST Number'],
-                    ['value' => 'billing_address', 'label' => 'Billing Address'],
-                    ['value' => 'shipping_address', 'label' => 'Shipping Address'],
-                ],
-                'tally_fields' => [
-                    ['value' => 'NAME', 'label' => 'NAME'],
-                    ['value' => 'PARENT', 'label' => 'PARENT (Ledger Group)'],
-                    ['value' => 'LEDGERMOBILE', 'label' => 'LEDGERMOBILE'],
-                    ['value' => 'EMAIL', 'label' => 'EMAIL'],
-                    ['value' => 'PARTYGSTIN', 'label' => 'PARTYGSTIN'],
-                    ['value' => 'ADDRESS', 'label' => 'ADDRESS'],
-                ],
-            ],
-            'sale' => [
-                'label' => 'Sale',
-                'project_fields' => [
-                    ['value' => 'sale_code', 'label' => 'Sale Code'],
-                    ['value' => 'sale_date', 'label' => 'Sale Date'],
-                    ['value' => 'note', 'label' => 'Note'],
-                    ['value' => 'party.company_name', 'label' => 'Party Company Name'],
-                    ['value' => 'party.primary_name', 'label' => 'Party Primary Name'],
-                    ['value' => 'grand_total', 'label' => 'Grand Total'],
-                ],
-                'tally_fields' => [
-                    ['value' => 'VOUCHERNUMBER', 'label' => 'VOUCHERNUMBER'],
-                    ['value' => 'PARTYLEDGERNAME', 'label' => 'PARTYLEDGERNAME'],
-                    ['value' => 'DATE', 'label' => 'DATE'],
-                    ['value' => 'NARRATION', 'label' => 'NARRATION'],
-                    ['value' => 'VOUCHERTYPENAME', 'label' => 'VOUCHERTYPENAME'],
-                ],
-            ],
-        ];
-    }
-
-    private function validateTallyMappingSelection(Request $request): array
-    {
-        $mappingDefinitions = $this->tallyMappingDefinitions();
-
-        $validator = Validator::make($request->all(), [
-            'entity' => ['required', 'string', 'max:50'],
-            'project_field_key' => ['required', 'string', 'max:255'],
-            'tally_field_key' => ['required', 'string', 'max:255'],
-        ]);
-
-        $validator->after(function ($validator) use ($request, $mappingDefinitions) {
-            $entity = Str::lower(trim((string) $request->input('entity')));
-            $projectFieldKey = trim((string) $request->input('project_field_key'));
-            $tallyFieldKey = Str::upper(trim((string) $request->input('tally_field_key')));
-
-            if (! isset($mappingDefinitions[$entity])) {
-                $validator->errors()->add('entity', 'Please select a valid entity.');
-
-                return;
-            }
-
-            $allowedProjectFieldKeys = collect($mappingDefinitions[$entity]['project_fields'] ?? [])
-                ->pluck('value')
-                ->map(fn ($value) => (string) $value)
-                ->all();
-
-            if (! in_array($projectFieldKey, $allowedProjectFieldKeys, true)) {
-                $validator->errors()->add('project_field_key', 'Please select a valid project field.');
-            }
-
-            $allowedTallyFieldKeys = collect($mappingDefinitions[$entity]['tally_fields'] ?? [])
-                ->pluck('value')
-                ->map(fn ($value) => Str::upper((string) $value))
-                ->all();
-
-            if (! in_array($tallyFieldKey, $allowedTallyFieldKeys, true)) {
-                $validator->errors()->add('tally_field_key', 'Please select a valid Tally field.');
-            }
-        });
-
-        $validated = $validator->validate();
-
-        $entity = Str::lower(trim((string) $validated['entity']));
-        $projectFieldKey = trim((string) $validated['project_field_key']);
-        $tallyFieldKey = Str::upper(trim((string) $validated['tally_field_key']));
-
-        return [
-            'project_field' => $projectFieldKey,
-            'tally_field' => $entity.'.'.$tallyFieldKey,
-        ];
-    }
-
-    private function splitTallyFieldWithEntity(?string $tallyField): array
-    {
-        $tallyField = trim((string) $tallyField);
-        if ($tallyField === '') {
-            return [null, null];
-        }
-
-        if (Str::contains($tallyField, '.')) {
-            [$entity, $field] = explode('.', $tallyField, 2);
-
-            return [Str::lower(trim((string) $entity)), Str::upper(trim((string) $field))];
-        }
-
-        return [null, Str::upper($tallyField)];
-    }
-
-    private function detectEntityByTallyField(array $mappingDefinitions, ?string $tallyFieldKey): ?string
-    {
-        $tallyFieldKey = Str::upper(trim((string) $tallyFieldKey));
-        if ($tallyFieldKey === '') {
-            return null;
-        }
-
-        foreach ($mappingDefinitions as $entityKey => $definition) {
-            $allowedTallyFields = collect($definition['tally_fields'] ?? [])
-                ->pluck('value')
-                ->map(fn ($value) => Str::upper((string) $value))
-                ->all();
-
-            if (in_array($tallyFieldKey, $allowedTallyFields, true)) {
-                return $entityKey;
-            }
-        }
-
-        return null;
-    }
-
-    private function resolveFieldLabel(array $mappingDefinitions, string $entityKey, string $fieldType, string $fieldValue): string
-    {
-        $fieldValue = trim((string) $fieldValue);
-        if ($fieldValue === '') {
-            return '-';
-        }
-
-        $definition = $mappingDefinitions[$entityKey][$fieldType] ?? [];
-        foreach ($definition as $fieldDefinition) {
-            if ((string) ($fieldDefinition['value'] ?? '') === $fieldValue) {
-                return (string) ($fieldDefinition['label'] ?? $fieldValue);
-            }
-        }
-
-        return $fieldValue;
     }
 
     public function store(GeneralSettingsRequest $request): JsonResponse

@@ -81,13 +81,11 @@
                 <h5 class="mb-0 text-uppercase">Field Mapping</h5>
             </div>
             <div class="card-body">
-                <div class="alert border-0 border-start border-5 border-info alert-dismissible fade show py-2">
-                    <div class="d-flex align-items-center">
-                        <div class="font-35 text-info"><i class='bx bxs-info-circle'></i></div>
-                        <div class="ms-3">
-                            <h6 class="mb-0 text-info">How To Map</h6>
-                            <div>Select <strong>Entity</strong>, then choose Project Field and Tally Field from dropdown and save.</div>
-                        </div>
+                <div class="alert alert-info border-0 border-start border-5 border-info py-2">
+                    <div class="small">
+                        Use target field with optional entity prefix for exact mapping:
+                        <strong>item.NAME</strong>, <strong>party.PARTYGSTIN</strong>, <strong>sale.VOUCHERNUMBER</strong>.
+                        Without prefix, mapping works as global target field.
                     </div>
                 </div>
                 <form method="POST" action="{{ $editMapping ? route('settings.tally.integration.update', ['id' => $editMapping->id]) : route('settings.tally.integration.store') }}">
@@ -97,23 +95,13 @@
                     @endif
 
                     <div class="row g-3 align-items-end">
-                        <div class="col-md-3">
-                            <x-label for="mapping_entity" name="Entity" />
-                            <select class="form-select" id="mapping_entity" name="entity" required>
-                                @foreach ($mappingDefinitions as $entityKey => $entityDefinition)
-                                    <option value="{{ $entityKey }}" {{ $selectedMappingEntity === $entityKey ? 'selected' : '' }}>
-                                        {{ $entityDefinition['label'] }}
-                                    </option>
-                                @endforeach
-                            </select>
+                        <div class="col-md-5">
+                            <x-label for="project_field" name="Project Field" />
+                            <x-input type="text" name="project_field" id="project_field" :required="true" value="{{ old('project_field', $editMapping->project_field ?? '') }}" />
                         </div>
-                        <div class="col-md-4">
-                            <x-label for="project_field_key" name="Project Field" />
-                            <select class="form-select" id="project_field_key" name="project_field_key" required></select>
-                        </div>
-                        <div class="col-md-3">
-                            <x-label for="tally_field_key" name="Tally Field" />
-                            <select class="form-select" id="tally_field_key" name="tally_field_key" required></select>
+                        <div class="col-md-5">
+                            <x-label for="tally_field" name="Tally Field" />
+                            <x-input type="text" name="tally_field" id="tally_field" :required="true" value="{{ old('tally_field', $editMapping->tally_field ?? '') }}" />
                         </div>
                         <div class="col-md-2">
                             <x-button type="submit" class="primary w-100" text="{{ $editMapping ? __('app.update') : __('app.save') }}" />
@@ -138,7 +126,6 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Entity</th>
                                 <th>Project Field</th>
                                 <th>Tally Field</th>
                                 <th>{{ __('app.action') }}</th>
@@ -148,9 +135,8 @@
                             @forelse ($mappings as $mapping)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $mapping->entity_label ?? '-' }}</td>
-                                <td>{{ $mapping->project_field_label ?? $mapping->project_field }}</td>
-                                <td>{{ $mapping->tally_field_label ?? $mapping->tally_field }}</td>
+                                <td>{{ $mapping->project_field }}</td>
+                                <td>{{ $mapping->tally_field }}</td>
                                 <td class="text-nowrap">
                                     <a class="btn btn-sm btn-outline-primary" href="{{ route('settings.tally.integration', ['edit' => $mapping->id]) }}">Edit</a>
                                     <form class="d-inline-block" method="POST" action="{{ route('settings.tally.integration.delete', ['id' => $mapping->id]) }}" onsubmit="return confirm('Delete this mapping?');">
@@ -162,7 +148,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="text-center text-muted">No mappings found.</td>
+                                <td colspan="4" class="text-center text-muted">No mappings found.</td>
                             </tr>
                             @endforelse
                         </tbody>
@@ -232,13 +218,6 @@
     const manualSyncResult = document.getElementById('manualSyncResult');
     const syncLogsBtn = document.getElementById('loadTallySyncLogsBtn');
     const syncLogsBody = document.getElementById('tallySyncLogsBody');
-    const mappingDefinitions = @json($mappingDefinitions);
-    const mappingEntity = document.getElementById('mapping_entity');
-    const projectFieldSelect = document.getElementById('project_field_key');
-    const tallyFieldSelect = document.getElementById('tally_field_key');
-    const selectedMappingEntity = @json($selectedMappingEntity);
-    const selectedProjectFieldKey = @json($selectedProjectFieldKey);
-    const selectedTallyFieldKey = @json($selectedTallyFieldKey);
 
     if (!testBtn || !resultBox || !form) {
         return;
@@ -309,69 +288,6 @@
 
         return { text, json };
     };
-
-    const populateMappingSelect = (element, options, selectedValue, placeholder) => {
-        if (!element) {
-            return;
-        }
-
-        const optionList = Array.isArray(options) ? options : [];
-        element.innerHTML = '';
-
-        const defaultOption = document.createElement('option');
-        defaultOption.value = '';
-        defaultOption.textContent = placeholder;
-        element.appendChild(defaultOption);
-
-        optionList.forEach((option) => {
-            const optionElement = document.createElement('option');
-            optionElement.value = option.value;
-            optionElement.textContent = option.label;
-            element.appendChild(optionElement);
-        });
-
-        if (selectedValue) {
-            const hasSelected = optionList.some((option) => String(option.value) === String(selectedValue));
-            if (!hasSelected) {
-                const customOption = document.createElement('option');
-                customOption.value = selectedValue;
-                customOption.textContent = `Custom: ${selectedValue}`;
-                element.appendChild(customOption);
-            }
-            element.value = selectedValue;
-        }
-    };
-
-    const refreshMappingDropdowns = (entityKey, projectSelected = '', tallySelected = '') => {
-        if (!mappingDefinitions || !mappingDefinitions[entityKey]) {
-            populateMappingSelect(projectFieldSelect, [], '', 'Select Project Field');
-            populateMappingSelect(tallyFieldSelect, [], '', 'Select Tally Field');
-            return;
-        }
-
-        const definition = mappingDefinitions[entityKey];
-        populateMappingSelect(projectFieldSelect, definition.project_fields || [], projectSelected, 'Select Project Field');
-        populateMappingSelect(tallyFieldSelect, definition.tally_fields || [], tallySelected, 'Select Tally Field');
-    };
-
-    const initMappingDropdowns = () => {
-        if (!mappingEntity || !projectFieldSelect || !tallyFieldSelect) {
-            return;
-        }
-
-        const initialEntity = selectedMappingEntity && mappingDefinitions[selectedMappingEntity]
-            ? selectedMappingEntity
-            : (Object.keys(mappingDefinitions)[0] || 'item');
-
-        mappingEntity.value = initialEntity;
-        refreshMappingDropdowns(initialEntity, selectedProjectFieldKey, selectedTallyFieldKey);
-
-        mappingEntity.addEventListener('change', function () {
-            refreshMappingDropdowns(this.value, '', '');
-        });
-    };
-
-    initMappingDropdowns();
 
     const showManualResult = (isSuccess, message) => {
         if (!manualSyncResult) {
