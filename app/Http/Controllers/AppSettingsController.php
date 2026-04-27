@@ -9,6 +9,7 @@ use App\Models\AppSettings;
 use App\Models\Company;
 use App\Models\SmtpSettings;
 use App\Models\TallyFieldMapping;
+use App\Models\TallyIntegrationSetting;
 use App\Models\Twilio;
 use App\Models\Vonage;
 use Illuminate\Http\JsonResponse;
@@ -52,6 +53,7 @@ class AppSettingsController extends Controller
     {
         $mappings = collect();
         $editMapping = null;
+        $connectionSettings = null;
 
         if (Schema::hasTable('tally_field_mappings')) {
             $mappings = TallyFieldMapping::orderByDesc('id')->get();
@@ -60,7 +62,98 @@ class AppSettingsController extends Controller
             }
         }
 
-        return view('app.tally-integration', compact('mappings', 'editMapping'));
+        if (Schema::hasTable('tally_integration_settings')) {
+            $connectionSettings = TallyIntegrationSetting::query()->latest('id')->first();
+        }
+
+        return view('app.tally-integration', compact('mappings', 'editMapping', 'connectionSettings'));
+    }
+
+    public function tallyIntegrationConnectionStore(Request $request)
+    {
+        if (! Schema::hasTable('tally_integration_settings')) {
+            return redirect()->back()->withErrors(['migration' => 'Please run migration first for Tally Integration settings table.'])->withInput();
+        }
+
+        $validatedData = $request->validate([
+            'host' => ['required', 'string', 'max:255'],
+            'port' => ['nullable', 'integer', 'between:1,65535'],
+            'odbc_port' => ['required', 'integer', 'between:1,65535'],
+            'username' => ['nullable', 'string', 'max:255'],
+            'password' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $settings = TallyIntegrationSetting::query()->first() ?? new TallyIntegrationSetting();
+        $settings->host = $validatedData['host'];
+        $settings->port = $validatedData['port'] ?? null;
+        $settings->odbc_port = $validatedData['odbc_port'];
+        $settings->username = $validatedData['username'] ?? null;
+        if (! empty($validatedData['password'])) {
+            $settings->password = $validatedData['password'];
+        }
+        $settings->status = 1;
+        $settings->save();
+
+        return redirect()->route('settings.tally.integration')->with('success', 'Connection settings saved successfully.');
+    }
+
+    public function tallyIntegrationTestConnection(Request $request): JsonResponse
+    {
+        $inputHost = $request->input('host');
+        $inputPort = $request->input('port');
+        $inputOdbcPort = $request->input('odbc_port');
+
+        $settings = null;
+        if (Schema::hasTable('tally_integration_settings')) {
+            $settings = TallyIntegrationSetting::query()->latest('id')->first();
+        }
+
+        $host = $inputHost ?: ($settings->host ?? null);
+        $port = $inputPort ?: ($settings->port ?? null);
+        $odbcPort = $inputOdbcPort ?: ($settings->odbc_port ?? null);
+
+        if (empty($host) || empty($odbcPort)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Host and ODBC Port are required to test connection.',
+            ], 422);
+        }
+
+        $testPort = function (string $hostAddress, int $portNumber): array {
+            $errno = 0;
+            $errstr = '';
+            $connection = @stream_socket_client(
+                "tcp://{$hostAddress}:{$portNumber}",
+                $errno,
+                $errstr,
+                5
+            );
+
+            if ($connection !== false) {
+                fclose($connection);
+                return ['open' => true, 'message' => 'Open'];
+            }
+
+            return ['open' => false, 'message' => $errstr ?: "Connection failed ({$errno})"];
+        };
+
+        $odbcResult = $testPort((string) $host, (int) $odbcPort);
+        $appPortResult = null;
+        if (! empty($port)) {
+            $appPortResult = $testPort((string) $host, (int) $port);
+        }
+
+        $isSuccess = $odbcResult['open'] === true;
+
+        return response()->json([
+            'status' => $isSuccess,
+            'message' => $isSuccess ? 'ODBC connection test successful.' : 'ODBC connection test failed.',
+            'details' => [
+                'host' => $host,
+                'odbc_port' => ['port' => (int) $odbcPort, 'status' => $odbcResult['message']],
+                'app_port' => $appPortResult ? ['port' => (int) $port, 'status' => $appPortResult['message']] : null,
+            ],
+        ], $isSuccess ? 200 : 422);
     }
 
     public function tallyIntegrationStore(Request $request)

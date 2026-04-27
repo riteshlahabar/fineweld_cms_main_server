@@ -200,6 +200,8 @@ Route::middleware('auth')->group(function () {
 
     Route::group(['prefix' => 'settings', 'middleware' => ['can:tally.integration.view']], function () {
         Route::get('/tally-integration', [AppSettingsController::class, 'tallyIntegration'])->name('settings.tally.integration');
+        Route::post('/tally-integration/connection/store', [AppSettingsController::class, 'tallyIntegrationConnectionStore'])->name('settings.tally.integration.connection.store');
+        Route::post('/tally-integration/test-connection', [AppSettingsController::class, 'tallyIntegrationTestConnection'])->name('settings.tally.integration.test.connection');
         Route::post('/tally-integration/store', [AppSettingsController::class, 'tallyIntegrationStore'])->name('settings.tally.integration.store');
         Route::put('/tally-integration/update/{id}', [AppSettingsController::class, 'tallyIntegrationUpdate'])->name('settings.tally.integration.update');
         Route::delete('/tally-integration/delete/{id}', [AppSettingsController::class, 'tallyIntegrationDelete'])->name('settings.tally.integration.delete');
