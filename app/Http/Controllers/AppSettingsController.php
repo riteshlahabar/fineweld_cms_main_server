@@ -8,12 +8,14 @@ use App\Http\Requests\LogoRequest;
 use App\Models\AppSettings;
 use App\Models\Company;
 use App\Models\SmtpSettings;
+use App\Models\TallyFieldMapping;
 use App\Models\Twilio;
 use App\Models\Vonage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 class AppSettingsController extends Controller
@@ -46,9 +48,64 @@ class AppSettingsController extends Controller
         return view('app.settings', compact('data', 'company', 'smtp', 'twilio', 'vonage'));
     }
 
-    public function tallyIntegration()
+        public function tallyIntegration(Request $request)
     {
-        return view('app.tally-integration');
+        $mappings = collect();
+        $editMapping = null;
+
+        if (Schema::hasTable('tally_field_mappings')) {
+            $mappings = TallyFieldMapping::orderByDesc('id')->get();
+            if ($request->filled('edit')) {
+                $editMapping = TallyFieldMapping::find($request->integer('edit'));
+            }
+        }
+
+        return view('app.tally-integration', compact('mappings', 'editMapping'));
+    }
+
+    public function tallyIntegrationStore(Request $request)
+    {
+        if (! Schema::hasTable('tally_field_mappings')) {
+            return redirect()->back()->withErrors(['migration' => 'Please run migration first for Tally Integration table.'])->withInput();
+        }
+
+        $validatedData = $request->validate([
+            'project_field' => ['required', 'string', 'max:255'],
+            'tally_field' => ['required', 'string', 'max:255'],
+        ]);
+
+        TallyFieldMapping::create($validatedData);
+
+        return redirect()->route('settings.tally.integration')->with('success', 'Mapping saved successfully.');
+    }
+
+    public function tallyIntegrationUpdate(Request $request, int $id)
+    {
+        if (! Schema::hasTable('tally_field_mappings')) {
+            return redirect()->back()->withErrors(['migration' => 'Please run migration first for Tally Integration table.'])->withInput();
+        }
+
+        $validatedData = $request->validate([
+            'project_field' => ['required', 'string', 'max:255'],
+            'tally_field' => ['required', 'string', 'max:255'],
+        ]);
+
+        $mapping = TallyFieldMapping::findOrFail($id);
+        $mapping->update($validatedData);
+
+        return redirect()->route('settings.tally.integration')->with('success', 'Mapping updated successfully.');
+    }
+
+    public function tallyIntegrationDelete(int $id)
+    {
+        if (! Schema::hasTable('tally_field_mappings')) {
+            return redirect()->route('settings.tally.integration')->withErrors(['migration' => 'Please run migration first for Tally Integration table.']);
+        }
+
+        $mapping = TallyFieldMapping::findOrFail($id);
+        $mapping->delete();
+
+        return redirect()->route('settings.tally.integration')->with('success', 'Mapping deleted successfully.');
     }
 
     public function store(GeneralSettingsRequest $request): JsonResponse

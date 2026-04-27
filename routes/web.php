@@ -170,6 +170,9 @@ Route::middleware('auth')->group(function () {
     Route::group(['prefix' => 'settings', 'middleware' => ['can:app.settings.edit']], function () {
         Route::get('/app-settings', [AppSettingsController::class, 'index'])->name('settings.app');
         Route::get('/tally-integration', [AppSettingsController::class, 'tallyIntegration'])->name('settings.tally.integration');
+        Route::post('/tally-integration/store', [AppSettingsController::class, 'tallyIntegrationStore'])->name('settings.tally.integration.store');
+        Route::put('/tally-integration/update/{id}', [AppSettingsController::class, 'tallyIntegrationUpdate'])->name('settings.tally.integration.update');
+        Route::delete('/tally-integration/delete/{id}', [AppSettingsController::class, 'tallyIntegrationDelete'])->name('settings.tally.integration.delete');
         Route::post('/app/store', [AppSettingsController::class, 'store'])->name('general.store');
         Route::post('/app/store_logo', [AppSettingsController::class, 'storeLogo'])->name('logo.store');
         Route::post('/smtp/store', [SmtpSettingsController::class, 'store'])->name('smtp.store');
