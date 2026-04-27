@@ -947,7 +947,7 @@
 				</li>
                 @endif
 
-				@canany(['tax.view', 'app.settings.edit', 'company.edit', 'payment.type.view', 'unit.view', 'language.view'])
+				@canany(['tax.view', 'app.settings.edit', 'company.edit', 'payment.type.view', 'unit.view', 'language.view', 'tally.integration.view'])
 				<li>
 					<a href="javascript:;" class="has-arrow">
 						<div class="parent-icon"><i class="bx bx-cog"></i>
@@ -1004,7 +1004,7 @@
 						</li>
 					</ul>
 					@endcanany
-					@canany(['app.settings.edit'])
+					@canany(['tally.integration.view'])
 					<ul>
 						<li class="{{ request()->is('settings/tally-integration*') ? 'mm-active' : '' }}">
 							<a href="{{ route('settings.tally.integration') }}"><i class='bx bx-radio-circle'></i>Tally Integration</a>

@@ -874,6 +874,18 @@
                                                     </td>
                                                 </tr>
 
+                                                <tr>
+                                                    <td class="group-name">Tally Integration</td>
+                                                    <td>
+                                                        <input class="form-check-input row-select" type="checkbox" id="tally_integration_group">
+                                                        <label for="tally_integration_group">{{ __('app.select_all') }}</label>
+                                                    </td>
+                                                    <td>
+                                                        <input class="form-check-input tally_integration_group_p" type="checkbox" name="permission[tally.integration.view]" id="tally.integration.view">
+                                                        <label for="tally.integration.view">{{ __('app.view') }}</label>
+                                                        <br>
+                                                    </td>
+                                                </tr>
                                                 @if(isPartnershipModuleActive()) 
                                                 @include('partnership::general.permission')
                                                 @endif
