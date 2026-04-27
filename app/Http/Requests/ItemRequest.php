@@ -40,7 +40,7 @@ class ItemRequest extends FormRequest
             'base_unit_id' => ['required'],
             'secondary_unit_id' => ['required'],
             'conversion_rate' => ['required'],
-            'description' => ['nullable', 'string', 'max:250'],
+            'description' => ['nullable', 'string'],
             'status' => ['required'],
             // Pricing Tab
             'sale_price' => ['required', 'numeric'],
