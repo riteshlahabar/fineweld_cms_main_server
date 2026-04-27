@@ -218,7 +218,8 @@
                 throw new Error((text || `HTTP ${response.status}`).substring(0, 300));
             }
 
-            const isOk = response.ok && !!json.status;
+            const successFlag = (typeof json.status !== 'undefined') ? !!json.status : !!json.success;
+            const isOk = response.ok && successFlag;
             const css = isOk ? 'alert-success' : 'alert-danger';
 
             let extra = '';
