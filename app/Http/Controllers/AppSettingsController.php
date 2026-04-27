@@ -10,14 +10,17 @@ use App\Models\Company;
 use App\Models\SmtpSettings;
 use App\Models\TallyFieldMapping;
 use App\Models\TallyIntegrationSetting;
+use App\Models\TallySyncLog;
 use App\Models\Twilio;
 use App\Models\Vonage;
+use App\Services\TallyIntegration\TallySyncService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AppSettingsController extends Controller
 {
@@ -229,6 +232,50 @@ class AppSettingsController extends Controller
                 'message' => 'Unable to log client error',
             ], 500);
         }
+    }
+
+    public function tallyIntegrationSyncEntity(Request $request, string $entity, int $id, TallySyncService $tallySyncService): JsonResponse
+    {
+        $entity = Str::lower(trim($entity));
+
+        $result = match ($entity) {
+            'item', 'items' => $tallySyncService->syncItemById($id, 'upsert'),
+            'party', 'vendor', 'customer' => $tallySyncService->syncPartyById($id, 'upsert'),
+            'sale', 'invoice' => $tallySyncService->syncSaleById($id, 'upsert'),
+            default => [
+                'status' => false,
+                'message' => 'Unsupported entity. Allowed: item, party, sale.',
+                'entity_type' => $entity,
+                'entity_id' => $id,
+            ],
+        };
+
+        return response()->json($result, ($result['status'] ?? false) ? 200 : 422);
+    }
+
+    public function tallyIntegrationSyncLogs(Request $request): JsonResponse
+    {
+        if (! Schema::hasTable('tally_sync_logs')) {
+            return response()->json([
+                'status' => false,
+                'message' => 'tally_sync_logs table not found. Please run latest migrations.',
+                'data' => [],
+            ], 422);
+        }
+
+        $limit = (int) $request->input('limit', 50);
+        $limit = max(1, min(500, $limit));
+
+        $logs = TallySyncLog::query()
+            ->orderByDesc('id')
+            ->limit($limit)
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Tally sync logs fetched successfully.',
+            'data' => $logs,
+        ]);
     }
 
     public function tallyIntegrationStore(Request $request)

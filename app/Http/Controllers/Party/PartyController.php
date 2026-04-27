@@ -10,6 +10,7 @@ use App\Models\Party\Party;
 use App\Services\AccountTransactionService;
 use App\Services\PartyService;
 use App\Services\PartyTransactionService;
+use App\Services\TallyIntegration\TallySyncService;
 use App\Traits\FormatNumber;
 use App\Traits\FormatsDateInputs;
 use Illuminate\Contracts\View\View;
@@ -17,6 +18,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -29,15 +31,18 @@ class PartyController extends Controller
     public $accountTransactionService;
     public $partyTransactionService;
     public $partyService;
+    public $tallySyncService;
 
     public function __construct(
         PartyTransactionService $partyTransactionService, 
         AccountTransactionService $accountTransactionService, 
-        PartyService $partyService
+        PartyService $partyService,
+        TallySyncService $tallySyncService
     ) {
         $this->partyTransactionService = $partyTransactionService;
         $this->accountTransactionService = $accountTransactionService;
         $this->partyService = $partyService;
+        $this->tallySyncService = $tallySyncService;
     }
 
 public function publicForm(): View
@@ -247,10 +252,24 @@ public function export($partyType, Request $request)
 
         DB::commit();
 
+        $tallySyncResult = null;
+        try {
+            $tallySyncResult = $this->tallySyncService->syncPartyById(
+                partyId: (int) $partyModel->id,
+                operation: $partyId ? 'update' : 'create'
+            );
+        } catch (\Throwable $syncException) {
+            Log::error('Tally party sync exception', [
+                'party_id' => $partyModel->id ?? null,
+                'message' => $syncException->getMessage(),
+            ]);
+        }
+
         return response()->json([
             'status' => true,
             'message' => $message,
-            'data' => $partyModel->only(['id', 'company_name', 'primary_name'])
+            'data' => $partyModel->only(['id', 'company_name', 'primary_name']),
+            'tally_sync' => $tallySyncResult,
         ]);
 
     } catch (\Exception $e) {
@@ -379,10 +398,24 @@ public function export($partyType, Request $request)
         $party = Party::create($recordsToSave);
         DB::commit();
 
+        $tallySyncResult = null;
+        try {
+            $tallySyncResult = $this->tallySyncService->syncPartyById(
+                partyId: (int) $party->id,
+                operation: 'create'
+            );
+        } catch (\Throwable $syncException) {
+            Log::error('Tally public party sync exception', [
+                'party_id' => $party->id ?? null,
+                'message' => $syncException->getMessage(),
+            ]);
+        }
+
         return response()->json([
             'status' => true,
             'message' => 'Vendor registration submitted successfully! Our team will review and activate your account soon.',
-            'data' => $party->only(['id', 'company_name'])
+            'data' => $party->only(['id', 'company_name']),
+            'tally_sync' => $tallySyncResult,
         ]);
 
     } catch (\Illuminate\Validation\ValidationException $e) {

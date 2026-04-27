@@ -19,6 +19,7 @@ use App\Services\AccountTransactionService;
 use App\Services\CacheService;
 use App\Services\ItemService;
 use App\Services\ItemTransactionService;
+use App\Services\TallyIntegration\TallySyncService;
 use App\Traits\FormatNumber;
 use App\Traits\FormatsDateInputs;
 use Illuminate\Contracts\View\View;
@@ -26,6 +27,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Image\Image;
 use Yajra\DataTables\Facades\DataTables;
@@ -41,16 +43,20 @@ class ItemController extends Controller
 
     public $accountTransactionService;
 
+    public $tallySyncService;
+
     public $previousHistoryOfItems;
 
     public function __construct(
         ItemTransactionService $itemTransactionService,
         ItemService $itemService,
         AccountTransactionService $accountTransactionService,
+        TallySyncService $tallySyncService,
     ) {
         $this->itemTransactionService = $itemTransactionService;
         $this->itemService = $itemService;
         $this->accountTransactionService = $accountTransactionService;
+        $this->tallySyncService = $tallySyncService;
         $this->previousHistoryOfItems = [];
     }
 
@@ -347,11 +353,26 @@ class ItemController extends Controller
             // exit;
             DB::commit();
 
+            $tallySyncResult = null;
+            try {
+                $tallySyncResult = $this->tallySyncService->syncItemById(
+                    itemId: (int) $request->itemModel->id,
+                    operation: $operation === 'save' ? 'create' : 'update'
+                );
+            } catch (\Throwable $syncException) {
+                Log::error('Tally item sync exception', [
+                    'item_id' => $request->itemModel->id,
+                    'operation' => $operation,
+                    'message' => $syncException->getMessage(),
+                ]);
+            }
+
             return response()->json([
                 'status' => true,
                 'message' => __('app.record_saved_successfully'),
                 'id' => $request->itemModel->id,
                 'name' => $request->itemModel->name,
+                'tally_sync' => $tallySyncResult,
 
             ]);
         } catch (\Exception $e) {

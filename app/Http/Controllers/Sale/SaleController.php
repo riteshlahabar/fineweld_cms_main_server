@@ -22,6 +22,7 @@ use App\Services\ItemTransactionService;
 use App\Services\PartyService;
 use App\Services\PaymentTransactionService;
 use App\Services\PaymentTypeService;
+use App\Services\TallyIntegration\TallySyncService;
 use App\Traits\FormatNumber;
 use App\Traits\FormatsDateInputs;
 use Illuminate\Contracts\View\View;
@@ -29,6 +30,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Mpdf\Mpdf;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -57,6 +59,8 @@ class SaleController extends Controller
 
     public $saleSmsNotificationService;
 
+    private $tallySyncService;
+
     public function __construct(PaymentTypeService $paymentTypeService,
         PaymentTransactionService $paymentTransactionService,
         AccountTransactionService $accountTransactionService,
@@ -64,7 +68,8 @@ class SaleController extends Controller
         ItemService $itemService,
         PartyService $partyService,
         SaleEmailNotificationService $saleEmailNotificationService,
-        SaleSmsNotificationService $saleSmsNotificationService
+        SaleSmsNotificationService $saleSmsNotificationService,
+        TallySyncService $tallySyncService
     ) {
         $this->companyId = App::APP_SETTINGS_RECORD_ID->value;
         $this->paymentTypeService = $paymentTypeService;
@@ -75,6 +80,7 @@ class SaleController extends Controller
         $this->partyService = $partyService;
         $this->saleEmailNotificationService = $saleEmailNotificationService;
         $this->saleSmsNotificationService = $saleSmsNotificationService;
+        $this->tallySyncService = $tallySyncService;
         $this->previousHistoryOfItems = [];
     }
 
@@ -711,6 +717,20 @@ $this->partyService->updateShippingAddress(
 
             DB::commit();
 
+            $tallySyncResult = null;
+            try {
+                $tallySyncResult = $this->tallySyncService->syncSaleById(
+                    saleId: (int) $newSale->id,
+                    operation: ($request->operation === 'save' || $request->operation === 'convert') ? 'create' : 'update'
+                );
+            } catch (\Throwable $syncException) {
+                Log::error('Tally sale sync exception', [
+                    'sale_id' => $newSale->id ?? null,
+                    'operation' => $request->operation,
+                    'message' => $syncException->getMessage(),
+                ]);
+            }
+
             // Regenerate the CSRF token
             // Session::regenerateToken();
 
@@ -718,6 +738,7 @@ $this->partyService->updateShippingAddress(
                 'status' => true,
                 'message' => __('app.record_saved_successfully'),
                 'id' => $request->sale_id,
+                'tally_sync' => $tallySyncResult,
 
             ]);
 

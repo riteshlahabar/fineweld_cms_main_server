@@ -149,6 +149,53 @@
                 </div>
             </div>
         </div>
+
+        <div class="card">
+            <div class="card-header px-4 py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 text-uppercase">Manual Sync & Logs</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <x-label for="manual_sync_entity" name="Entity" />
+                        <select id="manual_sync_entity" class="form-select">
+                            <option value="item">Item</option>
+                            <option value="party">Party</option>
+                            <option value="sale">Sale</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <x-label for="manual_sync_id" name="Record ID" />
+                        <input id="manual_sync_id" type="number" min="1" class="form-control" placeholder="Enter ID">
+                    </div>
+                    <div class="col-md-6 d-flex gap-2">
+                        <button id="manualSyncBtn" type="button" class="btn btn-outline-primary px-4" data-base-url="{{ url('settings/tally-integration/sync') }}">Run Manual Sync</button>
+                        <button id="loadTallySyncLogsBtn" type="button" class="btn btn-outline-secondary px-4" data-url="{{ route('settings.tally.integration.sync.logs') }}">Load Latest Logs</button>
+                    </div>
+                </div>
+
+                <div class="mt-3 d-none" id="manualSyncResult"></div>
+
+                <div class="table-responsive mt-3">
+                    <table class="table table-striped table-bordered border w-100">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Entity</th>
+                                <th>Record ID</th>
+                                <th>Operation</th>
+                                <th>Status</th>
+                                <th>Message</th>
+                                <th>Created At</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tallySyncLogsBody">
+                            <tr><td colspan="7" class="text-center text-muted">Click "Load Latest Logs" to view sync history.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 @endsection
@@ -160,6 +207,10 @@
     const resultBox = document.getElementById('connectionTestResult');
     const form = document.getElementById('tallyConnectionForm');
     const clientErrorLogUrl = "{{ route('settings.tally.integration.client.error') }}";
+    const manualSyncBtn = document.getElementById('manualSyncBtn');
+    const manualSyncResult = document.getElementById('manualSyncResult');
+    const syncLogsBtn = document.getElementById('loadTallySyncLogsBtn');
+    const syncLogsBody = document.getElementById('tallySyncLogsBody');
 
     if (!testBtn || !resultBox || !form) {
         return;
@@ -229,6 +280,42 @@
         }
 
         return { text, json };
+    };
+
+    const showManualResult = (isSuccess, message) => {
+        if (!manualSyncResult) {
+            return;
+        }
+        const cssClass = isSuccess ? 'alert alert-success' : 'alert alert-danger';
+        manualSyncResult.className = cssClass;
+        manualSyncResult.innerHTML = `<strong>${message}</strong>`;
+        manualSyncResult.classList.remove('d-none');
+    };
+
+    const renderSyncLogs = (logs) => {
+        if (!syncLogsBody) {
+            return;
+        }
+
+        if (!Array.isArray(logs) || logs.length === 0) {
+            syncLogsBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No sync logs found.</td></tr>';
+            return;
+        }
+
+        syncLogsBody.innerHTML = logs.map((row) => {
+            const statusClass = row.status === 'success' ? 'badge bg-success' : 'badge bg-danger';
+            return `
+                <tr>
+                    <td>${row.id ?? ''}</td>
+                    <td>${row.entity_type ?? ''}</td>
+                    <td>${row.entity_id ?? ''}</td>
+                    <td>${row.operation ?? ''}</td>
+                    <td><span class="${statusClass}">${row.status ?? ''}</span></td>
+                    <td>${row.message ?? ''}</td>
+                    <td>${row.created_at ?? ''}</td>
+                </tr>
+            `;
+        }).join('');
     };
 
     testBtn.addEventListener('click', async function() {
@@ -312,6 +399,78 @@
             testBtn.innerText = 'Test Connection';
         }
     });
+
+    if (manualSyncBtn) {
+        manualSyncBtn.addEventListener('click', async function() {
+            const entity = (document.getElementById('manual_sync_entity')?.value || '').trim();
+            const id = (document.getElementById('manual_sync_id')?.value || '').trim();
+            const baseUrl = manualSyncBtn.dataset.baseUrl || '';
+
+            if (entity === '' || id === '') {
+                showManualResult(false, 'Please select entity and enter record ID.');
+                return;
+            }
+
+            manualSyncBtn.disabled = true;
+            const originalText = manualSyncBtn.innerText;
+            manualSyncBtn.innerText = 'Syncing...';
+
+            try {
+                const response = await fetch(`${baseUrl}/${encodeURIComponent(entity)}/${encodeURIComponent(id)}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken(),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({})
+                });
+
+                const { text, json } = await parseResponse(response);
+                if (!json) {
+                    throw new Error((text || `HTTP ${response.status}`).substring(0, 300));
+                }
+
+                showManualResult(!!json.status, json.message || 'Manual sync response received.');
+            } catch (error) {
+                showManualResult(false, error?.message || 'Manual sync request failed.');
+            } finally {
+                manualSyncBtn.disabled = false;
+                manualSyncBtn.innerText = originalText;
+            }
+        });
+    }
+
+    if (syncLogsBtn) {
+        syncLogsBtn.addEventListener('click', async function() {
+            const url = syncLogsBtn.dataset.url;
+            syncLogsBtn.disabled = true;
+            const originalText = syncLogsBtn.innerText;
+            syncLogsBtn.innerText = 'Loading...';
+
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                const { text, json } = await parseResponse(response);
+                if (!json) {
+                    throw new Error((text || `HTTP ${response.status}`).substring(0, 300));
+                }
+
+                renderSyncLogs(json.data || []);
+            } catch (error) {
+                renderSyncLogs([]);
+                showManualResult(false, error?.message || 'Unable to load sync logs.');
+            } finally {
+                syncLogsBtn.disabled = false;
+                syncLogsBtn.innerText = originalText;
+            }
+        });
+    }
 })();
 </script>
 @endsection
