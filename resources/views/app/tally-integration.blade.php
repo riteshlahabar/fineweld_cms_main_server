@@ -159,6 +159,7 @@
     const testBtn = document.getElementById('testConnectionBtn');
     const resultBox = document.getElementById('connectionTestResult');
     const form = document.getElementById('tallyConnectionForm');
+    const clientErrorLogUrl = "{{ route('settings.tally.integration.client.error') }}";
 
     if (!testBtn || !resultBox || !form) {
         return;
@@ -175,6 +176,47 @@
         const meta = document.querySelector('meta[name="csrf-token"]');
         return meta ? meta.getAttribute('content') : '';
     };
+
+    const sendClientErrorLog = async (payload) => {
+        try {
+            await fetch(clientErrorLogUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(payload)
+            });
+        } catch (e) {
+            // Keep silent on logging transport failures
+        }
+    };
+
+    window.addEventListener('error', function(event) {
+        sendClientErrorLog({
+            message: event.message || 'Unknown JS error',
+            stack: event.error && event.error.stack ? event.error.stack : '',
+            source: event.filename || '',
+            line: event.lineno || 0,
+            column: event.colno || 0,
+            context: 'tally_integration_page',
+            url: window.location.href
+        });
+    });
+
+    window.addEventListener('unhandledrejection', function(event) {
+        const reason = event.reason || {};
+        sendClientErrorLog({
+            message: reason.message || String(reason) || 'Unhandled promise rejection',
+            stack: reason.stack || '',
+            source: '',
+            line: 0,
+            column: 0,
+            context: 'tally_integration_page_unhandledrejection',
+            url: window.location.href
+        });
+    });
 
     const parseResponse = async (response) => {
         const text = await response.text();
@@ -234,14 +276,31 @@
             resultBox.classList.remove('d-none');
 
             if (typeof iziToast !== 'undefined') {
-                (isOk ? iziToast.success : iziToast.error)({
-                    title: isOk ? 'Success' : 'Error',
-                    layout: 2,
-                    message: json.message || 'Connection test completed.'
-                });
+                if (isOk) {
+                    iziToast.success({
+                        title: 'Success',
+                        layout: 2,
+                        message: json.message || 'Connection test completed.'
+                    });
+                } else {
+                    iziToast.error({
+                        title: 'Error',
+                        layout: 2,
+                        message: json.message || 'Connection test completed.'
+                    });
+                }
             }
         } catch (error) {
             const message = error && error.message ? error.message : 'Connection test failed due to network or server error.';
+            sendClientErrorLog({
+                message: message,
+                stack: error && error.stack ? error.stack : '',
+                source: '',
+                line: 0,
+                column: 0,
+                context: 'tally_test_connection_click',
+                url: window.location.href
+            });
             resultBox.className = 'alert alert-danger';
             resultBox.innerHTML = `<strong>${message}</strong>`;
             resultBox.classList.remove('d-none');

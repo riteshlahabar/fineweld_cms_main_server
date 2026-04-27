@@ -114,6 +114,13 @@ class AppSettingsController extends Controller
             $odbcPort = $inputOdbcPort ?: ($settings->odbc_port ?? null);
 
             if (empty($host) || empty($odbcPort)) {
+                Log::warning('Tally integration connection test validation failed', [
+                    'host' => $host,
+                    'port' => $port,
+                    'odbc_port' => $odbcPort,
+                    'user_id' => auth()->id(),
+                ]);
+
                 return response()->json([
                     'status' => false,
                     'message' => 'Host and ODBC Port are required to test connection.',
@@ -146,6 +153,26 @@ class AppSettingsController extends Controller
 
             $isSuccess = $odbcResult['open'] === true;
 
+            if ($isSuccess) {
+                Log::info('Tally integration ODBC connection test successful', [
+                    'host' => $host,
+                    'port' => $port,
+                    'odbc_port' => $odbcPort,
+                    'odbc_status' => $odbcResult['message'],
+                    'app_port_status' => $appPortResult['message'] ?? null,
+                    'user_id' => auth()->id(),
+                ]);
+            } else {
+                Log::warning('Tally integration ODBC connection test failed', [
+                    'host' => $host,
+                    'port' => $port,
+                    'odbc_port' => $odbcPort,
+                    'odbc_status' => $odbcResult['message'],
+                    'app_port_status' => $appPortResult['message'] ?? null,
+                    'user_id' => auth()->id(),
+                ]);
+            }
+
             return response()->json([
                 'status' => $isSuccess,
                 'message' => $isSuccess ? 'ODBC connection test successful.' : 'ODBC connection test failed.',
@@ -156,9 +183,50 @@ class AppSettingsController extends Controller
                 ],
             ], $isSuccess ? 200 : 422);
         } catch (\Throwable $e) {
+            Log::error('Tally integration test connection exception', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'user_id' => auth()->id(),
+            ]);
+
             return response()->json([
                 'status' => false,
                 'message' => 'Connection test error: '.$e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function tallyIntegrationClientError(Request $request): JsonResponse
+    {
+        try {
+            Log::error('Tally integration client-side JS error', [
+                'message' => mb_substr((string) $request->input('message', ''), 0, 2000),
+                'stack' => mb_substr((string) $request->input('stack', ''), 0, 8000),
+                'source' => mb_substr((string) $request->input('source', ''), 0, 2000),
+                'line' => (int) $request->input('line', 0),
+                'column' => (int) $request->input('column', 0),
+                'context' => mb_substr((string) $request->input('context', ''), 0, 255),
+                'url' => mb_substr((string) $request->input('url', ''), 0, 2000),
+                'user_id' => auth()->id(),
+                'ip' => $request->ip(),
+                'user_agent' => mb_substr((string) $request->userAgent(), 0, 1000),
+            ]);
+
+            return response()->json([
+                'status' => true,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Failed to write Tally integration client JS log', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'user_id' => auth()->id(),
+            ]);
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Unable to log client error',
             ], 500);
         }
     }
