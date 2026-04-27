@@ -99,61 +99,68 @@ class AppSettingsController extends Controller
 
     public function tallyIntegrationTestConnection(Request $request): JsonResponse
     {
-        $inputHost = $request->input('host');
-        $inputPort = $request->input('port');
-        $inputOdbcPort = $request->input('odbc_port');
+        try {
+            $inputHost = $request->input('host');
+            $inputPort = $request->input('port');
+            $inputOdbcPort = $request->input('odbc_port');
 
-        $settings = null;
-        if (Schema::hasTable('tally_integration_settings')) {
-            $settings = TallyIntegrationSetting::query()->latest('id')->first();
-        }
-
-        $host = $inputHost ?: ($settings->host ?? null);
-        $port = $inputPort ?: ($settings->port ?? null);
-        $odbcPort = $inputOdbcPort ?: ($settings->odbc_port ?? null);
-
-        if (empty($host) || empty($odbcPort)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Host and ODBC Port are required to test connection.',
-            ], 422);
-        }
-
-        $testPort = function (string $hostAddress, int $portNumber): array {
-            $errno = 0;
-            $errstr = '';
-            $connection = @stream_socket_client(
-                "tcp://{$hostAddress}:{$portNumber}",
-                $errno,
-                $errstr,
-                5
-            );
-
-            if ($connection !== false) {
-                fclose($connection);
-                return ['open' => true, 'message' => 'Open'];
+            $settings = null;
+            if (Schema::hasTable('tally_integration_settings')) {
+                $settings = TallyIntegrationSetting::query()->latest('id')->first();
             }
 
-            return ['open' => false, 'message' => $errstr ?: "Connection failed ({$errno})"];
-        };
+            $host = $inputHost ?: ($settings->host ?? null);
+            $port = $inputPort ?: ($settings->port ?? null);
+            $odbcPort = $inputOdbcPort ?: ($settings->odbc_port ?? null);
 
-        $odbcResult = $testPort((string) $host, (int) $odbcPort);
-        $appPortResult = null;
-        if (! empty($port)) {
-            $appPortResult = $testPort((string) $host, (int) $port);
+            if (empty($host) || empty($odbcPort)) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Host and ODBC Port are required to test connection.',
+                ], 422);
+            }
+
+            $testPort = function (string $hostAddress, int $portNumber): array {
+                $errno = 0;
+                $errstr = '';
+                $connection = @stream_socket_client(
+                    "tcp://{$hostAddress}:{$portNumber}",
+                    $errno,
+                    $errstr,
+                    5
+                );
+
+                if ($connection !== false) {
+                    fclose($connection);
+                    return ['open' => true, 'message' => 'Open'];
+                }
+
+                return ['open' => false, 'message' => $errstr ?: "Connection failed ({$errno})"];
+            };
+
+            $odbcResult = $testPort((string) $host, (int) $odbcPort);
+            $appPortResult = null;
+            if (! empty($port)) {
+                $appPortResult = $testPort((string) $host, (int) $port);
+            }
+
+            $isSuccess = $odbcResult['open'] === true;
+
+            return response()->json([
+                'status' => $isSuccess,
+                'message' => $isSuccess ? 'ODBC connection test successful.' : 'ODBC connection test failed.',
+                'details' => [
+                    'host' => $host,
+                    'odbc_port' => ['port' => (int) $odbcPort, 'status' => $odbcResult['message']],
+                    'app_port' => $appPortResult ? ['port' => (int) $port, 'status' => $appPortResult['message']] : null,
+                ],
+            ], $isSuccess ? 200 : 422);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Connection test error: '.$e->getMessage(),
+            ], 500);
         }
-
-        $isSuccess = $odbcResult['open'] === true;
-
-        return response()->json([
-            'status' => $isSuccess,
-            'message' => $isSuccess ? 'ODBC connection test successful.' : 'ODBC connection test failed.',
-            'details' => [
-                'host' => $host,
-                'odbc_port' => ['port' => (int) $odbcPort, 'status' => $odbcResult['message']],
-                'app_port' => $appPortResult ? ['port' => (int) $port, 'status' => $appPortResult['message']] : null,
-            ],
-        ], $isSuccess ? 200 : 422);
     }
 
     public function tallyIntegrationStore(Request $request)

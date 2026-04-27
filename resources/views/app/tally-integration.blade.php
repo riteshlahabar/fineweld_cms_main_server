@@ -164,6 +164,31 @@
         return;
     }
 
+    const getCsrfToken = () => {
+        const tokenInput = form.querySelector('input[name="_token"]');
+        if (tokenInput && tokenInput.value) {
+            return tokenInput.value;
+        }
+        if (typeof _csrf_token !== 'undefined' && _csrf_token) {
+            return _csrf_token;
+        }
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        return meta ? meta.getAttribute('content') : '';
+    };
+
+    const parseResponse = async (response) => {
+        const text = await response.text();
+        let json = null;
+
+        try {
+            json = text ? JSON.parse(text) : null;
+        } catch (e) {
+            json = null;
+        }
+
+        return { text, json };
+    };
+
     testBtn.addEventListener('click', async function() {
         const host = document.getElementById('host').value;
         const port = document.getElementById('port').value;
@@ -177,7 +202,8 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: JSON.stringify({
                     host: host,
@@ -186,34 +212,40 @@
                 })
             });
 
-            const data = await response.json();
-            const isOk = !!data.status;
+            const { text, json } = await parseResponse(response);
+
+            if (!json) {
+                throw new Error((text || `HTTP ${response.status}`).substring(0, 300));
+            }
+
+            const isOk = response.ok && !!json.status;
             const css = isOk ? 'alert-success' : 'alert-danger';
 
             let extra = '';
-            if (data.details) {
-                const odbcStatus = data.details.odbc_port ? data.details.odbc_port.status : 'N/A';
-                const appStatus = data.details.app_port ? data.details.app_port.status : 'N/A';
+            if (json.details) {
+                const odbcStatus = json.details.odbc_port ? json.details.odbc_port.status : 'N/A';
+                const appStatus = json.details.app_port ? json.details.app_port.status : 'N/A';
                 extra = `<div class="mt-1"><strong>ODBC:</strong> ${odbcStatus}<br><strong>App Port:</strong> ${appStatus}</div>`;
             }
 
             resultBox.className = `alert ${css}`;
-            resultBox.innerHTML = `<strong>${data.message || 'Done'}</strong>${extra}`;
+            resultBox.innerHTML = `<strong>${json.message || 'Done'}</strong>${extra}`;
             resultBox.classList.remove('d-none');
 
             if (typeof iziToast !== 'undefined') {
                 (isOk ? iziToast.success : iziToast.error)({
                     title: isOk ? 'Success' : 'Error',
                     layout: 2,
-                    message: data.message || 'Connection test completed.'
+                    message: json.message || 'Connection test completed.'
                 });
             }
         } catch (error) {
+            const message = error && error.message ? error.message : 'Connection test failed due to network or server error.';
             resultBox.className = 'alert alert-danger';
-            resultBox.innerHTML = '<strong>Connection test failed due to network or server error.</strong>';
+            resultBox.innerHTML = `<strong>${message}</strong>`;
             resultBox.classList.remove('d-none');
             if (typeof iziToast !== 'undefined') {
-                iziToast.error({title: 'Error', layout: 2, message: 'Connection test failed due to network or server error.'});
+                iziToast.error({title: 'Error', layout: 2, message: message});
             }
         } finally {
             testBtn.disabled = false;
