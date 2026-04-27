@@ -1004,6 +1004,13 @@
 						</li>
 					</ul>
 					@endcanany
+					@canany(['app.settings.edit'])
+					<ul>
+						<li class="{{ request()->is('settings/tally-integration') ? 'mm-active' : '' }}">
+							<a href="{{ route('settings.tally.integration') }}"><i class='bx bx-radio-circle'></i>Tally Integration</a>
+						</li>
+					</ul>
+					@endcanany
 				</li>
 				@endcanany
 

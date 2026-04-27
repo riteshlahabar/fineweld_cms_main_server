@@ -46,6 +46,11 @@ class AppSettingsController extends Controller
         return view('app.settings', compact('data', 'company', 'smtp', 'twilio', 'vonage'));
     }
 
+    public function tallyIntegration()
+    {
+        return view('app.tally-integration');
+    }
+
     public function store(GeneralSettingsRequest $request): JsonResponse
     {
         $validatedData = $request->validated();
