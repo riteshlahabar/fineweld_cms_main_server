@@ -164,18 +164,18 @@
             <div class="card-body">
                 <div class="row g-3 align-items-end">
                     <div class="col-md-3">
-                        <x-label for="manual_sync_entity" name="Entity" />
-                        <select id="manual_sync_entity" class="form-select">
-                            <option value="item">Item</option>
-                            <option value="party">Party</option>
-                            <option value="sale">Sale</option>
-                        </select>
+                        <x-label for="manual_sync_project_field" name="Project Field" />
+                        <input id="manual_sync_project_field" type="text" class="form-control" placeholder="e.g. name">
                     </div>
                     <div class="col-md-3">
-                        <x-label for="manual_sync_id" name="Record ID" />
-                        <input id="manual_sync_id" type="number" min="1" class="form-control" placeholder="Enter ID">
+                        <x-label for="manual_sync_tally_field" name="Tally Field" />
+                        <input id="manual_sync_tally_field" type="text" class="form-control" placeholder="e.g. item.NAME">
                     </div>
-                    <div class="col-md-6 d-flex gap-2">
+                    <div class="col-md-2">
+                        <x-label for="manual_sync_id" name="ID" />
+                        <input id="manual_sync_id" type="number" min="1" class="form-control" placeholder="Record ID">
+                    </div>
+                    <div class="col-md-4 d-flex gap-2">
                         <button id="manualSyncBtn" type="button" class="btn btn-outline-primary px-4" data-base-url="{{ url('settings/tally-integration/sync') }}">Run Manual Sync</button>
                         <button id="loadTallySyncLogsBtn" type="button" class="btn btn-outline-secondary px-4" data-url="{{ route('settings.tally.integration.sync.logs') }}">Load Latest Logs</button>
                     </div>
@@ -325,6 +325,29 @@
         }).join('');
     };
 
+    const resolveSyncEntityFromTallyField = (tallyFieldValue) => {
+        const rawValue = String(tallyFieldValue || '').trim();
+        if (rawValue === '') {
+            return null;
+        }
+
+        const value = rawValue.toLowerCase();
+        if (value.includes('.')) {
+            const prefix = value.split('.', 1)[0];
+            if (['item', 'items'].includes(prefix)) {
+                return 'item';
+            }
+            if (['party', 'vendor', 'customer', 'supplier'].includes(prefix)) {
+                return 'party';
+            }
+            if (['sale', 'invoice'].includes(prefix)) {
+                return 'sale';
+            }
+        }
+
+        return null;
+    };
+
     testBtn.addEventListener('click', async function() {
         const host = document.getElementById('host').value;
         const port = document.getElementById('port').value;
@@ -409,12 +432,19 @@
 
     if (manualSyncBtn) {
         manualSyncBtn.addEventListener('click', async function() {
-            const entity = (document.getElementById('manual_sync_entity')?.value || '').trim();
+            const projectField = (document.getElementById('manual_sync_project_field')?.value || '').trim();
+            const tallyField = (document.getElementById('manual_sync_tally_field')?.value || '').trim();
             const id = (document.getElementById('manual_sync_id')?.value || '').trim();
             const baseUrl = manualSyncBtn.dataset.baseUrl || '';
 
-            if (entity === '' || id === '') {
-                showManualResult(false, 'Please select entity and enter record ID.');
+            if (projectField === '' || tallyField === '' || id === '') {
+                showManualResult(false, 'Please enter Project Field, Tally Field and ID.');
+                return;
+            }
+
+            const entity = resolveSyncEntityFromTallyField(tallyField);
+            if (!entity) {
+                showManualResult(false, 'Use Tally Field with prefix: item.*, party.* or sale.*');
                 return;
             }
 
@@ -430,7 +460,10 @@
                         'X-CSRF-TOKEN': getCsrfToken(),
                         'X-Requested-With': 'XMLHttpRequest'
                     },
-                    body: JSON.stringify({})
+                    body: JSON.stringify({
+                        project_field: projectField,
+                        tally_field: tallyField
+                    })
                 });
 
                 const { text, json } = await parseResponse(response);
