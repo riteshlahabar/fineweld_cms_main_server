@@ -12,6 +12,7 @@ class TallyFieldMapping extends Model
     protected $fillable = [
         'project_field',
         'tally_field',
+        'company_name',
         'status',
         'created_by',
         'updated_by',

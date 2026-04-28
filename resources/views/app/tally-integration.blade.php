@@ -58,7 +58,7 @@
                             <x-input type="number" name="odbc_port" id="odbc_port" :required="true" value="{{ old('odbc_port', $connectionSettings->odbc_port ?? '') }}" />
                         </div>
                         <div class="col-md-2">
-                            <x-label for="username" name="User ID / Tally Company Name" />
+                            <x-label for="username" name="User ID" />
                             <x-input type="text" name="username" id="username" :required="false" value="{{ old('username', $connectionSettings->username ?? '') }}" />
                         </div>
                         <div class="col-md-2">
@@ -95,13 +95,17 @@
                     @endif
 
                     <div class="row g-3 align-items-end">
-                        <div class="col-md-5">
+                        <div class="col-md-4">
                             <x-label for="project_field" name="Project Field" />
                             <x-input type="text" name="project_field" id="project_field" :required="true" value="{{ old('project_field', $editMapping->project_field ?? '') }}" />
                         </div>
-                        <div class="col-md-5">
+                        <div class="col-md-4">
                             <x-label for="tally_field" name="Tally Field" />
                             <x-input type="text" name="tally_field" id="tally_field" :required="true" value="{{ old('tally_field', $editMapping->tally_field ?? '') }}" />
+                        </div>
+                        <div class="col-md-2">
+                            <x-label for="company_name" name="Company Name" />
+                            <x-input type="text" name="company_name" id="company_name" :required="false" value="{{ old('company_name', $editMapping->company_name ?? '') }}" />
                         </div>
                         <div class="col-md-2">
                             <x-button type="submit" class="primary w-100" text="{{ $editMapping ? __('app.update') : __('app.save') }}" />
@@ -128,6 +132,7 @@
                                 <th>#</th>
                                 <th>Project Field</th>
                                 <th>Tally Field</th>
+                                <th>Company Name</th>
                                 <th>{{ __('app.action') }}</th>
                             </tr>
                         </thead>
@@ -137,6 +142,7 @@
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $mapping->project_field }}</td>
                                 <td>{{ $mapping->tally_field }}</td>
+                                <td>{{ $mapping->company_name ?: '-' }}</td>
                                 <td class="text-nowrap">
                                     <a class="btn btn-sm btn-outline-primary" href="{{ route('settings.tally.integration', ['edit' => $mapping->id]) }}">Edit</a>
                                     <form class="d-inline-block" method="POST" action="{{ route('settings.tally.integration.delete', ['id' => $mapping->id]) }}" onsubmit="return confirm('Delete this mapping?');">
@@ -148,7 +154,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="4" class="text-center text-muted">No mappings found.</td>
+                                <td colspan="5" class="text-center text-muted">No mappings found.</td>
                             </tr>
                             @endforelse
                         </tbody>

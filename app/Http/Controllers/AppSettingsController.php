@@ -287,6 +287,7 @@ class AppSettingsController extends Controller
         $validatedData = $request->validate([
             'project_field' => ['required', 'string', 'max:255'],
             'tally_field' => ['required', 'string', 'max:255'],
+            'company_name' => ['nullable', 'string', 'max:255'],
         ]);
 
         TallyFieldMapping::create($validatedData);
@@ -303,6 +304,7 @@ class AppSettingsController extends Controller
         $validatedData = $request->validate([
             'project_field' => ['required', 'string', 'max:255'],
             'tally_field' => ['required', 'string', 'max:255'],
+            'company_name' => ['nullable', 'string', 'max:255'],
         ]);
 
         $mapping = TallyFieldMapping::findOrFail($id);
