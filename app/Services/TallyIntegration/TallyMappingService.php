@@ -24,10 +24,10 @@ class TallyMappingService
             return $defaultSourcePath;
         }
 
-        $target = strtoupper(trim($targetField));
+        $target = $this->normalizeTallyField($targetField);
 
         $matching = $allMappings->filter(function (TallyFieldMapping $mapping) use ($target) {
-            return strtoupper(trim((string) $mapping->tally_field)) === $target;
+            return $this->normalizeTallyField((string) $mapping->tally_field) === $target;
         });
 
         if ($matching->isEmpty()) {
@@ -54,6 +54,21 @@ class TallyMappingService
         }
 
         return $sourcePath !== '' ? $sourcePath : $defaultSourcePath;
+    }
+
+    private function normalizeTallyField(string $field): string
+    {
+        $normalized = strtoupper(trim($field));
+
+        // Backward compatibility: convert "sale.VOUCHERNUMBER" to "VOUCHERNUMBER"
+        if (str_contains($normalized, '.')) {
+            $parts = array_values(array_filter(array_map('trim', explode('.', $normalized))));
+            if (! empty($parts)) {
+                $normalized = end($parts);
+            }
+        }
+
+        return $normalized;
     }
 
     public function valueForTarget(string $entity, mixed $source, string $targetField, string $defaultSourcePath, mixed $fallback = null): mixed
@@ -83,4 +98,3 @@ class TallyMappingService
         return $this->mappings;
     }
 }
-

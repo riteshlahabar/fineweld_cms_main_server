@@ -59,9 +59,16 @@ class AppSettingsController extends Controller
         $connectionSettings = null;
 
         if (Schema::hasTable('tally_field_mappings')) {
-            $mappings = TallyFieldMapping::orderByDesc('id')->get();
+            $mappings = TallyFieldMapping::orderByDesc('id')->get()->map(function (TallyFieldMapping $mapping) {
+                $mapping->tally_field = $this->normalizeTallyFieldInput((string) $mapping->tally_field);
+
+                return $mapping;
+            });
             if ($request->filled('edit')) {
                 $editMapping = TallyFieldMapping::find($request->integer('edit'));
+                if ($editMapping) {
+                    $editMapping->tally_field = $this->normalizeTallyFieldInput((string) $editMapping->tally_field);
+                }
             }
         }
 
@@ -293,6 +300,7 @@ class AppSettingsController extends Controller
             'tally_field' => ['required', 'string', 'max:255'],
             'company_name' => ['nullable', 'string', 'max:255'],
         ]);
+        $validatedData['tally_field'] = $this->normalizeTallyFieldInput($validatedData['tally_field']);
 
         TallyFieldMapping::create($validatedData);
 
@@ -310,6 +318,7 @@ class AppSettingsController extends Controller
             'tally_field' => ['required', 'string', 'max:255'],
             'company_name' => ['nullable', 'string', 'max:255'],
         ]);
+        $validatedData['tally_field'] = $this->normalizeTallyFieldInput($validatedData['tally_field']);
 
         $mapping = TallyFieldMapping::findOrFail($id);
         $mapping->update($validatedData);
@@ -327,6 +336,23 @@ class AppSettingsController extends Controller
         $mapping->delete();
 
         return redirect()->route('settings.tally.integration')->with('success', 'Mapping deleted successfully.');
+    }
+
+    private function normalizeTallyFieldInput(string $field): string
+    {
+        $normalized = trim($field);
+        if ($normalized === '') {
+            return $normalized;
+        }
+
+        if (Str::contains($normalized, '.')) {
+            $parts = array_values(array_filter(array_map('trim', explode('.', $normalized))));
+            if (! empty($parts)) {
+                $normalized = (string) end($parts);
+            }
+        }
+
+        return Str::upper($normalized);
     }
 
     public function store(GeneralSettingsRequest $request): JsonResponse

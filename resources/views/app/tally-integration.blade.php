@@ -83,9 +83,9 @@
             <div class="card-body">
                 <div class="alert alert-info border-0 border-start border-5 border-info py-2">
                     <div class="small">
-                        Use target field with optional entity prefix for exact mapping:
-                        <strong>item.NAME</strong>, <strong>party.PARTYGSTIN</strong>, <strong>sale.VOUCHERNUMBER</strong>.
-                        Without prefix, mapping works as global target field.
+                        Use single Tally target field names only:
+                        <strong>NAME</strong>, <strong>PARTYGSTIN</strong>, <strong>VOUCHERNUMBER</strong>.
+                        Do not use prefixes like <strong>item.</strong>, <strong>party.</strong> or <strong>sale.</strong>.
                     </div>
                 </div>
                 <form method="POST" action="{{ $editMapping ? route('settings.tally.integration.update', ['id' => $editMapping->id]) : route('settings.tally.integration.store') }}">
@@ -175,7 +175,7 @@
                     </div>
                     <div class="col-md-2">
                         <x-label for="manual_sync_tally_field" name="Tally Field" />
-                        <input id="manual_sync_tally_field" type="text" class="form-control" placeholder="e.g. item.NAME">
+                        <input id="manual_sync_tally_field" type="text" class="form-control" placeholder="e.g. VOUCHERNUMBER">
                     </div>
                     <div class="col-md-2">
                         <x-label for="manual_sync_company_name" name="Company Name" />
@@ -335,15 +335,39 @@
         }).join('');
     };
 
-    const resolveSyncEntityFromTallyField = (tallyFieldValue) => {
+    const normalizeTallyField = (value) => {
+        const rawValue = String(value || '').trim();
+        if (rawValue === '') {
+            return '';
+        }
+
+        if (rawValue.includes('.')) {
+            const prefix = rawValue.split('.', 1)[0].toLowerCase();
+            const tail = rawValue.split('.').pop() || '';
+
+            if (['item', 'items'].includes(prefix)) {
+                return String(tail).trim().toUpperCase();
+            }
+            if (['party', 'vendor', 'customer', 'supplier'].includes(prefix)) {
+                return String(tail).trim().toUpperCase();
+            }
+            if (['sale', 'invoice'].includes(prefix)) {
+                return String(tail).trim().toUpperCase();
+            }
+        }
+
+        return rawValue.toUpperCase();
+    };
+
+    const resolveSyncEntity = (projectFieldValue, tallyFieldValue) => {
         const rawValue = String(tallyFieldValue || '').trim();
         if (rawValue === '') {
             return null;
         }
 
-        const value = rawValue.toLowerCase();
-        if (value.includes('.')) {
-            const prefix = value.split('.', 1)[0];
+        const lowerRawValue = rawValue.toLowerCase();
+        if (lowerRawValue.includes('.')) {
+            const prefix = lowerRawValue.split('.', 1)[0];
             if (['item', 'items'].includes(prefix)) {
                 return 'item';
             }
@@ -355,7 +379,34 @@
             }
         }
 
-        return null;
+        const tallyField = normalizeTallyField(tallyFieldValue);
+        const projectField = String(projectFieldValue || '').trim().toLowerCase();
+
+        const tallyFieldEntityMap = {
+            item: ['BASEUNITS', 'ADDITIONALUNITS', 'CONVERSION', 'HSNCODE', 'OPENINGBALANCE', 'ALIAS'],
+            party: ['PARTYGSTIN', 'INCOMETAXNUMBER', 'SHIPPINGADDRESS', 'LEDGERMOBILE'],
+            sale: ['VOUCHERNUMBER', 'PARTYLEDGERNAME', 'VOUCHERTYPENAME', 'REFERENCE'],
+        };
+
+        for (const [entity, fields] of Object.entries(tallyFieldEntityMap)) {
+            if (fields.includes(tallyField)) {
+                return entity;
+            }
+        }
+
+        // NAME/EMAIL/MOBILE/ADDRESS/AMOUNT/DATE/NARRATION can appear in multiple contexts.
+        if (projectField.includes('sale') || projectField.includes('order') || projectField.includes('invoice')) {
+            return 'sale';
+        }
+        if (projectField.includes('party') || projectField.includes('vendor') || projectField.includes('customer') || projectField.includes('gst') || projectField.includes('ledger')) {
+            return 'party';
+        }
+        if (projectField.includes('item') || projectField.includes('stock') || projectField.includes('hsn') || projectField.includes('unit')) {
+            return 'item';
+        }
+
+        // Default fallback for ambiguous fields
+        return 'sale';
     };
 
     testBtn.addEventListener('click', async function() {
@@ -453,11 +504,13 @@
                 return;
             }
 
-            const entity = resolveSyncEntityFromTallyField(tallyField);
+            const entity = resolveSyncEntity(projectField, tallyField);
             if (!entity) {
-                showManualResult(false, 'Use Tally Field with prefix: item.*, party.* or sale.*');
+                showManualResult(false, 'Unable to detect entity from mapping fields. Use clear project/tally field names.');
                 return;
             }
+
+            const normalizedTallyField = normalizeTallyField(tallyField);
 
             manualSyncBtn.disabled = true;
             const originalText = manualSyncBtn.innerText;
@@ -473,7 +526,7 @@
                     },
                     body: JSON.stringify({
                         project_field: projectField,
-                        tally_field: tallyField,
+                        tally_field: normalizedTallyField,
                         company_name: companyName
                     })
                 });
