@@ -289,6 +289,7 @@
                                     <th>{{ __('item.item_name') }}</th>
                                     <th>{{ __('item.brand.brand') }}</th>
                                     <th>{{ __('item.category.category') }}</th>
+                                    <th>{{ __('warehouse.warehouse') }}</th>
                                     <th>{{ __('item.min_stock') }}</th>
                                     <th>{{ __('item.current_stock') }}</th>
                                     <th>{{ __('unit.unit') }}</th>
@@ -302,6 +303,9 @@
                                             <td>{{ $item->name }}</td>
                                             <td>{{ $item->brand->name??'' }}</td>
                                             <td>{{ $item->category->name }}</td>
+                                            <td>
+                                                {{ $item->itemGeneralQuantities->pluck('warehouse.name')->filter()->unique()->implode(', ') ?: '-' }}
+                                            </td>
                                             <td class="">{{ $formatNumber->formatQuantity($item->min_stock) }}</td>
                                             <td class="text-danger fw-bold">{{ $formatNumber->formatQuantity($item->current_stock) }}</td>
                                             <td>{{ $item->baseUnit->name }}</td>

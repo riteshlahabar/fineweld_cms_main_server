@@ -214,7 +214,12 @@ class DashboardController extends Controller
 
     public function getLowStockItemRecords()
     {
-        return Item::with('baseUnit')
+        return Item::with([
+            'baseUnit',
+            'brand',
+            'category',
+            'itemGeneralQuantities.warehouse',
+        ])
             ->whereColumn('current_stock', '<=', 'min_stock')
             ->where('min_stock', '>', 0)
             ->orderByDesc('current_stock')
