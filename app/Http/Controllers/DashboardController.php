@@ -53,9 +53,7 @@ class DashboardController extends Controller
 
         $totalCompletedPurchaseOrders = $this->formatWithPrecision($totalCompletedPurchaseOrders);
 
-        $totalCustomers = $this->applyDashboardOwnershipFilter(
-            $this->partyQueryByVendorRole('customer')
-        )->count();
+        $totalCustomers = $this->partyQueryByVendorRole('customer')->count();
 
         $totalExpense = $this->applyDashboardOwnershipFilter(
             Expense::query(),
@@ -197,13 +195,9 @@ class DashboardController extends Controller
 
     public function paymentReceivables()
     {
-        $customerIds = $this->applyDashboardOwnershipFilter(
-            $this->partyQueryByVendorRole('customer')
-        )->pluck('id');
+        $customerIds = $this->partyQueryByVendorRole('customer')->pluck('id');
 
-        $supplierIds = $this->applyDashboardOwnershipFilter(
-            $this->partyQueryByVendorRole('supplier')
-        )->pluck('id');
+        $supplierIds = $this->partyQueryByVendorRole('supplier')->pluck('id');
 
         $customerIds = $customerIds->toArray();
         $supplierIds = $supplierIds->toArray();
@@ -232,16 +226,7 @@ class DashboardController extends Controller
         $role = strtolower(trim($role));
         $vendorTypes = $role === 'supplier' ? ['supplier', 'both'] : ['customer', 'both'];
 
-        return Party::query()->where(function (Builder $query) use ($role, $vendorTypes) {
-            // New vendor model
-            $query->where(function (Builder $subQuery) use ($vendorTypes) {
-                $subQuery->where('party_type', 'vendor')
-                    ->whereIn('vendor_type', $vendorTypes);
-            });
-
-            // Backward compatibility for legacy data
-            $query->orWhere('party_type', $role);
-        });
+        return Party::query()->whereIn('vendor_type', $vendorTypes);
     }
 
     private function applyDashboardOwnershipFilter(
