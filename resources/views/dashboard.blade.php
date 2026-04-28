@@ -319,6 +319,57 @@
                 </div>
                 @endcan
 
+                @can('sale.order.view')
+                 <div class="card radius-10">
+                    <div class="card-header">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h6 class="mb-0">{{ __('sale.order.pending') }}</h6>
+                            </div>
+                            <div class="font-13 ms-auto">
+                                <a href="{{ route('sale.order.list') }}" class="btn btn-sm btn-outline-primary">{{ __('app.view_all') }}</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead class="table-light">
+                                <tr class="text-uppercase">
+                                    <th>{{ __('app.date') }}</th>
+                                    <th>{{ __('sale.order.code') }}</th>
+                                    <th>{{ __('customer.customer') }}</th>
+                                    <th>{{ __('app.total') }}</th>
+                                    <th>{{ __('payment.balance') }}</th>
+                                    <th>{{ __('app.status') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($pendingSaleOrderRecords as $order)
+                                    <tr>
+                                        <td>{{ $order->formatted_order_date }}</td>
+                                        <td>
+                                            <a href="{{ route('sale.order.details', ['id' => $order->id]) }}">
+                                                {{ $order->order_code }}
+                                            </a>
+                                        </td>
+                                        <td>{{ $order->party?->getFullName() }}</td>
+                                        <td>{{ $formatNumber->formatWithPrecision($order->grand_total) }}</td>
+                                        <td>{{ $formatNumber->formatWithPrecision($order->grand_total - $order->paid_amount) }}</td>
+                                        <td><span class="badge rounded-pill text-warning bg-light-warning p-2 text-uppercase px-3">{{ $order->order_status }}</span></td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">{{ __('app.no_records_found') }}</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                </div>
+                @endcan
+
 
 
 			</div>

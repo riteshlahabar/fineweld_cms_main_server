@@ -8,6 +8,7 @@ use App\Models\Items\ItemTransaction;
 use App\Models\Party\Party;
 use App\Models\Purchase\Purchase;
 use App\Models\Sale\Sale;
+use App\Models\Sale\SaleOrder;
 use App\Services\PartyService;
 use App\Traits\FormatNumber;
 use Illuminate\Database\Eloquent\Builder;
@@ -71,6 +72,15 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
+        $pendingSaleOrderRecords = $this->applyDashboardOwnershipFilter(
+            SaleOrder::query()->where('order_status', 'Pending'),
+            'sale.order.can.view.other.users.sale.orders'
+        )
+            ->with(['party', 'user'])
+            ->orderByDesc('id')
+            ->limit(10)
+            ->get();
+
         $saleVsPurchase = $this->saleVsPurchase();
         $trendingItems = $this->trendingItems();
         $lowStockItems = $this->getLowStockItemRecords();
@@ -91,6 +101,7 @@ class DashboardController extends Controller
             'trendingItems',
             'lowStockItems',
             'recentInvoices',
+            'pendingSaleOrderRecords',
         ));
     }
 
