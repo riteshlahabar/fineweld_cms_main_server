@@ -2,6 +2,7 @@
 
 namespace App\Services\TallyIntegration;
 
+use App\Models\Company;
 use App\Models\TallyIntegrationSetting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -25,9 +26,19 @@ class TallyClientService
     {
         $reportName = trim($reportName);
         $staticVariables = '';
+        $resolvedCompanyName = trim((string) ($companyName ?? ''));
 
-        if (! empty($companyName)) {
-            $staticVariables = '<STATICVARIABLES><SVCURRENTCOMPANY>'.$this->xmlEscape($companyName).'</SVCURRENTCOMPANY></STATICVARIABLES>';
+        if ($resolvedCompanyName === '') {
+            $settings = $this->activeSettings();
+            $resolvedCompanyName = trim((string) (($settings->company_name ?? null) ?: ($settings->username ?? null) ?: ''));
+
+            if ($resolvedCompanyName === '') {
+                $resolvedCompanyName = trim((string) (Company::query()->where('id', 1)->value('name') ?? ''));
+            }
+        }
+
+        if ($resolvedCompanyName !== '') {
+            $staticVariables = '<STATICVARIABLES><SVCURRENTCOMPANY>'.$this->xmlEscape($resolvedCompanyName).'</SVCURRENTCOMPANY></STATICVARIABLES>';
         }
 
         $xmlEnvelope = '<?xml version="1.0" encoding="UTF-8"?>'
@@ -172,4 +183,3 @@ class TallyClientService
         return htmlspecialchars((string) ($value ?? ''), ENT_XML1 | ENT_QUOTES, 'UTF-8');
     }
 }
-

@@ -58,7 +58,7 @@
                             <x-input type="number" name="odbc_port" id="odbc_port" :required="true" value="{{ old('odbc_port', $connectionSettings->odbc_port ?? '') }}" />
                         </div>
                         <div class="col-md-2">
-                            <x-label for="username" name="User ID" />
+                            <x-label for="username" name="User ID / Tally Company Name" />
                             <x-input type="text" name="username" id="username" :required="false" value="{{ old('username', $connectionSettings->username ?? '') }}" />
                         </div>
                         <div class="col-md-2">
