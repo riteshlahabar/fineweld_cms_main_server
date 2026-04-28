@@ -237,11 +237,15 @@ class AppSettingsController extends Controller
     public function tallyIntegrationSyncEntity(Request $request, string $entity, int $id, TallySyncService $tallySyncService): JsonResponse
     {
         $entity = Str::lower(trim($entity));
+        $validatedData = $request->validate([
+            'company_name' => ['required', 'string', 'max:255'],
+        ]);
+        $companyName = trim((string) ($validatedData['company_name'] ?? ''));
 
         $result = match ($entity) {
-            'item', 'items' => $tallySyncService->syncItemById($id, 'upsert'),
-            'party', 'vendor', 'customer' => $tallySyncService->syncPartyById($id, 'upsert'),
-            'sale', 'invoice' => $tallySyncService->syncSaleById($id, 'upsert'),
+            'item', 'items' => $tallySyncService->syncItemById($id, 'upsert', $companyName),
+            'party', 'vendor', 'customer' => $tallySyncService->syncPartyById($id, 'upsert', $companyName),
+            'sale', 'invoice' => $tallySyncService->syncSaleById($id, 'upsert', $companyName),
             default => [
                 'status' => false,
                 'message' => 'Unsupported entity. Allowed: item, party, sale.',

@@ -173,15 +173,19 @@
                         <x-label for="manual_sync_project_field" name="Project Field" />
                         <input id="manual_sync_project_field" type="text" class="form-control" placeholder="e.g. name">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <x-label for="manual_sync_tally_field" name="Tally Field" />
                         <input id="manual_sync_tally_field" type="text" class="form-control" placeholder="e.g. item.NAME">
+                    </div>
+                    <div class="col-md-2">
+                        <x-label for="manual_sync_company_name" name="Company Name" />
+                        <input id="manual_sync_company_name" type="text" class="form-control" placeholder="Exact Tally company" required>
                     </div>
                     <div class="col-md-2">
                         <x-label for="manual_sync_id" name="ID" />
                         <input id="manual_sync_id" type="number" min="1" class="form-control" placeholder="Record ID">
                     </div>
-                    <div class="col-md-4 d-flex gap-2">
+                    <div class="col-md-3 d-flex gap-2">
                         <button id="manualSyncBtn" type="button" class="btn btn-outline-primary px-4" data-base-url="{{ url('settings/tally-integration/sync') }}">Run Manual Sync</button>
                         <button id="loadTallySyncLogsBtn" type="button" class="btn btn-outline-secondary px-4" data-url="{{ route('settings.tally.integration.sync.logs') }}">Load Latest Logs</button>
                     </div>
@@ -440,11 +444,12 @@
         manualSyncBtn.addEventListener('click', async function() {
             const projectField = (document.getElementById('manual_sync_project_field')?.value || '').trim();
             const tallyField = (document.getElementById('manual_sync_tally_field')?.value || '').trim();
+            const companyName = (document.getElementById('manual_sync_company_name')?.value || '').trim();
             const id = (document.getElementById('manual_sync_id')?.value || '').trim();
             const baseUrl = manualSyncBtn.dataset.baseUrl || '';
 
-            if (projectField === '' || tallyField === '' || id === '') {
-                showManualResult(false, 'Please enter Project Field, Tally Field and ID.');
+            if (projectField === '' || tallyField === '' || id === '' || companyName === '') {
+                showManualResult(false, 'Please enter Project Field, Tally Field, Company Name and ID.');
                 return;
             }
 
@@ -468,7 +473,8 @@
                     },
                     body: JSON.stringify({
                         project_field: projectField,
-                        tally_field: tallyField
+                        tally_field: tallyField,
+                        company_name: companyName
                     })
                 });
 

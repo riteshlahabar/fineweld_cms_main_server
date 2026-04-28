@@ -16,7 +16,7 @@ class TallySyncService
         private readonly TallyMappingService $mappingService,
     ) {}
 
-    public function syncItemById(int $itemId, string $operation = 'upsert'): array
+    public function syncItemById(int $itemId, string $operation = 'upsert', ?string $companyName = null): array
     {
         $item = Item::with(['tax', 'baseUnit', 'category', 'itemGeneralQuantities'])->find($itemId);
         if (! $item) {
@@ -53,6 +53,7 @@ class TallySyncService
             reportName: 'All Masters',
             context: 'item_sync',
             operation: $operation,
+            companyName: $companyName,
             buildMessageXml: function (string $action) use ($itemName, $stockGroup, $baseUnit, $alias, $hsnCode, $description, $rate, $openingQty) {
                 $xml = '<TALLYMESSAGE xmlns:UDF="TallyUDF">';
                 $xml .= '<STOCKITEM NAME="'.$this->esc($itemName).'" ACTION="'.$this->esc($action).'">';
@@ -99,7 +100,7 @@ class TallySyncService
         );
     }
 
-    public function syncPartyById(int $partyId, string $operation = 'upsert'): array
+    public function syncPartyById(int $partyId, string $operation = 'upsert', ?string $companyName = null): array
     {
         $party = Party::find($partyId);
         if (! $party) {
@@ -137,6 +138,7 @@ class TallySyncService
             reportName: 'All Masters',
             context: 'party_sync',
             operation: $operation,
+            companyName: $companyName,
             buildMessageXml: function (string $action) use ($ledgerName, $parentLedger, $mobile, $email, $gstin, $pan, $billingAddress, $shippingAddress) {
                 $xml = '<TALLYMESSAGE xmlns:UDF="TallyUDF">';
                 $xml .= '<LEDGER NAME="'.$this->esc($ledgerName).'" ACTION="'.$this->esc($action).'">';
@@ -188,7 +190,7 @@ class TallySyncService
         );
     }
 
-    public function syncSaleById(int $saleId, string $operation = 'upsert'): array
+    public function syncSaleById(int $saleId, string $operation = 'upsert', ?string $companyName = null): array
     {
         $sale = Sale::with([
             'party',
@@ -229,11 +231,11 @@ class TallySyncService
         }
 
         // Ensure dependencies in Tally: Party + Items
-        $partySync = $this->syncPartyById((int) $sale->party_id, 'upsert');
+        $partySync = $this->syncPartyById((int) $sale->party_id, 'upsert', $companyName);
         $itemSyncSummary = [];
         $itemIds = $lineRecords->pluck('item_id')->filter()->unique()->values();
         foreach ($itemIds as $itemId) {
-            $itemSyncSummary[] = $this->syncItemById((int) $itemId, 'upsert');
+            $itemSyncSummary[] = $this->syncItemById((int) $itemId, 'upsert', $companyName);
         }
 
         $voucherType = 'Sales';
@@ -290,6 +292,7 @@ class TallySyncService
             reportName: 'Vouchers',
             context: 'sale_sync',
             operation: $operation,
+            companyName: $companyName,
             buildMessageXml: function (string $action) use ($voucherType, $voucherNo, $partyLedgerName, $referenceNo, $narration, $grandTotal, $salesLedgerName, $dateYmd, $inventoryEntryXml) {
                 $voucherAmount = number_format(abs($grandTotal), 2, '.', '');
                 $salesAmountNegative = number_format(-1 * abs($grandTotal), 2, '.', '');
@@ -354,7 +357,7 @@ class TallySyncService
         );
     }
 
-    private function pushWithFallback(string $reportName, string $context, string $operation, callable $buildMessageXml): array
+    private function pushWithFallback(string $reportName, string $context, string $operation, callable $buildMessageXml, ?string $companyName = null): array
     {
         $operation = strtolower(trim($operation));
 
@@ -363,6 +366,7 @@ class TallySyncService
                 reportName: $reportName,
                 requestDataXml: $buildMessageXml('Alter'),
                 context: $context.'_alter',
+                companyName: $companyName,
             );
         }
 
@@ -371,6 +375,7 @@ class TallySyncService
                 reportName: $reportName,
                 requestDataXml: $buildMessageXml('Create'),
                 context: $context.'_create',
+                companyName: $companyName,
             );
         }
 
@@ -379,6 +384,7 @@ class TallySyncService
             reportName: $reportName,
             requestDataXml: $buildMessageXml('Create'),
             context: $context.'_create',
+            companyName: $companyName,
         );
 
         if ($createResult['status'] ?? false) {
@@ -389,6 +395,7 @@ class TallySyncService
             reportName: $reportName,
             requestDataXml: $buildMessageXml('Alter'),
             context: $context.'_alter_fallback',
+            companyName: $companyName,
         );
 
         if ($alterResult['status'] ?? false) {
@@ -471,4 +478,3 @@ class TallySyncService
         }
     }
 }
-
