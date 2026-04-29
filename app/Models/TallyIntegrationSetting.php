@@ -11,6 +11,9 @@ class TallyIntegrationSetting extends Model
 
     protected $fillable = [
         'host',
+        'company_name',
+        'xml_port',
+        'sales_ledger_name',
         'port',
         'odbc_port',
         'username',
@@ -23,6 +26,9 @@ class TallyIntegrationSetting extends Model
     protected $casts = [
         'password' => 'encrypted',
         'status' => 'boolean',
+        'xml_port' => 'integer',
+        'port' => 'integer',
+        'odbc_port' => 'integer',
     ];
 
     protected static function boot()

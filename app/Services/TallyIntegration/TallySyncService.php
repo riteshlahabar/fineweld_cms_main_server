@@ -49,6 +49,27 @@ class TallySyncService
             'OPENINGBALANCE' => $openingQty,
         ];
 
+        $dependencySync = [
+            'unit' => $this->syncUnitMaster($baseUnit, $companyName),
+            'stock_group' => $this->syncStockGroupMaster($stockGroup, $companyName),
+        ];
+        $dependencyFailure = $this->firstFailedDependencyMessage($dependencySync);
+        if ($dependencyFailure !== null) {
+            return $this->finalizeAndReturn(
+                entityType: 'item',
+                entityId: $item->id,
+                operation: $operation,
+                success: false,
+                message: 'Item dependency sync failed before stock item transfer: '.$dependencyFailure,
+                requestPayload: [
+                    'mapped_payload' => $mappedPayload,
+                ],
+                responsePayload: [
+                    'dependency_sync' => $dependencySync,
+                ],
+            );
+        }
+
         $result = $this->pushWithFallback(
             reportName: 'All Masters',
             context: 'item_sync',
@@ -96,6 +117,7 @@ class TallySyncService
                 'response_body' => $result['response_body'] ?? null,
                 'parsed' => $result['parsed'] ?? [],
                 'http_status' => $result['http_status'] ?? null,
+                'dependency_sync' => $dependencySync,
             ],
         );
     }
@@ -238,14 +260,60 @@ class TallySyncService
             $itemSyncSummary[] = $this->syncItemById((int) $itemId, 'upsert', $companyName);
         }
 
+        $dependencySync = [
+            'party' => $partySync,
+            'items' => $itemSyncSummary,
+        ];
+        $dependencyFailure = $this->firstFailedDependencyMessage($dependencySync);
+        if ($dependencyFailure !== null) {
+            return $this->finalizeAndReturn(
+                entityType: 'sale',
+                entityId: $sale->id,
+                operation: $operation,
+                success: false,
+                message: 'Sale dependency sync failed before voucher transfer: '.$dependencyFailure,
+                responsePayload: [
+                    'dependency_sync' => $dependencySync,
+                ],
+            );
+        }
+
         $voucherType = 'Sales';
         $voucherNo = (string) $this->mappingService->valueForTarget('sale', $sale, 'VOUCHERNUMBER', 'sale_code', $sale->sale_code);
         $partyLedgerName = (string) $this->mappingService->valueForTarget('sale', $sale, 'PARTYLEDGERNAME', 'party.company_name', $sale->party->company_name ?: '');
         $referenceNo = (string) $this->mappingService->valueForTarget('sale', $sale, 'REFERENCE', 'reference_no', $sale->reference_no ?: '');
         $narration = (string) $this->mappingService->valueForTarget('sale', $sale, 'NARRATION', 'note', $sale->note ?: '');
         $grandTotal = (float) $this->mappingService->valueForTarget('sale', $sale, 'AMOUNT', 'grand_total', $sale->grand_total ?: 0);
-        $salesLedgerName = 'Sales A/c';
+        $salesLedgerName = (string) $this->mappingService->valueForTarget('sale', $sale, 'SALESLEDGERNAME', 'tally_sales_ledger_name', $this->client->defaultSalesLedgerName());
         $dateYmd = date('Ymd', strtotime((string) $sale->sale_date));
+
+        if ($voucherNo === '' || $partyLedgerName === '' || trim($salesLedgerName) === '') {
+            return $this->finalizeAndReturn(
+                entityType: 'sale',
+                entityId: $sale->id,
+                operation: $operation,
+                success: false,
+                message: 'Sale voucher is missing required Tally fields: voucher number, party ledger, or sales ledger.',
+                responsePayload: [
+                    'dependency_sync' => $dependencySync,
+                ],
+            );
+        }
+
+        $dependencySync['sales_ledger'] = $this->syncLedgerMaster($salesLedgerName, 'Sales Accounts', $companyName);
+        $dependencyFailure = $this->firstFailedDependencyMessage($dependencySync);
+        if ($dependencyFailure !== null) {
+            return $this->finalizeAndReturn(
+                entityType: 'sale',
+                entityId: $sale->id,
+                operation: $operation,
+                success: false,
+                message: 'Sale dependency sync failed before voucher transfer: '.$dependencyFailure,
+                responsePayload: [
+                    'dependency_sync' => $dependencySync,
+                ],
+            );
+        }
 
         $inventoryEntryXml = '';
         foreach ($lineRecords as $line) {
@@ -274,7 +342,25 @@ class TallySyncService
             if ($description !== '') {
                 $inventoryEntryXml .= '<DESCRIPTION>'.$this->esc($description).'</DESCRIPTION>';
             }
+            $inventoryEntryXml .= '<ACCOUNTINGALLOCATIONS.LIST>';
+            $inventoryEntryXml .= '<LEDGERNAME>'.$this->esc($salesLedgerName).'</LEDGERNAME>';
+            $inventoryEntryXml .= '<ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>';
+            $inventoryEntryXml .= '<AMOUNT>'.$this->esc(number_format($amountNegative, 2, '.', '')).'</AMOUNT>';
+            $inventoryEntryXml .= '</ACCOUNTINGALLOCATIONS.LIST>';
             $inventoryEntryXml .= '</ALLINVENTORYENTRIES.LIST>';
+        }
+
+        if ($inventoryEntryXml === '') {
+            return $this->finalizeAndReturn(
+                entityType: 'sale',
+                entityId: $sale->id,
+                operation: $operation,
+                success: false,
+                message: 'Sale voucher has no valid inventory lines for Tally transfer.',
+                responsePayload: [
+                    'dependency_sync' => $dependencySync,
+                ],
+            );
         }
 
         $mappedPayload = [
@@ -295,7 +381,6 @@ class TallySyncService
             companyName: $companyName,
             buildMessageXml: function (string $action) use ($voucherType, $voucherNo, $partyLedgerName, $referenceNo, $narration, $grandTotal, $salesLedgerName, $dateYmd, $inventoryEntryXml) {
                 $voucherAmount = number_format(abs($grandTotal), 2, '.', '');
-                $salesAmountNegative = number_format(-1 * abs($grandTotal), 2, '.', '');
 
                 $xml = '<TALLYMESSAGE xmlns:UDF="TallyUDF">';
                 $xml .= '<VOUCHER VCHTYPE="'.$this->esc($voucherType).'" ACTION="'.$this->esc($action).'" OBJVIEW="Invoice Voucher View">';
@@ -320,12 +405,6 @@ class TallySyncService
                 $xml .= '<AMOUNT>'.$this->esc($voucherAmount).'</AMOUNT>';
                 $xml .= '</LEDGERENTRIES.LIST>';
 
-                $xml .= '<LEDGERENTRIES.LIST>';
-                $xml .= '<LEDGERNAME>'.$this->esc($salesLedgerName).'</LEDGERNAME>';
-                $xml .= '<ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>';
-                $xml .= '<AMOUNT>'.$this->esc($salesAmountNegative).'</AMOUNT>';
-                $xml .= '</LEDGERENTRIES.LIST>';
-
                 $xml .= '</VOUCHER>';
                 $xml .= '</TALLYMESSAGE>';
 
@@ -337,10 +416,7 @@ class TallySyncService
             'response_body' => $result['response_body'] ?? null,
             'parsed' => $result['parsed'] ?? [],
             'http_status' => $result['http_status'] ?? null,
-            'dependency_sync' => [
-                'party' => $partySync,
-                'items' => $itemSyncSummary,
-            ],
+            'dependency_sync' => $dependencySync,
         ];
 
         return $this->finalizeAndReturn(
@@ -410,6 +486,141 @@ class TallySyncService
         return $alterResult;
     }
 
+    private function syncUnitMaster(string $unitName, ?string $companyName = null): array
+    {
+        $unitName = trim($unitName);
+        if ($unitName === '') {
+            return [
+                'status' => false,
+                'message' => 'Unit name is empty.',
+            ];
+        }
+
+        $result = $this->pushWithFallback(
+            reportName: 'All Masters',
+            context: 'unit_master_sync',
+            operation: 'upsert',
+            companyName: $companyName,
+            buildMessageXml: function (string $action) use ($unitName) {
+                $xml = '<TALLYMESSAGE xmlns:UDF="TallyUDF">';
+                $xml .= '<UNIT NAME="'.$this->esc($unitName).'" ACTION="'.$this->esc($action).'">';
+                $xml .= '<NAME>'.$this->esc($unitName).'</NAME>';
+                $xml .= '<ISSIMPLEUNIT>Yes</ISSIMPLEUNIT>';
+                $xml .= '</UNIT>';
+                $xml .= '</TALLYMESSAGE>';
+
+                return $xml;
+            }
+        );
+
+        return $this->allowAlreadyExistsDependency($result, 'Unit already exists in Tally.');
+    }
+
+    private function syncStockGroupMaster(string $stockGroupName, ?string $companyName = null): array
+    {
+        $stockGroupName = trim($stockGroupName);
+        if ($stockGroupName === '' || strcasecmp($stockGroupName, 'Primary') === 0) {
+            return [
+                'status' => true,
+                'message' => 'Stock group is Primary or empty; no transfer required.',
+            ];
+        }
+
+        $result = $this->pushWithFallback(
+            reportName: 'All Masters',
+            context: 'stock_group_master_sync',
+            operation: 'upsert',
+            companyName: $companyName,
+            buildMessageXml: function (string $action) use ($stockGroupName) {
+                $xml = '<TALLYMESSAGE xmlns:UDF="TallyUDF">';
+                $xml .= '<STOCKGROUP NAME="'.$this->esc($stockGroupName).'" ACTION="'.$this->esc($action).'">';
+                $xml .= '<NAME>'.$this->esc($stockGroupName).'</NAME>';
+                $xml .= '<PARENT>Primary</PARENT>';
+                $xml .= '<ISADDABLE>Yes</ISADDABLE>';
+                $xml .= '</STOCKGROUP>';
+                $xml .= '</TALLYMESSAGE>';
+
+                return $xml;
+            }
+        );
+
+        return $this->allowAlreadyExistsDependency($result, 'Stock group already exists in Tally.');
+    }
+
+    private function syncLedgerMaster(string $ledgerName, string $parentLedgerName, ?string $companyName = null): array
+    {
+        $ledgerName = trim($ledgerName);
+        $parentLedgerName = trim($parentLedgerName);
+        if ($ledgerName === '' || $parentLedgerName === '') {
+            return [
+                'status' => false,
+                'message' => 'Ledger name or parent ledger group is empty.',
+            ];
+        }
+
+        $result = $this->pushWithFallback(
+            reportName: 'All Masters',
+            context: 'ledger_master_sync',
+            operation: 'upsert',
+            companyName: $companyName,
+            buildMessageXml: function (string $action) use ($ledgerName, $parentLedgerName) {
+                $xml = '<TALLYMESSAGE xmlns:UDF="TallyUDF">';
+                $xml .= '<LEDGER NAME="'.$this->esc($ledgerName).'" ACTION="'.$this->esc($action).'">';
+                $xml .= '<NAME>'.$this->esc($ledgerName).'</NAME>';
+                $xml .= '<PARENT>'.$this->esc($parentLedgerName).'</PARENT>';
+                $xml .= '<ISBILLWISEON>No</ISBILLWISEON>';
+                $xml .= '<AFFECTSSTOCK>Yes</AFFECTSSTOCK>';
+                $xml .= '</LEDGER>';
+                $xml .= '</TALLYMESSAGE>';
+
+                return $xml;
+            }
+        );
+
+        return $this->allowAlreadyExistsDependency($result, 'Ledger already exists in Tally.');
+    }
+
+    private function allowAlreadyExistsDependency(array $result, string $successMessage): array
+    {
+        if (($result['status'] ?? false) || ! preg_match('/already\s+exists|exists\s+already|duplicate/i', (string) ($result['message'] ?? ''))) {
+            return $result;
+        }
+
+        $result['status'] = true;
+        $result['message'] = $successMessage;
+
+        return $result;
+    }
+
+    private function firstFailedDependencyMessage(array $dependencyResults, string $prefix = ''): ?string
+    {
+        foreach ($dependencyResults as $name => $dependency) {
+            if (! is_array($dependency)) {
+                continue;
+            }
+
+            $label = is_string($name) ? ucfirst(str_replace('_', ' ', $name)) : trim($prefix);
+
+            if (array_key_exists('status', $dependency)) {
+                if (! (bool) ($dependency['status'] ?? false)) {
+                    $message = trim((string) ($dependency['message'] ?? 'Failed.'));
+
+                    return trim($label.': '.$message);
+                }
+
+                continue;
+            }
+
+            $nestedPrefix = trim($prefix.' '.$label);
+            $nestedMessage = $this->firstFailedDependencyMessage($dependency, $nestedPrefix);
+            if ($nestedMessage !== null) {
+                return $nestedMessage;
+            }
+        }
+
+        return null;
+    }
+
     private function normalizePartyParentLedger(string $raw): string
     {
         $normalized = strtolower(trim($raw));
@@ -457,6 +668,8 @@ class TallySyncService
             'entity_id' => $entityId,
             'operation' => $operation,
             'log_status' => $status,
+            'tally_response' => $responsePayload['parsed'] ?? null,
+            'dependency_sync' => $responsePayload['dependency_sync'] ?? null,
         ];
     }
 

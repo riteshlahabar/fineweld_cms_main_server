@@ -256,7 +256,7 @@ public function export($partyType, Request $request)
         try {
             $tallySyncResult = $this->tallySyncService->syncPartyById(
                 partyId: (int) $partyModel->id,
-                operation: $partyId ? 'update' : 'create'
+                operation: 'upsert'
             );
         } catch (\Throwable $syncException) {
             Log::error('Tally party sync exception', [
@@ -402,7 +402,7 @@ public function export($partyType, Request $request)
         try {
             $tallySyncResult = $this->tallySyncService->syncPartyById(
                 partyId: (int) $party->id,
-                operation: 'create'
+                operation: 'upsert'
             );
         } catch (\Throwable $syncException) {
             Log::error('Tally public party sync exception', [

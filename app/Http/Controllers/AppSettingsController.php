@@ -13,6 +13,7 @@ use App\Models\TallyIntegrationSetting;
 use App\Models\TallySyncLog;
 use App\Models\Twilio;
 use App\Models\Vonage;
+use App\Services\TallyIntegration\TallyClientService;
 use App\Services\TallyIntegration\TallySyncService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -87,16 +88,30 @@ class AppSettingsController extends Controller
 
         $validatedData = $request->validate([
             'host' => ['required', 'string', 'max:255'],
+            'company_name' => ['required', 'string', 'max:255'],
+            'xml_port' => ['required', 'integer', 'between:1,65535'],
+            'sales_ledger_name' => ['nullable', 'string', 'max:255'],
             'port' => ['nullable', 'integer', 'between:1,65535'],
-            'odbc_port' => ['required', 'integer', 'between:1,65535'],
+            'odbc_port' => ['nullable', 'integer', 'between:1,65535'],
             'username' => ['nullable', 'string', 'max:255'],
             'password' => ['nullable', 'string', 'max:255'],
         ]);
 
         $settings = TallyIntegrationSetting::query()->first() ?? new TallyIntegrationSetting();
         $settings->host = $validatedData['host'];
-        $settings->port = $validatedData['port'] ?? null;
-        $settings->odbc_port = $validatedData['odbc_port'];
+        $settings->port = (int) $validatedData['xml_port'];
+        if (Schema::hasColumn('tally_integration_settings', 'company_name')) {
+            $settings->company_name = $validatedData['company_name'];
+        }
+        if (Schema::hasColumn('tally_integration_settings', 'xml_port')) {
+            $settings->xml_port = (int) $validatedData['xml_port'];
+        }
+        if (Schema::hasColumn('tally_integration_settings', 'sales_ledger_name')) {
+            $settings->sales_ledger_name = $validatedData['sales_ledger_name'] ?? null;
+        }
+        if (array_key_exists('odbc_port', $validatedData) && ! empty($validatedData['odbc_port'])) {
+            $settings->odbc_port = $validatedData['odbc_port'];
+        }
         $settings->username = $validatedData['username'] ?? null;
         if (! empty($validatedData['password'])) {
             $settings->password = $validatedData['password'];
@@ -104,96 +119,61 @@ class AppSettingsController extends Controller
         $settings->status = 1;
         $settings->save();
 
-        return redirect()->route('settings.tally.integration')->with('success', 'Connection settings saved successfully.');
+        return redirect()->route('settings.tally.integration')->with('success', 'Tally XML connection settings saved successfully.');
     }
 
-    public function tallyIntegrationTestConnection(Request $request): JsonResponse
+    public function tallyIntegrationTestConnection(Request $request, TallyClientService $tallyClient): JsonResponse
     {
+        $validatedData = $request->validate([
+            'host' => ['required', 'string', 'max:255'],
+            'xml_port' => ['required', 'integer', 'between:1,65535'],
+            'company_name' => ['nullable', 'string', 'max:255'],
+        ]);
+
         try {
-            $inputHost = $request->input('host');
-            $inputPort = $request->input('port');
-            $inputOdbcPort = $request->input('odbc_port');
-
-            $settings = null;
-            if (Schema::hasTable('tally_integration_settings')) {
-                $settings = TallyIntegrationSetting::query()->latest('id')->first();
-            }
-
-            $host = $inputHost ?: ($settings->host ?? null);
-            $port = $inputPort ?: ($settings->port ?? null);
-            $odbcPort = $inputOdbcPort ?: ($settings->odbc_port ?? null);
-
-            if (empty($host) || empty($odbcPort)) {
-                Log::warning('Tally integration connection test validation failed', [
-                    'host' => $host,
-                    'port' => $port,
-                    'odbc_port' => $odbcPort,
-                    'user_id' => auth()->id(),
-                ]);
-
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Host and ODBC Port are required to test connection.',
-                ], 422);
-            }
-
-            $testPort = function (string $hostAddress, int $portNumber): array {
-                $errno = 0;
-                $errstr = '';
-                $connection = @stream_socket_client(
-                    "tcp://{$hostAddress}:{$portNumber}",
-                    $errno,
-                    $errstr,
-                    5
-                );
-
-                if ($connection !== false) {
-                    fclose($connection);
-                    return ['open' => true, 'message' => 'Open'];
-                }
-
-                return ['open' => false, 'message' => $errstr ?: "Connection failed ({$errno})"];
-            };
-
-            $odbcResult = $testPort((string) $host, (int) $odbcPort);
-            $appPortResult = null;
-            if (! empty($port)) {
-                $appPortResult = $testPort((string) $host, (int) $port);
-            }
-
-            $isSuccess = $odbcResult['open'] === true;
+            $host = trim((string) $validatedData['host']);
+            $xmlPort = (int) $validatedData['xml_port'];
+            $companyName = trim((string) ($validatedData['company_name'] ?? ''));
+            $result = $tallyClient->testXmlConnection($host, $xmlPort, $companyName);
+            $isSuccess = (bool) ($result['status'] ?? false);
 
             if ($isSuccess) {
-                Log::info('Tally integration ODBC connection test successful', [
+                Log::info('Tally XML connection test successful', [
                     'host' => $host,
-                    'port' => $port,
-                    'odbc_port' => $odbcPort,
-                    'odbc_status' => $odbcResult['message'],
-                    'app_port_status' => $appPortResult['message'] ?? null,
+                    'xml_port' => $xmlPort,
+                    'company_name' => $companyName,
+                    'parsed' => $result['parsed'] ?? [],
                     'user_id' => auth()->id(),
                 ]);
             } else {
-                Log::warning('Tally integration ODBC connection test failed', [
+                Log::warning('Tally XML connection test failed', [
                     'host' => $host,
-                    'port' => $port,
-                    'odbc_port' => $odbcPort,
-                    'odbc_status' => $odbcResult['message'],
-                    'app_port_status' => $appPortResult['message'] ?? null,
+                    'xml_port' => $xmlPort,
+                    'company_name' => $companyName,
+                    'message' => $result['message'] ?? null,
+                    'parsed' => $result['parsed'] ?? [],
                     'user_id' => auth()->id(),
                 ]);
             }
 
+            $responseExcerpt = trim(preg_replace('/\s+/', ' ', strip_tags((string) ($result['response_body'] ?? ''))) ?? '');
+
             return response()->json([
                 'status' => $isSuccess,
-                'message' => $isSuccess ? 'ODBC connection test successful.' : 'ODBC connection test failed.',
+                'message' => $isSuccess ? 'Tally XML connection successful.' : ($result['message'] ?? 'Tally XML connection failed.'),
                 'details' => [
                     'host' => $host,
-                    'odbc_port' => ['port' => (int) $odbcPort, 'status' => $odbcResult['message']],
-                    'app_port' => $appPortResult ? ['port' => (int) $port, 'status' => $appPortResult['message']] : null,
+                    'xml_port' => $xmlPort,
+                    'company_name' => $companyName,
+                    'endpoint' => $result['endpoint'] ?? null,
+                    'http_status' => $result['http_status'] ?? null,
+                    'tally_message' => $result['parsed']['message'] ?? null,
+                    'tally_errors' => $result['parsed']['line_errors'] ?? [],
+                    'response_excerpt' => Str::limit($responseExcerpt, 500, ''),
                 ],
             ], $isSuccess ? 200 : 422);
         } catch (\Throwable $e) {
-            Log::error('Tally integration test connection exception', [
+            Log::error('Tally XML test connection exception', [
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),

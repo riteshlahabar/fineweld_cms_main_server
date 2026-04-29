@@ -357,7 +357,7 @@ class ItemController extends Controller
             try {
                 $tallySyncResult = $this->tallySyncService->syncItemById(
                     itemId: (int) $request->itemModel->id,
-                    operation: $operation === 'save' ? 'create' : 'update'
+                    operation: 'upsert'
                 );
             } catch (\Throwable $syncException) {
                 Log::error('Tally item sync exception', [

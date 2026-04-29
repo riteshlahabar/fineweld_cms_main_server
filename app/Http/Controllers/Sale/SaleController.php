@@ -721,7 +721,7 @@ $this->partyService->updateShippingAddress(
             try {
                 $tallySyncResult = $this->tallySyncService->syncSaleById(
                     saleId: (int) $newSale->id,
-                    operation: ($request->operation === 'save' || $request->operation === 'convert') ? 'create' : 'update'
+                    operation: 'upsert'
                 );
             } catch (\Throwable $syncException) {
                 Log::error('Tally sale sync exception', [

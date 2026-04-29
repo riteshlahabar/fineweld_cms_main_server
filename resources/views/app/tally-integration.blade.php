@@ -2,6 +2,11 @@
 @section('title', 'Tally Integration')
 
 @section('content')
+@php
+    $xmlPort = old('xml_port', $connectionSettings->xml_port ?? $connectionSettings->port ?? $connectionSettings->odbc_port ?? 9000);
+    $defaultCompanyName = old('company_name', $connectionSettings->company_name ?? '');
+    $salesLedgerName = old('sales_ledger_name', $connectionSettings->sales_ledger_name ?? 'Sales');
+@endphp
 <div class="page-wrapper">
     <div class="page-content">
         <x-breadcrumb :langArray="[
@@ -45,17 +50,21 @@
                 <form id="tallyConnectionForm" method="POST" action="{{ route('settings.tally.integration.connection.store') }}">
                     @csrf
                     <div class="row g-3 align-items-end">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <x-label for="host" name="Host / IP" />
                             <x-input type="text" name="host" id="host" :required="true" value="{{ old('host', $connectionSettings->host ?? '') }}" />
                         </div>
                         <div class="col-md-2">
-                            <x-label for="port" name="Port" />
-                            <x-input type="number" name="port" id="port" :required="false" value="{{ old('port', $connectionSettings->port ?? '') }}" />
+                            <x-label for="xml_port" name="XML Port" />
+                            <x-input type="number" name="xml_port" id="xml_port" :required="true" value="{{ $xmlPort }}" />
+                        </div>
+                        <div class="col-md-3">
+                            <x-label for="connection_company_name" name="Tally Company Name" />
+                            <x-input type="text" name="company_name" id="connection_company_name" :required="true" value="{{ $defaultCompanyName }}" />
                         </div>
                         <div class="col-md-2">
-                            <x-label for="odbc_port" name="ODBC Port" />
-                            <x-input type="number" name="odbc_port" id="odbc_port" :required="true" value="{{ old('odbc_port', $connectionSettings->odbc_port ?? '') }}" />
+                            <x-label for="sales_ledger_name" name="Sales Ledger" />
+                            <x-input type="text" name="sales_ledger_name" id="sales_ledger_name" :required="false" value="{{ $salesLedgerName }}" />
                         </div>
                         <div class="col-md-2">
                             <x-label for="username" name="User ID" />
@@ -179,7 +188,7 @@
                     </div>
                     <div class="col-md-2">
                         <x-label for="manual_sync_company_name" name="Company Name" />
-                        <input id="manual_sync_company_name" type="text" class="form-control" placeholder="Exact Tally company" required>
+                        <input id="manual_sync_company_name" type="text" class="form-control" placeholder="Exact Tally company" value="{{ $defaultCompanyName }}" required>
                     </div>
                     <div class="col-md-2">
                         <x-label for="manual_sync_id" name="ID" />
@@ -411,8 +420,8 @@
 
     testBtn.addEventListener('click', async function() {
         const host = document.getElementById('host').value;
-        const port = document.getElementById('port').value;
-        const odbcPort = document.getElementById('odbc_port').value;
+        const xmlPort = document.getElementById('xml_port').value;
+        const companyName = document.getElementById('connection_company_name').value;
 
         testBtn.disabled = true;
         testBtn.innerText = 'Testing...';
@@ -427,8 +436,8 @@
                 },
                 body: JSON.stringify({
                     host: host,
-                    port: port,
-                    odbc_port: odbcPort
+                    xml_port: xmlPort,
+                    company_name: companyName
                 })
             });
 
@@ -444,9 +453,10 @@
 
             let extra = '';
             if (json.details) {
-                const odbcStatus = json.details.odbc_port ? json.details.odbc_port.status : 'N/A';
-                const appStatus = json.details.app_port ? json.details.app_port.status : 'N/A';
-                extra = `<div class="mt-1"><strong>ODBC:</strong> ${odbcStatus}<br><strong>App Port:</strong> ${appStatus}</div>`;
+                const tallyMessage = json.details.tally_message || '';
+                const endpoint = json.details.endpoint || '';
+                const httpStatus = json.details.http_status || 'N/A';
+                extra = `<div class="mt-1"><strong>Endpoint:</strong> ${endpoint}<br><strong>HTTP:</strong> ${httpStatus}<br><strong>Tally:</strong> ${tallyMessage}</div>`;
             }
 
             resultBox.className = `alert ${css}`;
