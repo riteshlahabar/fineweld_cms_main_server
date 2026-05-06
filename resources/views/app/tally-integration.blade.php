@@ -312,7 +312,7 @@
     const masterFetchResult = document.getElementById('masterFetchResult');
     const form = document.getElementById('tallyConnectionForm');
     const clientErrorLogUrl = "{{ route('settings.tally.integration.client.error') }}";
-    const masterOptionsUrl = "{{ route('settings.tally.integration.master.options') }}";
+    const masterOptionsUrl = "{{ url('settings/tally-integration/master-options') }}";
     const manualSyncBtn = document.getElementById('manualSyncBtn');
     const manualSyncResult = document.getElementById('manualSyncResult');
     const syncLogsBtn = document.getElementById('loadTallySyncLogsBtn');
