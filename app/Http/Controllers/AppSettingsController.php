@@ -91,6 +91,14 @@ class AppSettingsController extends Controller
             'company_name' => ['required', 'string', 'max:255'],
             'xml_port' => ['required', 'integer', 'between:1,65535'],
             'sales_ledger_name' => ['nullable', 'string', 'max:255'],
+            'purchase_ledger_name' => ['nullable', 'string', 'max:255'],
+            'expense_ledger_name' => ['nullable', 'string', 'max:255'],
+            'cash_ledger_name' => ['nullable', 'string', 'max:255'],
+            'bank_ledger_name' => ['nullable', 'string', 'max:255'],
+            'round_off_ledger_name' => ['nullable', 'string', 'max:255'],
+            'cgst_ledger_name' => ['nullable', 'string', 'max:255'],
+            'sgst_ledger_name' => ['nullable', 'string', 'max:255'],
+            'igst_ledger_name' => ['nullable', 'string', 'max:255'],
             'port' => ['nullable', 'integer', 'between:1,65535'],
             'odbc_port' => ['nullable', 'integer', 'between:1,65535'],
             'username' => ['nullable', 'string', 'max:255'],
@@ -108,6 +116,20 @@ class AppSettingsController extends Controller
         }
         if (Schema::hasColumn('tally_integration_settings', 'sales_ledger_name')) {
             $settings->sales_ledger_name = $validatedData['sales_ledger_name'] ?? null;
+        }
+        foreach ([
+            'purchase_ledger_name',
+            'expense_ledger_name',
+            'cash_ledger_name',
+            'bank_ledger_name',
+            'round_off_ledger_name',
+            'cgst_ledger_name',
+            'sgst_ledger_name',
+            'igst_ledger_name',
+        ] as $ledgerSetting) {
+            if (Schema::hasColumn('tally_integration_settings', $ledgerSetting)) {
+                $settings->{$ledgerSetting} = $validatedData[$ledgerSetting] ?? null;
+            }
         }
         if (array_key_exists('odbc_port', $validatedData) && ! empty($validatedData['odbc_port'])) {
             $settings->odbc_port = $validatedData['odbc_port'];
@@ -183,6 +205,37 @@ class AppSettingsController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Connection test error: '.$e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function tallyIntegrationMasterOptions(Request $request, TallyClientService $tallyClient): JsonResponse
+    {
+        $validatedData = $request->validate([
+            'host' => ['required', 'string', 'max:255'],
+            'xml_port' => ['required', 'integer', 'between:1,65535'],
+            'company_name' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        try {
+            $result = $tallyClient->fetchMasterOptions(
+                companyName: trim((string) ($validatedData['company_name'] ?? '')) ?: null,
+                host: trim((string) $validatedData['host']),
+                xmlPort: (int) $validatedData['xml_port'],
+            );
+
+            return response()->json($result, ($result['status'] ?? false) ? 200 : 422);
+        } catch (\Throwable $e) {
+            Log::error('Tally master options fetch exception', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'user_id' => auth()->id(),
+            ]);
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Tally master options fetch error: '.$e->getMessage(),
             ], 500);
         }
     }

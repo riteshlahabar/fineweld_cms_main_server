@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\TallyMiddlewareController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\Engineer\EngineerLiveController;
 use App\Http\Controllers\Api\Engineer\EngineerTicketController;
@@ -47,6 +48,24 @@ Route::prefix('products')->group(function () {
     Route::get('/my-products/{party_id}', [ProductController::class, 'myProducts']);
 });
 
+Route::prefix('tally')->group(function () {
+    Route::post('/test-connection', [TallyMiddlewareController::class, 'testConnection']);
+    Route::match(['get', 'post'], '/current-company', [TallyMiddlewareController::class, 'currentCompany']);
+    Route::match(['get', 'post'], '/ledgers', [TallyMiddlewareController::class, 'ledgers']);
+    Route::match(['get', 'post'], '/groups', [TallyMiddlewareController::class, 'groups']);
+    Route::match(['get', 'post'], '/stock-items', [TallyMiddlewareController::class, 'stockItems']);
+    Route::match(['get', 'post'], '/units', [TallyMiddlewareController::class, 'units']);
+    Route::match(['get', 'post'], '/voucher-types', [TallyMiddlewareController::class, 'voucherTypes']);
+    Route::match(['get', 'post'], '/master-options', [TallyMiddlewareController::class, 'masterOptions']);
+    Route::get('/fields', [TallyMiddlewareController::class, 'fields']);
+    Route::post('/ledger/create', [TallyMiddlewareController::class, 'createLedger']);
+    Route::post('/item/create', [TallyMiddlewareController::class, 'createItem']);
+    Route::post('/sales/create', [TallyMiddlewareController::class, 'createSalesVoucher']);
+    Route::post('/expense/create', [TallyMiddlewareController::class, 'createExpenseVoucher']);
+    Route::post('/journal/create', [TallyMiddlewareController::class, 'createJournalVoucher']);
+    Route::get('/sync-logs', [TallyMiddlewareController::class, 'logs']);
+});
+
 
 /*
 |--------------------------------------------------------------------------
@@ -75,7 +94,4 @@ Route::prefix('engineer')->group(function () {
     [TicketVisitController::class, 'closeTicketAfterFirebase']
 );
 });
-
-
-
 

@@ -35,6 +35,13 @@ class TallyClientService
         return $salesLedgerName !== '' ? $salesLedgerName : 'Sales';
     }
 
+    public function settingValue(string $attribute, string $fallback = ''): string
+    {
+        $value = $this->settingString($this->activeSettings(), $attribute);
+
+        return $value !== '' ? $value : $fallback;
+    }
+
     public function resolvedXmlPort(?TallyIntegrationSetting $settings = null): int
     {
         $settings ??= $this->activeSettings();
@@ -78,11 +85,11 @@ class TallyClientService
 
     public function testXmlConnection(string $host, int $xmlPort = 9000, ?string $companyName = null): array
     {
-        $staticVariables = '';
+        $staticVariables = '<SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>';
         $companyName = trim((string) ($companyName ?? ''));
 
         if ($companyName !== '') {
-            $staticVariables = '<STATICVARIABLES><SVCURRENTCOMPANY>'.$this->xmlEscape($companyName).'</SVCURRENTCOMPANY></STATICVARIABLES>';
+            $staticVariables .= '<SVCURRENTCOMPANY>'.$this->xmlEscape($companyName).'</SVCURRENTCOMPANY>';
         }
 
         $xmlEnvelope = '<?xml version="1.0" encoding="UTF-8"?>'
@@ -91,9 +98,19 @@ class TallyClientService
             .'<BODY>'
             .'<EXPORTDATA>'
             .'<REQUESTDESC>'
-            .'<REPORTNAME>List of Companies</REPORTNAME>'
-            .$staticVariables
+            .'<REPORTNAME>Collection</REPORTNAME>'
+            .'<STATICVARIABLES>'.$staticVariables.'</STATICVARIABLES>'
             .'</REQUESTDESC>'
+            .'<REQUESTDATA>'
+            .'<TDL>'
+            .'<TDLMESSAGE>'
+            .'<COLLECTION NAME="Open Companies" ISMODIFY="No">'
+            .'<TYPE>Company</TYPE>'
+            .'<FETCH>Name</FETCH>'
+            .'</COLLECTION>'
+            .'</TDLMESSAGE>'
+            .'</TDL>'
+            .'</REQUESTDATA>'
             .'</EXPORTDATA>'
             .'</BODY>'
             .'</ENVELOPE>';
@@ -104,6 +121,186 @@ class TallyClientService
             context: 'connection_test',
             expectImportCounters: false,
         );
+    }
+
+    public function fetchCurrentCompany(?string $host = null, ?int $xmlPort = null): array
+    {
+        $xmlEnvelope = '<?xml version="1.0" encoding="UTF-8"?>'
+            .'<ENVELOPE>'
+            .'<HEADER><VERSION>1</VERSION><TALLYREQUEST>Export</TALLYREQUEST><TYPE>Collection</TYPE><ID>CompanyInfo</ID></HEADER>'
+            .'<BODY><DESC>'
+            .'<STATICVARIABLES><SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT></STATICVARIABLES>'
+            .'<TDL><TDLMESSAGE>'
+            .'<OBJECT NAME="CurrentCompany"><LOCALFORMULA>CurrentCompany:##SVCURRENTCOMPANY</LOCALFORMULA></OBJECT>'
+            .'<COLLECTION NAME="CompanyInfo"><OBJECTS>CurrentCompany</OBJECTS><NATIVEMETHOD>CurrentCompany</NATIVEMETHOD></COLLECTION>'
+            .'</TDLMESSAGE></TDL>'
+            .'</DESC></BODY>'
+            .'</ENVELOPE>';
+
+        $result = $this->sendExportEnvelope($xmlEnvelope, 'fetch_current_company', $host, $xmlPort);
+        $companyName = ($result['status'] ?? false) ? $this->parseCurrentCompanyName((string) ($result['response_body'] ?? '')) : '';
+
+        $result['current_company'] = $companyName;
+        $result['data'] = $companyName !== '' ? [['name' => $companyName]] : [];
+        $result['count'] = count($result['data']);
+
+        if (($result['status'] ?? false) && $companyName !== '') {
+            $result['message'] = 'Current Tally company fetched successfully.';
+        }
+
+        return $result;
+    }
+
+    public function fetchLedgers(?string $companyName = null, ?string $host = null, ?int $xmlPort = null): array
+    {
+        return $this->fetchMasterCollection(
+            collectionName: 'Ledgers',
+            masterType: 'Ledger',
+            nativeMethods: ['Name', 'Parent', 'MasterID', 'GUID', 'OpeningBalance', 'ClosingBalance', 'PartyGSTIN', 'LedgerMobile', 'Email'],
+            companyName: $companyName,
+            host: $host,
+            xmlPort: $xmlPort,
+            context: 'fetch_ledgers',
+        );
+    }
+
+    public function fetchGroups(?string $companyName = null, ?string $host = null, ?int $xmlPort = null): array
+    {
+        return $this->fetchMasterCollection(
+            collectionName: 'Groups',
+            masterType: 'Group',
+            nativeMethods: ['Name', 'Parent', 'MasterID', 'GUID'],
+            companyName: $companyName,
+            host: $host,
+            xmlPort: $xmlPort,
+            context: 'fetch_groups',
+        );
+    }
+
+    public function fetchStockItems(?string $companyName = null, ?string $host = null, ?int $xmlPort = null): array
+    {
+        return $this->fetchMasterCollection(
+            collectionName: 'StockItems',
+            masterType: 'StockItem',
+            nativeMethods: ['Name', 'Parent', 'MasterID', 'GUID', 'BaseUnits', 'HSNCode', 'ClosingBalance', 'ClosingRate', 'ClosingValue'],
+            companyName: $companyName,
+            host: $host,
+            xmlPort: $xmlPort,
+            context: 'fetch_stock_items',
+        );
+    }
+
+    public function fetchUnits(?string $companyName = null, ?string $host = null, ?int $xmlPort = null): array
+    {
+        return $this->fetchMasterCollection(
+            collectionName: 'Units',
+            masterType: 'Unit',
+            nativeMethods: ['Name', 'OriginalName', 'MasterID', 'GUID', 'DecimalPlaces', 'IsSimpleUnit'],
+            companyName: $companyName,
+            host: $host,
+            xmlPort: $xmlPort,
+            context: 'fetch_units',
+        );
+    }
+
+    public function fetchVoucherTypes(?string $companyName = null, ?string $host = null, ?int $xmlPort = null): array
+    {
+        return $this->fetchMasterCollection(
+            collectionName: 'VoucherTypes',
+            masterType: 'VoucherType',
+            nativeMethods: ['Name', 'Parent', 'MasterID', 'GUID', 'NumberingMethod'],
+            companyName: $companyName,
+            host: $host,
+            xmlPort: $xmlPort,
+            context: 'fetch_voucher_types',
+        );
+    }
+
+    public function fetchMasterOptions(?string $companyName = null, ?string $host = null, ?int $xmlPort = null): array
+    {
+        $currentCompany = $this->fetchCurrentCompany($host, $xmlPort);
+        $resolvedCompanyName = trim((string) (($currentCompany['current_company'] ?? '') ?: ($companyName ?: ($this->defaultCompanyName() ?? ''))));
+
+        $ledgers = $this->fetchLedgers($resolvedCompanyName, $host, $xmlPort);
+        $groups = $this->fetchGroups($resolvedCompanyName, $host, $xmlPort);
+        $stockItems = $this->fetchStockItems($resolvedCompanyName, $host, $xmlPort);
+        $units = $this->fetchUnits($resolvedCompanyName, $host, $xmlPort);
+        $voucherTypes = $this->fetchVoucherTypes($resolvedCompanyName, $host, $xmlPort);
+
+        $results = [
+            'current_company' => $currentCompany,
+            'ledgers' => $ledgers,
+            'groups' => $groups,
+            'stock_items' => $stockItems,
+            'units' => $units,
+            'voucher_types' => $voucherTypes,
+        ];
+
+        $failed = array_filter($results, static fn (array $result) => ! (bool) ($result['status'] ?? false));
+        $messages = array_values(array_filter(array_map(static fn (array $result) => $result['message'] ?? '', $failed)));
+
+        return [
+            'status' => count($failed) === 0,
+            'message' => count($failed) === 0
+                ? 'Tally company and master options fetched successfully.'
+                : 'Some Tally master options could not be fetched: '.implode(' | ', $messages),
+            'current_company' => $resolvedCompanyName,
+            'companies' => $currentCompany['data'] ?? [],
+            'ledgers' => $ledgers['data'] ?? [],
+            'groups' => $groups['data'] ?? [],
+            'stock_items' => $stockItems['data'] ?? [],
+            'units' => $units['data'] ?? [],
+            'voucher_types' => $voucherTypes['data'] ?? [],
+            'field_options' => $this->tallyFieldOptions(),
+            'counts' => [
+                'companies' => count($currentCompany['data'] ?? []),
+                'ledgers' => count($ledgers['data'] ?? []),
+                'groups' => count($groups['data'] ?? []),
+                'stock_items' => count($stockItems['data'] ?? []),
+                'units' => count($units['data'] ?? []),
+                'voucher_types' => count($voucherTypes['data'] ?? []),
+            ],
+            'diagnostics' => array_map(fn (array $result) => $this->exportDiagnostics($result), $results),
+        ];
+    }
+
+    public function tallyFieldOptions(): array
+    {
+        return [
+            'ledger' => [
+                'NAME',
+                'PARENT',
+                'PARTYGSTIN',
+                'LEDGERMOBILE',
+                'EMAIL',
+                'OPENINGBALANCE',
+                'CLOSINGBALANCE',
+            ],
+            'stock_item' => [
+                'NAME',
+                'PARENT',
+                'BASEUNITS',
+                'HSNCODE',
+                'OPENINGBALANCE',
+                'CLOSINGBALANCE',
+                'CLOSINGRATE',
+                'CLOSINGVALUE',
+            ],
+            'voucher' => [
+                'VOUCHERNUMBER',
+                'DATE',
+                'VOUCHERTYPENAME',
+                'PARTYLEDGERNAME',
+                'REFERENCE',
+                'NARRATION',
+                'AMOUNT',
+                'LEDGERNAME',
+                'STOCKITEMNAME',
+                'RATE',
+                'ACTUALQTY',
+                'BILLEDQTY',
+            ],
+        ];
     }
 
     public function sendEnvelope(string $xmlEnvelope, string $context = 'generic'): array
@@ -146,6 +343,7 @@ class TallyClientService
 
             $hasTallyError = (($parsed['errors'] ?? 0) > 0)
                 || (($parsed['exceptions'] ?? 0) > 0)
+                || (($parsed['response_status'] ?? null) === 0)
                 || ! empty($parsed['line_errors']);
             $hasBody = trim($body) !== '';
             $hasExpectedResponse = $expectImportCounters
@@ -161,6 +359,11 @@ class TallyClientService
                 $message = 'Tally XML server returned HTTP '.$response->status().': '.$this->bodyExcerpt($body);
             } elseif (! $hasBody) {
                 $message = 'Tally XML server returned an empty response.';
+            } elseif ($context === 'connection_test' && $hasBody && ($parsed['has_tally_response'] ?? false)) {
+                $status = true;
+                $message = empty($parsed['line_errors'])
+                    ? 'Tally XML server is reachable. '.$parsed['message']
+                    : 'Tally XML server is reachable. Diagnostic response: '.$parsed['message'];
             } elseif ($hasTallyError) {
                 $message = 'Tally error: '.($parsed['message'] ?: $this->bodyExcerpt($body));
             } elseif (! $hasExpectedResponse) {
@@ -222,6 +425,8 @@ class TallyClientService
             $this->extractTagList($xmlBody, 'ERRDESC'),
             $this->extractTagList($xmlBody, 'ERROR')
         )));
+        $responseStatusText = $this->extractTagText($xmlBody, 'STATUS');
+        $responseStatus = is_numeric($responseStatusText) ? (int) $responseStatusText : null;
         $hasImportCounters = preg_match('/<(CREATED|ALTERED|DELETED|CANCELLED|ERRORS|EXCEPTIONS)>/i', $xmlBody) === 1;
         $looksLikeXml = $body !== '' && str_starts_with($body, '<') && str_contains($body, '>');
         $hasTallyResponse = $looksLikeXml && preg_match('/<(ENVELOPE|RESPONSE|IMPORTRESULT|CREATED|ALTERED|ERRORS|LINEERROR|DSPACCNAME|COMPANY)>/i', $xmlBody) === 1;
@@ -229,6 +434,8 @@ class TallyClientService
         $message = '';
         if (! empty($lineErrors)) {
             $message = implode(' | ', $lineErrors);
+        } elseif ($responseStatus === 0) {
+            $message = 'Tally returned response status 0.';
         } elseif ($errors > 0 || $exceptions > 0) {
             $message = 'Tally returned import errors. Errors: '.$errors.', Exceptions: '.$exceptions.'. '.$this->bodyExcerpt($xmlBody);
         } elseif ($hasImportCounters) {
@@ -250,6 +457,7 @@ class TallyClientService
             'errors' => $errors,
             'exceptions' => $exceptions,
             'last_voucher_id' => $lastVoucherId,
+            'response_status' => $responseStatus,
             'line_errors' => $lineErrors,
             'message' => $message,
             'has_import_counters' => $hasImportCounters,
@@ -260,7 +468,7 @@ class TallyClientService
 
     private function extractTagValue(string $xml, string $tag): int
     {
-        if (preg_match('/<'.preg_quote($tag, '/').'>\s*(-?\d+)\s*<\/'.preg_quote($tag, '/').'>/i', $xml, $matches)) {
+        if (preg_match('/<'.preg_quote($tag, '/').'\b[^>]*>\s*(-?\d+)\s*<\/'.preg_quote($tag, '/').'>/i', $xml, $matches)) {
             return (int) $matches[1];
         }
 
@@ -269,7 +477,7 @@ class TallyClientService
 
     private function extractTagList(string $xml, string $tag): array
     {
-        if (! preg_match_all('/<'.preg_quote($tag, '/').'>\s*(.*?)\s*<\/'.preg_quote($tag, '/').'>/is', $xml, $matches)) {
+        if (! preg_match_all('/<'.preg_quote($tag, '/').'\b[^>]*>\s*(.*?)\s*<\/'.preg_quote($tag, '/').'>/is', $xml, $matches)) {
             return [];
         }
 
@@ -280,21 +488,238 @@ class TallyClientService
 
     private function extractTagText(string $xml, string $tag): string
     {
-        if (preg_match('/<'.preg_quote($tag, '/').'>\s*(.*?)\s*<\/'.preg_quote($tag, '/').'>/is', $xml, $matches)) {
+        if (preg_match('/<'.preg_quote($tag, '/').'\b[^>]*>\s*(.*?)\s*<\/'.preg_quote($tag, '/').'>/is', $xml, $matches)) {
             return trim(html_entity_decode(strip_tags((string) $matches[1])));
         }
 
         return '';
     }
 
+    private function fetchMasterCollection(string $collectionName, string $masterType, array $nativeMethods, ?string $companyName, ?string $host, ?int $xmlPort, string $context): array
+    {
+        $xmlEnvelope = $this->collectionExportEnvelope($collectionName, $masterType, $nativeMethods, $companyName);
+        $result = $this->sendExportEnvelope($xmlEnvelope, $context, $host, $xmlPort);
+        $records = ($result['status'] ?? false) ? $this->parseCollectionRecords((string) ($result['response_body'] ?? ''), $masterType) : [];
+
+        $result['data'] = $records;
+        $result['count'] = count($records);
+
+        if (($result['status'] ?? false)) {
+            $result['message'] = ucfirst(str_replace('_', ' ', $context)).' fetched successfully.';
+        }
+
+        return $result;
+    }
+
+    private function collectionExportEnvelope(string $collectionName, string $masterType, array $nativeMethods, ?string $companyName): string
+    {
+        $companyName = $this->resolveCompanyName($companyName);
+        $staticVariables = '<SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>';
+
+        if (! empty($companyName)) {
+            $staticVariables .= '<SVCURRENTCOMPANY>'.$this->xmlEscape($companyName).'</SVCURRENTCOMPANY>';
+        }
+
+        $fetchXml = '';
+        foreach ($nativeMethods as $method) {
+            $fetchXml .= '<NATIVEMETHOD>'.$this->xmlEscape($method).'</NATIVEMETHOD>';
+        }
+
+        return '<?xml version="1.0" encoding="UTF-8"?>'
+            .'<ENVELOPE>'
+            .'<HEADER><VERSION>1</VERSION><TALLYREQUEST>Export</TALLYREQUEST><TYPE>Collection</TYPE><ID>'.$this->xmlEscape($collectionName).'</ID></HEADER>'
+            .'<BODY><DESC>'
+            .'<STATICVARIABLES>'.$staticVariables.'</STATICVARIABLES>'
+            .'<TDL><TDLMESSAGE>'
+            .'<COLLECTION NAME="'.$this->xmlEscape($collectionName).'" ISMODIFY="No" ISFIXED="No" ISINITIALIZE="No" ISOPTION="No" ISINTERNAL="No">'
+            .'<TYPE>'.$this->xmlEscape($masterType).'</TYPE>'
+            .$fetchXml
+            .'</COLLECTION>'
+            .'</TDLMESSAGE></TDL>'
+            .'</DESC></BODY>'
+            .'</ENVELOPE>';
+    }
+
+    private function sendExportEnvelope(string $xmlEnvelope, string $context, ?string $host = null, ?int $xmlPort = null): array
+    {
+        $settings = $this->activeSettings();
+        $host = trim((string) ($host ?: $settings?->host ?: ''));
+        $xmlPort = (int) ($xmlPort ?: $this->resolvedXmlPort($settings));
+
+        if ($host === '') {
+            return [
+                'status' => false,
+                'message' => 'Tally host is missing. Save Tally connection settings first or pass host/xml_port.',
+                'request_xml' => $xmlEnvelope,
+                'response_body' => null,
+                'http_status' => null,
+                'endpoint' => null,
+                'parsed' => [],
+            ];
+        }
+
+        return $this->postXmlEnvelope(
+            endpoint: $this->buildEndpoint($host, $xmlPort),
+            xmlEnvelope: $xmlEnvelope,
+            context: $context,
+            expectImportCounters: false,
+        );
+    }
+
+    private function parseCurrentCompanyName(string $xmlBody): string
+    {
+        $companyName = '';
+        $xml = $this->loadXml($xmlBody);
+
+        if ($xml) {
+            foreach ($xml->xpath('//*[local-name()="CURRENTCOMPANY"]') ?: [] as $node) {
+                $text = $this->cleanScalar((string) $node);
+                if ($text !== '') {
+                    $companyName = $text;
+                }
+            }
+        }
+
+        if ($companyName === '') {
+            $companyName = $this->extractTagText($xmlBody, 'CURRENTCOMPANY');
+        }
+
+        return $companyName;
+    }
+
+    private function parseCollectionRecords(string $xmlBody, string $masterType): array
+    {
+        $xml = $this->loadXml($xmlBody);
+        if (! $xml) {
+            return [];
+        }
+
+        $records = [];
+        $target = strtoupper($masterType);
+        $walk = function (\SimpleXMLElement $node) use (&$walk, &$records, $target): void {
+            if (strtoupper($node->getName()) === strtoupper($target)) {
+                $record = $this->normalizeMasterNode($node);
+                if (($record['name'] ?? '') !== '') {
+                    $records[] = $record;
+                }
+            }
+
+            foreach ($node->children() as $child) {
+                $walk($child);
+            }
+        };
+
+        $walk($xml);
+
+        $unique = [];
+        foreach ($records as $record) {
+            $key = strtolower(($record['name'] ?? '').'|'.($record['parent'] ?? '').'|'.($record['master_id'] ?? ''));
+            $unique[$key] = $record;
+        }
+
+        $records = array_values($unique);
+        usort($records, static fn (array $a, array $b) => strcasecmp((string) ($a['name'] ?? ''), (string) ($b['name'] ?? '')));
+
+        return $records;
+    }
+
+    private function normalizeMasterNode(\SimpleXMLElement $node): array
+    {
+        $attributes = [];
+        foreach ($node->attributes() as $key => $value) {
+            $attributes[strtolower((string) $key)] = $this->cleanScalar((string) $value);
+        }
+
+        $fields = [];
+        foreach ($node->children() as $child) {
+            $key = strtoupper($child->getName());
+            $value = $this->cleanScalar((string) $child);
+            if ($value === '') {
+                continue;
+            }
+
+            if (array_key_exists($key, $fields)) {
+                if (! is_array($fields[$key])) {
+                    $fields[$key] = [$fields[$key]];
+                }
+                $fields[$key][] = $value;
+            } else {
+                $fields[$key] = $value;
+            }
+        }
+
+        $name = $this->fieldValue($fields, 'NAME') ?: ($attributes['name'] ?? '');
+
+        return [
+            'name' => $name,
+            'parent' => $this->fieldValue($fields, 'PARENT'),
+            'master_id' => $this->fieldValue($fields, 'MASTERID'),
+            'guid' => $this->fieldValue($fields, 'GUID'),
+            'reserved_name' => $attributes['reservedname'] ?? '',
+            'fields' => $fields,
+        ];
+    }
+
+    private function fieldValue(array $fields, string $key): string
+    {
+        $value = $fields[strtoupper($key)] ?? '';
+
+        return is_array($value) ? (string) ($value[0] ?? '') : (string) $value;
+    }
+
+    private function loadXml(string $xmlBody): ?\SimpleXMLElement
+    {
+        if (! function_exists('simplexml_load_string')) {
+            return null;
+        }
+
+        $previous = libxml_use_internal_errors(true);
+        try {
+            $xml = simplexml_load_string($xmlBody, \SimpleXMLElement::class, LIBXML_NOCDATA | LIBXML_NONET);
+
+            return $xml instanceof \SimpleXMLElement ? $xml : null;
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
+        }
+    }
+
+    private function cleanScalar(string $value): string
+    {
+        return trim(html_entity_decode(preg_replace('/\s+/', ' ', $value) ?? '', ENT_QUOTES | ENT_XML1, 'UTF-8'));
+    }
+
+    private function exportDiagnostics(array $result): array
+    {
+        return [
+            'status' => (bool) ($result['status'] ?? false),
+            'message' => $result['message'] ?? '',
+            'count' => $result['count'] ?? 0,
+            'endpoint' => $result['endpoint'] ?? null,
+            'http_status' => $result['http_status'] ?? null,
+            'tally_response' => $result['parsed'] ?? [],
+        ];
+    }
+
     private function buildEndpoint(string $host, int $port): string
     {
         $host = trim($host);
+        $host = preg_replace('/\s+/', '', $host) ?: $host;
         if (str_starts_with($host, 'http://') || str_starts_with($host, 'https://')) {
+            $parts = parse_url($host);
+            $scheme = $parts['scheme'] ?? 'http';
+            $hostname = $parts['host'] ?? '';
+
+            if ($hostname !== '') {
+                return $scheme.'://'.$hostname.':'.$port;
+            }
+
             $host = preg_replace('/:\d+$/', '', rtrim($host, '/')) ?: $host;
 
             return $host.':'.$port;
         }
+
+        $host = preg_replace('/:\d+$/', '', $host) ?: $host;
 
         return 'http://'.$host.':'.$port;
     }
