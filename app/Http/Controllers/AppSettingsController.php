@@ -7,7 +7,10 @@ use App\Http\Requests\GeneralSettingsRequest;
 use App\Http\Requests\LogoRequest;
 use App\Models\AppSettings;
 use App\Models\Company;
+use App\Models\Expenses\Expense;
 use App\Models\SmtpSettings;
+use App\Models\Purchase\Purchase;
+use App\Models\Sale\Sale;
 use App\Models\TallyFieldMapping;
 use App\Models\TallyIntegrationSetting;
 use App\Models\TallySyncLog;
@@ -278,23 +281,69 @@ class AppSettingsController extends Controller
     {
         $entity = Str::lower(trim($entity));
         $validatedData = $request->validate([
-            'company_name' => ['required', 'string', 'max:255'],
+            'company_name' => ['nullable', 'string', 'max:255'],
         ]);
-        $companyName = trim((string) ($validatedData['company_name'] ?? ''));
+        $companyName = trim((string) ($validatedData['company_name'] ?? '')) ?: null;
 
         $result = match ($entity) {
             'item', 'items' => $tallySyncService->syncItemById($id, 'upsert', $companyName),
             'party', 'vendor', 'customer' => $tallySyncService->syncPartyById($id, 'upsert', $companyName),
             'sale', 'invoice' => $tallySyncService->syncSaleById($id, 'upsert', $companyName),
+            'purchase', 'bill' => $tallySyncService->syncPurchaseById($id, 'upsert', $companyName),
+            'expense', 'payment' => $tallySyncService->syncExpenseById($id, 'upsert', $companyName),
             default => [
                 'status' => false,
-                'message' => 'Unsupported entity. Allowed: item, party, sale.',
+                'message' => 'Unsupported entity. Allowed: item, party, sale, purchase, expense.',
                 'entity_type' => $entity,
                 'entity_id' => $id,
             ],
         };
 
         return response()->json($result, ($result['status'] ?? false) ? 200 : 422);
+    }
+
+    public function tallyIntegrationSyncByDate(Request $request, TallySyncService $tallySyncService): JsonResponse
+    {
+        $validatedData = $request->validate([
+            'entity' => ['required', 'string', 'max:50'],
+            'from_date' => ['required', 'date'],
+            'to_date' => ['required', 'date'],
+            'company_name' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $entity = Str::lower(trim((string) $validatedData['entity']));
+        $fromDate = $validatedData['from_date'];
+        $toDate = $validatedData['to_date'];
+        $companyName = trim((string) ($validatedData['company_name'] ?? '')) ?: null;
+        $results = [];
+
+        if ($entity === 'sale') {
+            foreach (Sale::query()->whereBetween('sale_date', [$fromDate, $toDate])->orderBy('sale_date')->orderBy('id')->get(['id']) as $record) {
+                $results[] = $tallySyncService->syncSaleById((int) $record->id, 'upsert', $companyName);
+            }
+        } elseif ($entity === 'purchase') {
+            foreach (Purchase::query()->whereBetween('purchase_date', [$fromDate, $toDate])->orderBy('purchase_date')->orderBy('id')->get(['id']) as $record) {
+                $results[] = $tallySyncService->syncPurchaseById((int) $record->id, 'upsert', $companyName);
+            }
+        } elseif ($entity === 'expense') {
+            foreach (Expense::query()->whereBetween('expense_date', [$fromDate, $toDate])->orderBy('expense_date')->orderBy('id')->get(['id']) as $record) {
+                $results[] = $tallySyncService->syncExpenseById((int) $record->id, 'upsert', $companyName);
+            }
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unsupported sync type. Allowed: sale, purchase, expense.',
+                'data' => [],
+            ], 422);
+        }
+
+        $failed = collect($results)->filter(fn ($result) => ! (bool) ($result['status'] ?? false))->count();
+
+        return response()->json([
+            'status' => $failed === 0,
+            'message' => 'Tally sync completed. Total: '.count($results).', Failed: '.$failed.'.',
+            'data' => $results,
+        ], $failed === 0 ? 200 : 422);
     }
 
     public function tallyIntegrationSyncLogs(Request $request): JsonResponse
@@ -311,9 +360,35 @@ class AppSettingsController extends Controller
         $limit = max(1, min(500, $limit));
 
         $logs = TallySyncLog::query()
+            ->when($request->filled('entity_type'), fn ($query) => $query->where('entity_type', Str::lower((string) $request->input('entity_type'))))
+            ->when($request->filled('status'), fn ($query) => $query->where('status', (string) $request->input('status')))
+            ->when($request->filled('from_date'), fn ($query) => $query->whereDate('created_at', '>=', (string) $request->input('from_date')))
+            ->when($request->filled('to_date'), fn ($query) => $query->whereDate('created_at', '<=', (string) $request->input('to_date')))
             ->orderByDesc('id')
             ->limit($limit)
-            ->get();
+            ->get()
+            ->map(function (TallySyncLog $log) {
+                $responsePayload = json_decode((string) $log->response_payload, true) ?: [];
+                $requestPayload = json_decode((string) $log->request_payload, true) ?: [];
+
+                return [
+                    'id' => $log->id,
+                    'entity_type' => $log->entity_type,
+                    'entity_id' => $log->entity_id,
+                    'operation' => $log->operation,
+                    'status' => $log->status,
+                    'message' => $log->message,
+                    'voucher_no' => data_get($requestPayload, 'mapped_payload.VOUCHERNUMBER', data_get($requestPayload, 'mapped_payload.NAME', '')),
+                    'voucher_type' => data_get($requestPayload, 'mapped_payload.VOUCHERTYPENAME', $log->entity_type),
+                    'amount' => data_get($requestPayload, 'mapped_payload.AMOUNT', ''),
+                    'tally_created' => data_get($responsePayload, 'parsed.created', 0),
+                    'tally_altered' => data_get($responsePayload, 'parsed.altered', 0),
+                    'tally_errors' => data_get($responsePayload, 'parsed.errors', 0),
+                    'tally_line_errors' => data_get($responsePayload, 'parsed.line_errors', []),
+                    'synced_at' => optional($log->synced_at)->toDateTimeString(),
+                    'created_at' => optional($log->created_at)->toDateTimeString(),
+                ];
+            });
 
         return response()->json([
             'status' => true,

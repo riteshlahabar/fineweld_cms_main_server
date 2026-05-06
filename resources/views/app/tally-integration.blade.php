@@ -14,24 +14,6 @@
     $cgstLedgerName = old('cgst_ledger_name', $connectionSettings->cgst_ledger_name ?? 'CGST');
     $sgstLedgerName = old('sgst_ledger_name', $connectionSettings->sgst_ledger_name ?? 'SGST');
     $igstLedgerName = old('igst_ledger_name', $connectionSettings->igst_ledger_name ?? 'IGST');
-    $tallyFieldOptions = [
-        'NAME', 'PARENT', 'PARTYGSTIN', 'LEDGERMOBILE', 'EMAIL',
-        'OPENINGBALANCE', 'CLOSINGBALANCE', 'BASEUNITS', 'HSNCODE',
-        'VOUCHERNUMBER', 'DATE', 'VOUCHERTYPENAME', 'PARTYLEDGERNAME',
-        'REFERENCE', 'NARRATION', 'AMOUNT', 'LEDGERNAME', 'STOCKITEMNAME',
-        'RATE', 'ACTUALQTY', 'BILLEDQTY',
-    ];
-    $projectFieldOptions = [
-        'item.name', 'item.baseUnit.name', 'item.category.name', 'item.item_code',
-        'item.hsn', 'item.description', 'item.sale_price', 'item.purchase_price',
-        'party.company_name', 'party.vendor_type', 'party.primary_mobile',
-        'party.primary_email', 'party.company_gst', 'party.company_pan',
-        'party.billing_address', 'party.shipping_address',
-        'sale.sale_code', 'sale.party.company_name', 'sale.reference_no',
-        'sale.note', 'sale.grand_total', 'sale.round_off', 'sale.sale_date',
-        'sale_item.item.name', 'sale_item.unit.name', 'sale_item.quantity',
-        'sale_item.unit_price', 'sale_item.total', 'sale_item.description',
-    ];
 @endphp
 <div class="page-wrapper">
     <div class="page-content">
@@ -93,14 +75,6 @@
                             <x-input type="text" name="sales_ledger_name" id="sales_ledger_name" :required="false" value="{{ $salesLedgerName }}" />
                         </div>
                         <div class="col-md-2">
-                            <x-label for="username" name="User ID" />
-                            <x-input type="text" name="username" id="username" :required="false" value="{{ old('username', $connectionSettings->username ?? '') }}" />
-                        </div>
-                        <div class="col-md-2">
-                            <x-label for="password" name="Password" />
-                            <x-input type="password" name="password" id="password" :required="false" value="" />
-                        </div>
-                        <div class="col-md-2">
                             <x-label for="purchase_ledger_name" name="Purchase Ledger" />
                             <x-input type="text" name="purchase_ledger_name" id="purchase_ledger_name" :required="false" value="{{ $purchaseLedgerName }}" />
                         </div>
@@ -146,16 +120,6 @@
                 <datalist id="tallyStockItemOptions"></datalist>
                 <datalist id="tallyUnitOptions"></datalist>
                 <datalist id="tallyVoucherTypeOptions"></datalist>
-                <datalist id="tallyFieldOptions">
-                    @foreach ($tallyFieldOptions as $fieldOption)
-                    <option value="{{ $fieldOption }}"></option>
-                    @endforeach
-                </datalist>
-                <datalist id="projectFieldOptions">
-                    @foreach ($projectFieldOptions as $fieldOption)
-                    <option value="{{ $fieldOption }}"></option>
-                    @endforeach
-                </datalist>
 
                 <div class="mt-3 d-none" id="connectionTestResult"></div>
                 <div class="mt-3 d-none" id="masterFetchResult"></div>
@@ -164,116 +128,39 @@
 
         <div class="card">
             <div class="card-header px-4 py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 text-uppercase">Field Mapping</h5>
-            </div>
-            <div class="card-body">
-                <div class="alert alert-info border-0 border-start border-5 border-info py-2">
-                    <div class="small">
-                        Use single Tally target field names only:
-                        <strong>NAME</strong>, <strong>PARTYGSTIN</strong>, <strong>VOUCHERNUMBER</strong>.
-                        Do not use prefixes like <strong>item.</strong>, <strong>party.</strong> or <strong>sale.</strong>.
-                    </div>
-                </div>
-                <form method="POST" action="{{ $editMapping ? route('settings.tally.integration.update', ['id' => $editMapping->id]) : route('settings.tally.integration.store') }}">
-                    @csrf
-                    @if ($editMapping)
-                    @method('PUT')
-                    @endif
-
-                    <div class="row g-3 align-items-end">
-                        <div class="col-md-4">
-                            <x-label for="project_field" name="Project Field" />
-                            <x-input type="text" name="project_field" id="project_field" :required="true" value="{{ old('project_field', $editMapping->project_field ?? '') }}" />
-                        </div>
-                        <div class="col-md-4">
-                            <x-label for="tally_field" name="Tally Field" />
-                            <x-input type="text" name="tally_field" id="tally_field" :required="true" value="{{ old('tally_field', $editMapping->tally_field ?? '') }}" />
-                        </div>
-                        <div class="col-md-2">
-                            <x-label for="company_name" name="Company Name" />
-                            <x-input type="text" name="company_name" id="company_name" :required="false" value="{{ old('company_name', $editMapping->company_name ?? '') }}" />
-                        </div>
-                        <div class="col-md-2">
-                            <x-button type="submit" class="primary w-100" text="{{ $editMapping ? __('app.update') : __('app.save') }}" />
-                        </div>
-                    </div>
-                </form>
-                @if ($editMapping)
-                <div class="mt-3">
-                    <a class="btn btn-outline-secondary px-4" href="{{ route('settings.tally.integration') }}">Cancel Edit</a>
-                </div>
-                @endif
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header px-4 py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 text-uppercase">Saved Field Mappings</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped table-bordered border w-100">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Project Field</th>
-                                <th>Tally Field</th>
-                                <th>Company Name</th>
-                                <th>{{ __('app.action') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($mappings as $mapping)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $mapping->project_field }}</td>
-                                <td>{{ $mapping->tally_field }}</td>
-                                <td>{{ $mapping->company_name ?: '-' }}</td>
-                                <td class="text-nowrap">
-                                    <a class="btn btn-sm btn-outline-primary" href="{{ route('settings.tally.integration', ['edit' => $mapping->id]) }}">Edit</a>
-                                    <form class="d-inline-block" method="POST" action="{{ route('settings.tally.integration.delete', ['id' => $mapping->id]) }}" onsubmit="return confirm('Delete this mapping?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="text-center text-muted">No mappings found.</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header px-4 py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 text-uppercase">Manual Sync & Logs</h5>
+                <h5 class="mb-0 text-uppercase">Tally Transfers</h5>
             </div>
             <div class="card-body">
                 <div class="row g-3 align-items-end">
-                    <div class="col-md-3">
-                        <x-label for="manual_sync_project_field" name="Project Field" />
-                        <input id="manual_sync_project_field" type="text" class="form-control" placeholder="e.g. name">
+                    <div class="col-md-2">
+                        <x-label for="manual_sync_entity" name="Transfer Type" />
+                        <select id="manual_sync_entity" class="form-control">
+                            <option value="sale">Sales</option>
+                            <option value="purchase">Purchase</option>
+                            <option value="expense">Expense</option>
+                            <option value="party">Party Ledger</option>
+                            <option value="item">Stock Item</option>
+                        </select>
                     </div>
                     <div class="col-md-2">
-                        <x-label for="manual_sync_tally_field" name="Tally Field" />
-                        <input id="manual_sync_tally_field" type="text" class="form-control" placeholder="e.g. VOUCHERNUMBER">
+                        <x-label for="manual_sync_id" name="Record ID" />
+                        <input id="manual_sync_id" type="number" min="1" class="form-control" placeholder="Optional ID">
+                    </div>
+                    <div class="col-md-2">
+                        <x-label for="manual_sync_from_date" name="From Date" />
+                        <input id="manual_sync_from_date" type="date" class="form-control" value="{{ now()->toDateString() }}">
+                    </div>
+                    <div class="col-md-2">
+                        <x-label for="manual_sync_to_date" name="To Date" />
+                        <input id="manual_sync_to_date" type="date" class="form-control" value="{{ now()->toDateString() }}">
                     </div>
                     <div class="col-md-2">
                         <x-label for="manual_sync_company_name" name="Company Name" />
-                        <input id="manual_sync_company_name" type="text" class="form-control" placeholder="Exact Tally company" value="{{ $defaultCompanyName }}" required>
+                        <input id="manual_sync_company_name" type="text" class="form-control" placeholder="Exact Tally company" value="{{ $defaultCompanyName }}">
                     </div>
-                    <div class="col-md-2">
-                        <x-label for="manual_sync_id" name="ID" />
-                        <input id="manual_sync_id" type="number" min="1" class="form-control" placeholder="Record ID">
-                    </div>
-                    <div class="col-md-3 d-flex gap-2">
-                        <button id="manualSyncBtn" type="button" class="btn btn-outline-primary px-4" data-base-url="{{ url('settings/tally-integration/sync') }}">Run Manual Sync</button>
-                        <button id="loadTallySyncLogsBtn" type="button" class="btn btn-outline-secondary px-4" data-url="{{ route('settings.tally.integration.sync.logs') }}">Load Latest Logs</button>
+                    <div class="col-md-2 d-flex gap-2">
+                        <button id="manualSyncBtn" type="button" class="btn btn-outline-primary px-3" data-base-url="{{ url('settings/tally-integration/sync') }}" data-date-url="{{ url('settings/tally-integration/sync-by-date') }}">Transfer</button>
+                        <button id="loadTallySyncLogsBtn" type="button" class="btn btn-outline-secondary px-3" data-url="{{ route('settings.tally.integration.sync.logs') }}">Logs</button>
                     </div>
                 </div>
 
@@ -284,16 +171,18 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Entity</th>
+                                <th>Date</th>
+                                <th>Type</th>
                                 <th>Record ID</th>
-                                <th>Operation</th>
+                                <th>Voucher</th>
+                                <th>Amount</th>
                                 <th>Status</th>
-                                <th>Message</th>
-                                <th>Created At</th>
+                                <th>Tally Result</th>
+                                <th>Error / Message</th>
                             </tr>
                         </thead>
                         <tbody id="tallySyncLogsBody">
-                            <tr><td colspan="7" class="text-center text-muted">Click "Load Latest Logs" to view sync history.</td></tr>
+                            <tr><td colspan="8" class="text-center text-muted">Click "Logs" to view date-wise transfer history.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -335,8 +224,6 @@
     ];
     ledgerInputIds.forEach((id) => document.getElementById(id)?.setAttribute('list', 'tallyLedgerOptions'));
     ['connection_company_name', 'company_name', 'manual_sync_company_name'].forEach((id) => document.getElementById(id)?.setAttribute('list', 'tallyCompanyOptions'));
-    ['tally_field', 'manual_sync_tally_field'].forEach((id) => document.getElementById(id)?.setAttribute('list', 'tallyFieldOptions'));
-    ['project_field', 'manual_sync_project_field'].forEach((id) => document.getElementById(id)?.setAttribute('list', 'projectFieldOptions'));
 
     const getCsrfToken = () => {
         const tokenInput = form.querySelector('input[name="_token"]');
@@ -460,15 +347,6 @@
         });
     };
 
-    const flattenFieldOptions = (fieldOptions) => {
-        const values = [];
-        Object.values(fieldOptions || {}).forEach((group) => {
-            (group || []).forEach((field) => values.push(String(field || '').trim().toUpperCase()));
-        });
-
-        return [...new Set(values.filter(Boolean))].sort();
-    };
-
     const pickLedger = (ledgers, parentText, nameText = '') => {
         const parentNeedle = String(parentText || '').toLowerCase();
         const nameNeedle = String(nameText || '').toLowerCase();
@@ -512,10 +390,6 @@
         replaceDatalistOptions('tallyStockItemOptions', json?.stock_items || []);
         replaceDatalistOptions('tallyUnitOptions', json?.units || []);
         replaceDatalistOptions('tallyVoucherTypeOptions', json?.voucher_types || []);
-        const fetchedFieldOptions = flattenFieldOptions(json?.field_options || {});
-        if (fetchedFieldOptions.length > 0) {
-            replaceDatalistOptions('tallyFieldOptions', fetchedFieldOptions);
-        }
 
         if (json?.current_company) {
             document.getElementById('connection_company_name').value = json.current_company;
@@ -556,98 +430,28 @@
         }
 
         if (!Array.isArray(logs) || logs.length === 0) {
-            syncLogsBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No sync logs found.</td></tr>';
+            syncLogsBody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No sync logs found.</td></tr>';
             return;
         }
 
         syncLogsBody.innerHTML = logs.map((row) => {
             const statusClass = row.status === 'success' ? 'badge bg-success' : 'badge bg-danger';
+            const lineErrors = Array.isArray(row.tally_line_errors) ? row.tally_line_errors.join(' | ') : '';
+            const tallyResult = `Created: ${row.tally_created ?? 0}, Altered: ${row.tally_altered ?? 0}, Errors: ${row.tally_errors ?? 0}`;
             return `
                 <tr>
                     <td>${row.id ?? ''}</td>
-                    <td>${row.entity_type ?? ''}</td>
+                    <td>${row.synced_at || row.created_at || ''}</td>
+                    <td>${row.voucher_type || row.entity_type || ''}</td>
                     <td>${row.entity_id ?? ''}</td>
-                    <td>${row.operation ?? ''}</td>
+                    <td>${row.voucher_no || ''}</td>
+                    <td>${row.amount || ''}</td>
                     <td><span class="${statusClass}">${row.status ?? ''}</span></td>
-                    <td>${row.message ?? ''}</td>
-                    <td>${row.created_at ?? ''}</td>
+                    <td>${tallyResult}</td>
+                    <td>${lineErrors || row.message || ''}</td>
                 </tr>
             `;
         }).join('');
-    };
-
-    const normalizeTallyField = (value) => {
-        const rawValue = String(value || '').trim();
-        if (rawValue === '') {
-            return '';
-        }
-
-        if (rawValue.includes('.')) {
-            const prefix = rawValue.split('.', 1)[0].toLowerCase();
-            const tail = rawValue.split('.').pop() || '';
-
-            if (['item', 'items'].includes(prefix)) {
-                return String(tail).trim().toUpperCase();
-            }
-            if (['party', 'vendor', 'customer', 'supplier'].includes(prefix)) {
-                return String(tail).trim().toUpperCase();
-            }
-            if (['sale', 'invoice'].includes(prefix)) {
-                return String(tail).trim().toUpperCase();
-            }
-        }
-
-        return rawValue.toUpperCase();
-    };
-
-    const resolveSyncEntity = (projectFieldValue, tallyFieldValue) => {
-        const rawValue = String(tallyFieldValue || '').trim();
-        if (rawValue === '') {
-            return null;
-        }
-
-        const lowerRawValue = rawValue.toLowerCase();
-        if (lowerRawValue.includes('.')) {
-            const prefix = lowerRawValue.split('.', 1)[0];
-            if (['item', 'items'].includes(prefix)) {
-                return 'item';
-            }
-            if (['party', 'vendor', 'customer', 'supplier'].includes(prefix)) {
-                return 'party';
-            }
-            if (['sale', 'invoice'].includes(prefix)) {
-                return 'sale';
-            }
-        }
-
-        const tallyField = normalizeTallyField(tallyFieldValue);
-        const projectField = String(projectFieldValue || '').trim().toLowerCase();
-
-        const tallyFieldEntityMap = {
-            item: ['BASEUNITS', 'ADDITIONALUNITS', 'CONVERSION', 'HSNCODE', 'OPENINGBALANCE', 'ALIAS'],
-            party: ['PARTYGSTIN', 'INCOMETAXNUMBER', 'SHIPPINGADDRESS', 'LEDGERMOBILE'],
-            sale: ['VOUCHERNUMBER', 'PARTYLEDGERNAME', 'VOUCHERTYPENAME', 'REFERENCE'],
-        };
-
-        for (const [entity, fields] of Object.entries(tallyFieldEntityMap)) {
-            if (fields.includes(tallyField)) {
-                return entity;
-            }
-        }
-
-        // NAME/EMAIL/MOBILE/ADDRESS/AMOUNT/DATE/NARRATION can appear in multiple contexts.
-        if (projectField.includes('sale') || projectField.includes('order') || projectField.includes('invoice')) {
-            return 'sale';
-        }
-        if (projectField.includes('party') || projectField.includes('vendor') || projectField.includes('customer') || projectField.includes('gst') || projectField.includes('ledger')) {
-            return 'party';
-        }
-        if (projectField.includes('item') || projectField.includes('stock') || projectField.includes('hsn') || projectField.includes('unit')) {
-            return 'item';
-        }
-
-        // Default fallback for ambiguous fields
-        return 'sale';
     };
 
     testBtn.addEventListener('click', async function() {
@@ -817,42 +621,44 @@
 
     if (manualSyncBtn) {
         manualSyncBtn.addEventListener('click', async function() {
-            const projectField = (document.getElementById('manual_sync_project_field')?.value || '').trim();
-            const tallyField = (document.getElementById('manual_sync_tally_field')?.value || '').trim();
+            const entity = (document.getElementById('manual_sync_entity')?.value || '').trim();
             const companyName = (document.getElementById('manual_sync_company_name')?.value || '').trim();
             const id = (document.getElementById('manual_sync_id')?.value || '').trim();
+            const fromDate = (document.getElementById('manual_sync_from_date')?.value || '').trim();
+            const toDate = (document.getElementById('manual_sync_to_date')?.value || '').trim();
             const baseUrl = manualSyncBtn.dataset.baseUrl || '';
+            const dateUrl = manualSyncBtn.dataset.dateUrl || '';
 
-            if (projectField === '' || tallyField === '' || id === '' || companyName === '') {
-                showManualResult(false, 'Please enter Project Field, Tally Field, Company Name and ID.');
+            if (entity === '') {
+                showManualResult(false, 'Please select a transfer type.');
                 return;
             }
 
-            const entity = resolveSyncEntity(projectField, tallyField);
-            if (!entity) {
-                showManualResult(false, 'Unable to detect entity from mapping fields. Use clear project/tally field names.');
+            if (id === '' && (fromDate === '' || toDate === '')) {
+                showManualResult(false, 'Enter Record ID or select From Date and To Date.');
                 return;
             }
-
-            const normalizedTallyField = normalizeTallyField(tallyField);
 
             manualSyncBtn.disabled = true;
             const originalText = manualSyncBtn.innerText;
-            manualSyncBtn.innerText = 'Syncing...';
+            manualSyncBtn.innerText = 'Transferring...';
 
             try {
-                const response = await fetch(`${baseUrl}/${encodeURIComponent(entity)}/${encodeURIComponent(id)}`, {
+                const url = id !== ''
+                    ? `${baseUrl}/${encodeURIComponent(entity)}/${encodeURIComponent(id)}`
+                    : dateUrl;
+                const payload = id !== ''
+                    ? { company_name: companyName }
+                    : { entity: entity, from_date: fromDate, to_date: toDate, company_name: companyName };
+
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': getCsrfToken(),
                         'X-Requested-With': 'XMLHttpRequest'
                     },
-                    body: JSON.stringify({
-                        project_field: projectField,
-                        tally_field: normalizedTallyField,
-                        company_name: companyName
-                    })
+                    body: JSON.stringify(payload)
                 });
 
                 const { text, json } = await parseResponse(response);
@@ -861,8 +667,11 @@
                 }
 
                 showManualResult(!!json.status, json.message || 'Manual sync response received.');
+                if (syncLogsBtn) {
+                    syncLogsBtn.click();
+                }
             } catch (error) {
-                showManualResult(false, error?.message || 'Manual sync request failed.');
+                showManualResult(false, error?.message || 'Transfer request failed.');
             } finally {
                 manualSyncBtn.disabled = false;
                 manualSyncBtn.innerText = originalText;
@@ -872,7 +681,21 @@
 
     if (syncLogsBtn) {
         syncLogsBtn.addEventListener('click', async function() {
-            const url = syncLogsBtn.dataset.url;
+            const baseUrl = syncLogsBtn.dataset.url;
+            const entity = (document.getElementById('manual_sync_entity')?.value || '').trim();
+            const fromDate = (document.getElementById('manual_sync_from_date')?.value || '').trim();
+            const toDate = (document.getElementById('manual_sync_to_date')?.value || '').trim();
+            const params = new URLSearchParams({limit: '100'});
+            if (entity) {
+                params.set('entity_type', entity);
+            }
+            if (fromDate) {
+                params.set('from_date', fromDate);
+            }
+            if (toDate) {
+                params.set('to_date', toDate);
+            }
+            const url = `${baseUrl}?${params.toString()}`;
             syncLogsBtn.disabled = true;
             const originalText = syncLogsBtn.innerText;
             syncLogsBtn.innerText = 'Loading...';

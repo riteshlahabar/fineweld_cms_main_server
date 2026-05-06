@@ -22,6 +22,7 @@ use App\Services\PaymentTransactionService;
 use App\Services\PaymentTypeService;
 use App\Traits\FormatNumber;
 use App\Traits\FormatsDateInputs;
+use App\Services\TallyIntegration\TallySyncService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -50,6 +51,8 @@ class PurchaseController extends Controller
     
     private $partyService;
 
+    private $tallySyncService;
+
     public $previousHistoryOfItems;
 
     public $purchaseBillEmailNotificationService;
@@ -63,7 +66,8 @@ class PurchaseController extends Controller
         ItemService $itemService,
         PurchaseBillEmailNotificationService $purchaseBillEmailNotificationService,
         PurchaseBillSmsNotificationService $purchaseBillSmsNotificationService,
-        PartyService $partyService
+        PartyService $partyService,
+        TallySyncService $tallySyncService
     ) {
         $this->companyId = App::APP_SETTINGS_RECORD_ID->value;
         $this->paymentTypeService = $paymentTypeService;
@@ -74,6 +78,7 @@ class PurchaseController extends Controller
         $this->purchaseBillEmailNotificationService = $purchaseBillEmailNotificationService;
         $this->purchaseBillSmsNotificationService = $purchaseBillSmsNotificationService;
         $this->partyService = $partyService;
+        $this->tallySyncService = $tallySyncService;
         $this->previousHistoryOfItems = [];
     }
 
@@ -528,11 +533,21 @@ class PurchaseController extends Controller
 
             // Regenerate the CSRF token
             // Session::regenerateToken();
+            $tallySyncResult = null;
+            try {
+                $tallySyncResult = $this->tallySyncService->syncPurchaseById((int) $request->purchase_id, 'upsert');
+            } catch (\Throwable $tallyException) {
+                $tallySyncResult = [
+                    'status' => false,
+                    'message' => 'Purchase saved, but Tally sync exception: '.$tallyException->getMessage(),
+                ];
+            }
 
             return response()->json([
                 'status' => true,
                 'message' => __('app.record_saved_successfully'),
                 'id' => $request->purchase_id,
+                'tally_sync' => $tallySyncResult,
 
             ]);
 

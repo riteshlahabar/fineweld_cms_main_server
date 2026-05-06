@@ -4,6 +4,8 @@ namespace App\Services\TallyIntegration;
 
 use App\Models\Items\Item;
 use App\Models\Party\Party;
+use App\Models\Purchase\Purchase;
+use App\Models\Expenses\Expense;
 use App\Models\Sale\Sale;
 use App\Models\TallySyncLog;
 use Illuminate\Support\Facades\Log;
@@ -300,7 +302,7 @@ class TallySyncService
             );
         }
 
-        $dependencySync['sales_ledger'] = $this->syncLedgerMaster($salesLedgerName, 'Sales Accounts', $companyName);
+        $dependencySync['sales_ledger'] = $this->syncLedgerMaster($salesLedgerName, 'Sales Accounts', $companyName, true);
         $dependencyFailure = $this->firstFailedDependencyMessage($dependencySync);
         if ($dependencyFailure !== null) {
             return $this->finalizeAndReturn(
@@ -433,6 +435,189 @@ class TallySyncService
         );
     }
 
+    public function syncPurchaseById(int $purchaseId, string $operation = 'upsert', ?string $companyName = null): array
+    {
+        $purchase = Purchase::with([
+            'party',
+            'itemTransaction.item',
+            'itemTransaction.unit',
+        ])->find($purchaseId);
+
+        if (! $purchase) {
+            return $this->finalizeAndReturn('purchase', $purchaseId, $operation, false, 'Purchase record not found for Tally sync.');
+        }
+
+        if (! $purchase->party) {
+            return $this->finalizeAndReturn('purchase', $purchase->id, $operation, false, 'Purchase party not found for Tally sync.');
+        }
+
+        $lineRecords = $purchase->itemTransaction;
+        if ($lineRecords->isEmpty()) {
+            return $this->finalizeAndReturn('purchase', $purchase->id, $operation, false, 'Purchase items not found for Tally sync.');
+        }
+
+        $partySync = $this->syncPartyById((int) $purchase->party_id, 'upsert', $companyName);
+        $itemSyncSummary = [];
+        foreach ($lineRecords->pluck('item_id')->filter()->unique()->values() as $itemId) {
+            $itemSyncSummary[] = $this->syncItemById((int) $itemId, 'upsert', $companyName);
+        }
+
+        $purchaseLedgerName = $this->client->settingValue('purchase_ledger_name', 'Purchase');
+        $dependencySync = [
+            'party' => $partySync,
+            'items' => $itemSyncSummary,
+            'purchase_ledger' => $this->syncLedgerMaster($purchaseLedgerName, 'Purchase Accounts', $companyName, true),
+        ];
+        if ($dependencyFailure = $this->firstFailedDependencyMessage($dependencySync)) {
+            return $this->finalizeAndReturn('purchase', $purchase->id, $operation, false, 'Purchase dependency sync failed before voucher transfer: '.$dependencyFailure, responsePayload: [
+                'dependency_sync' => $dependencySync,
+            ]);
+        }
+
+        $voucherNo = (string) ($purchase->purchase_code ?: $purchase->id);
+        $partyLedgerName = (string) ($purchase->party->company_name ?: $purchase->party->primary_name ?: '');
+        $dateYmd = date('Ymd', strtotime((string) $purchase->purchase_date));
+        $grandTotal = (float) ($purchase->grand_total ?: 0);
+        $narration = (string) ($purchase->note ?: '');
+        $inventoryEntryXml = '';
+
+        foreach ($lineRecords as $line) {
+            $itemName = (string) ($line->item?->name ?: '');
+            if ($itemName === '') {
+                continue;
+            }
+
+            $unitName = (string) ($line->unit?->name ?: 'Nos');
+            $quantity = abs((float) ($line->quantity ?: 0));
+            $rate = abs((float) ($line->unit_price ?: 0));
+            $amount = abs((float) ($line->total ?: 0));
+            $qtyText = number_format($quantity, 3, '.', '').' '.$unitName;
+
+            $inventoryEntryXml .= '<ALLINVENTORYENTRIES.LIST>';
+            $inventoryEntryXml .= '<STOCKITEMNAME>'.$this->esc($itemName).'</STOCKITEMNAME>';
+            $inventoryEntryXml .= '<ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>';
+            $inventoryEntryXml .= '<RATE>'.$this->esc(number_format($rate, 2, '.', '').'/'.$unitName).'</RATE>';
+            $inventoryEntryXml .= '<AMOUNT>'.$this->esc(number_format($amount, 2, '.', '')).'</AMOUNT>';
+            $inventoryEntryXml .= '<ACTUALQTY>'.$this->esc($qtyText).'</ACTUALQTY>';
+            $inventoryEntryXml .= '<BILLEDQTY>'.$this->esc($qtyText).'</BILLEDQTY>';
+            $inventoryEntryXml .= '<ACCOUNTINGALLOCATIONS.LIST>';
+            $inventoryEntryXml .= '<LEDGERNAME>'.$this->esc($purchaseLedgerName).'</LEDGERNAME>';
+            $inventoryEntryXml .= '<ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>';
+            $inventoryEntryXml .= '<AMOUNT>'.$this->esc(number_format($amount, 2, '.', '')).'</AMOUNT>';
+            $inventoryEntryXml .= '</ACCOUNTINGALLOCATIONS.LIST>';
+            $inventoryEntryXml .= '</ALLINVENTORYENTRIES.LIST>';
+        }
+
+        if ($inventoryEntryXml === '' || $partyLedgerName === '') {
+            return $this->finalizeAndReturn('purchase', $purchase->id, $operation, false, 'Purchase voucher is missing party ledger or inventory lines.', responsePayload: [
+                'dependency_sync' => $dependencySync,
+            ]);
+        }
+
+        $result = $this->pushWithFallback(
+            reportName: 'Vouchers',
+            context: 'purchase_sync',
+            operation: $operation,
+            companyName: $companyName,
+            buildMessageXml: function (string $action) use ($voucherNo, $partyLedgerName, $dateYmd, $grandTotal, $narration, $inventoryEntryXml) {
+                $xml = '<TALLYMESSAGE xmlns:UDF="TallyUDF">';
+                $xml .= '<VOUCHER VCHTYPE="Purchase" ACTION="'.$this->esc($action).'" OBJVIEW="Invoice Voucher View">';
+                $xml .= '<DATE>'.$this->esc($dateYmd).'</DATE>';
+                $xml .= '<VOUCHERTYPENAME>Purchase</VOUCHERTYPENAME>';
+                $xml .= '<VOUCHERNUMBER>'.$this->esc($voucherNo).'</VOUCHERNUMBER>';
+                $xml .= '<PARTYLEDGERNAME>'.$this->esc($partyLedgerName).'</PARTYLEDGERNAME>';
+                $xml .= '<PERSISTEDVIEW>Invoice Voucher View</PERSISTEDVIEW><ISINVOICE>Yes</ISINVOICE>';
+                if ($narration !== '') {
+                    $xml .= '<NARRATION>'.$this->esc($narration).'</NARRATION>';
+                }
+                $xml .= $inventoryEntryXml;
+                $xml .= '<LEDGERENTRIES.LIST><LEDGERNAME>'.$this->esc($partyLedgerName).'</LEDGERNAME><ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE><AMOUNT>'.$this->esc(number_format(-1 * abs($grandTotal), 2, '.', '')).'</AMOUNT></LEDGERENTRIES.LIST>';
+                $xml .= '</VOUCHER></TALLYMESSAGE>';
+
+                return $xml;
+            }
+        );
+
+        return $this->finalizeAndReturn('purchase', $purchase->id, $operation, (bool) ($result['status'] ?? false), (string) ($result['message'] ?? 'Purchase sync failed.'), [
+            'mapped_payload' => [
+                'VOUCHERTYPENAME' => 'Purchase',
+                'VOUCHERNUMBER' => $voucherNo,
+                'PARTYLEDGERNAME' => $partyLedgerName,
+                'AMOUNT' => $grandTotal,
+                'DATE' => $dateYmd,
+                'ITEMS_COUNT' => $lineRecords->count(),
+            ],
+            'request_xml' => $result['request_xml'] ?? null,
+        ], [
+            'response_body' => $result['response_body'] ?? null,
+            'parsed' => $result['parsed'] ?? [],
+            'http_status' => $result['http_status'] ?? null,
+            'dependency_sync' => $dependencySync,
+        ]);
+    }
+
+    public function syncExpenseById(int $expenseId, string $operation = 'upsert', ?string $companyName = null): array
+    {
+        $expense = Expense::with(['category', 'items.itemDetails'])->find($expenseId);
+        if (! $expense) {
+            return $this->finalizeAndReturn('expense', $expenseId, $operation, false, 'Expense record not found for Tally sync.');
+        }
+
+        $expenseLedger = (string) ($expense->category?->name ?: $this->client->settingValue('expense_ledger_name', 'Employee Expense'));
+        $paymentLedger = $this->client->settingValue('cash_ledger_name', 'Cash');
+        $voucherNo = (string) ($expense->expense_code ?: $expense->id);
+        $dateYmd = date('Ymd', strtotime((string) $expense->expense_date));
+        $amount = abs((float) ($expense->grand_total ?: 0));
+        $narration = (string) ($expense->note ?: '');
+
+        $dependencies = [
+            'expense_ledger' => $this->syncLedgerMaster($expenseLedger, 'Indirect Expenses', $companyName),
+            'payment_ledger' => $this->syncLedgerMaster($paymentLedger, 'Cash-in-Hand', $companyName),
+        ];
+        if ($dependencyFailure = $this->firstFailedDependencyMessage($dependencies)) {
+            return $this->finalizeAndReturn('expense', $expense->id, $operation, false, 'Expense dependency sync failed before voucher transfer: '.$dependencyFailure, responsePayload: [
+                'dependency_sync' => $dependencies,
+            ]);
+        }
+
+        $result = $this->pushWithFallback(
+            reportName: 'Vouchers',
+            context: 'expense_sync',
+            operation: $operation,
+            companyName: $companyName,
+            buildMessageXml: function (string $action) use ($voucherNo, $dateYmd, $expenseLedger, $paymentLedger, $amount, $narration) {
+                $xml = '<TALLYMESSAGE xmlns:UDF="TallyUDF"><VOUCHER VCHTYPE="Payment" ACTION="'.$this->esc($action).'">';
+                $xml .= '<DATE>'.$this->esc($dateYmd).'</DATE><VOUCHERTYPENAME>Payment</VOUCHERTYPENAME>';
+                $xml .= '<VOUCHERNUMBER>'.$this->esc($voucherNo).'</VOUCHERNUMBER>';
+                if ($narration !== '') {
+                    $xml .= '<NARRATION>'.$this->esc($narration).'</NARRATION>';
+                }
+                $xml .= '<LEDGERENTRIES.LIST><LEDGERNAME>'.$this->esc($expenseLedger).'</LEDGERNAME><ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE><AMOUNT>'.$this->esc(number_format($amount, 2, '.', '')).'</AMOUNT></LEDGERENTRIES.LIST>';
+                $xml .= '<LEDGERENTRIES.LIST><LEDGERNAME>'.$this->esc($paymentLedger).'</LEDGERNAME><ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE><AMOUNT>'.$this->esc(number_format(-1 * $amount, 2, '.', '')).'</AMOUNT></LEDGERENTRIES.LIST>';
+                $xml .= '</VOUCHER></TALLYMESSAGE>';
+
+                return $xml;
+            }
+        );
+
+        return $this->finalizeAndReturn('expense', $expense->id, $operation, (bool) ($result['status'] ?? false), (string) ($result['message'] ?? 'Expense sync failed.'), [
+            'mapped_payload' => [
+                'VOUCHERTYPENAME' => 'Payment',
+                'VOUCHERNUMBER' => $voucherNo,
+                'EXPENSELEDGER' => $expenseLedger,
+                'PAYMENTLEDGER' => $paymentLedger,
+                'AMOUNT' => $amount,
+                'DATE' => $dateYmd,
+            ],
+            'request_xml' => $result['request_xml'] ?? null,
+        ], [
+            'response_body' => $result['response_body'] ?? null,
+            'parsed' => $result['parsed'] ?? [],
+            'http_status' => $result['http_status'] ?? null,
+            'dependency_sync' => $dependencies,
+        ]);
+    }
+
     private function pushWithFallback(string $reportName, string $context, string $operation, callable $buildMessageXml, ?string $companyName = null): array
     {
         $operation = strtolower(trim($operation));
@@ -547,7 +732,7 @@ class TallySyncService
         return $this->allowAlreadyExistsDependency($result, 'Stock group already exists in Tally.');
     }
 
-    private function syncLedgerMaster(string $ledgerName, string $parentLedgerName, ?string $companyName = null): array
+    private function syncLedgerMaster(string $ledgerName, string $parentLedgerName, ?string $companyName = null, bool $affectsStock = false): array
     {
         $ledgerName = trim($ledgerName);
         $parentLedgerName = trim($parentLedgerName);
@@ -563,13 +748,15 @@ class TallySyncService
             context: 'ledger_master_sync',
             operation: 'upsert',
             companyName: $companyName,
-            buildMessageXml: function (string $action) use ($ledgerName, $parentLedgerName) {
+            buildMessageXml: function (string $action) use ($ledgerName, $parentLedgerName, $affectsStock) {
                 $xml = '<TALLYMESSAGE xmlns:UDF="TallyUDF">';
                 $xml .= '<LEDGER NAME="'.$this->esc($ledgerName).'" ACTION="'.$this->esc($action).'">';
                 $xml .= '<NAME>'.$this->esc($ledgerName).'</NAME>';
                 $xml .= '<PARENT>'.$this->esc($parentLedgerName).'</PARENT>';
                 $xml .= '<ISBILLWISEON>No</ISBILLWISEON>';
-                $xml .= '<AFFECTSSTOCK>Yes</AFFECTSSTOCK>';
+                if ($affectsStock) {
+                    $xml .= '<AFFECTSSTOCK>Yes</AFFECTSSTOCK>';
+                }
                 $xml .= '</LEDGER>';
                 $xml .= '</TALLYMESSAGE>';
 

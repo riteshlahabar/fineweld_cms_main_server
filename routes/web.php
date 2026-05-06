@@ -205,6 +205,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/tally-integration/master-options', [AppSettingsController::class, 'tallyIntegrationMasterOptions'])->name('settings.tally.integration.master.options');
         Route::post('/tally-integration/client-error', [AppSettingsController::class, 'tallyIntegrationClientError'])->name('settings.tally.integration.client.error');
         Route::post('/tally-integration/sync/{entity}/{id}', [AppSettingsController::class, 'tallyIntegrationSyncEntity'])->name('settings.tally.integration.sync.entity');
+        Route::post('/tally-integration/sync-by-date', [AppSettingsController::class, 'tallyIntegrationSyncByDate'])->name('settings.tally.integration.sync.by.date');
         Route::get('/tally-integration/sync-logs', [AppSettingsController::class, 'tallyIntegrationSyncLogs'])->name('settings.tally.integration.sync.logs');
         Route::post('/tally-integration/store', [AppSettingsController::class, 'tallyIntegrationStore'])->name('settings.tally.integration.store');
         Route::put('/tally-integration/update/{id}', [AppSettingsController::class, 'tallyIntegrationUpdate'])->name('settings.tally.integration.update');

@@ -12,6 +12,7 @@ use App\Models\Prefix;
 use App\Services\AccountTransactionService;
 use App\Services\PaymentTransactionService;
 use App\Services\PaymentTypeService;
+use App\Services\TallyIntegration\TallySyncService;
 use App\Traits\FormatNumber;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
@@ -35,14 +36,18 @@ class ExpenseController extends Controller
 
     private $paidPaymentTotal;
 
+    private $tallySyncService;
+
     public function __construct(AccountTransactionService $accountTransactionService,
         PaymentTypeService $paymentTypeService,
-        PaymentTransactionService $paymentTransactionService)
+        PaymentTransactionService $paymentTransactionService,
+        TallySyncService $tallySyncService)
     {
         $this->companyId = App::APP_SETTINGS_RECORD_ID->value;
         $this->accountTransactionService = $accountTransactionService;
         $this->paymentTypeService = $paymentTypeService;
         $this->paymentTransactionService = $paymentTransactionService;
+        $this->tallySyncService = $tallySyncService;
     }
 
     /**
@@ -295,11 +300,21 @@ class ExpenseController extends Controller
 
             // Regenerate the CSRF token
             // Session::regenerateToken();
+            $tallySyncResult = null;
+            try {
+                $tallySyncResult = $this->tallySyncService->syncExpenseById((int) $request->expense_id, 'upsert');
+            } catch (\Throwable $tallyException) {
+                $tallySyncResult = [
+                    'status' => false,
+                    'message' => 'Expense saved, but Tally sync exception: '.$tallyException->getMessage(),
+                ];
+            }
 
             return response()->json([
-                'status' => false,
+                'status' => true,
                 'message' => __('app.record_saved_successfully'),
                 'id' => $request->expense_id,
+                'tally_sync' => $tallySyncResult,
 
             ]);
 
@@ -307,7 +322,7 @@ class ExpenseController extends Controller
             DB::rollback();
 
             return response()->json([
-                'status' => true,
+                'status' => false,
                 'message' => __('app.something_went_wrong').__('app.check_custom_log_file').$e->getMessage(),
             ], 409);
 
