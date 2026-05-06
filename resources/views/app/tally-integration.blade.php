@@ -201,7 +201,10 @@
     const masterFetchResult = document.getElementById('masterFetchResult');
     const form = document.getElementById('tallyConnectionForm');
     const clientErrorLogUrl = "{{ route('settings.tally.integration.client.error') }}";
-    const masterOptionsUrl = "{{ url('api/tally/master-options') }}";
+    const masterOptionsUrls = [
+        "{{ url('settings/tally-integration/master-options') }}",
+        "{{ url('api/tally/master-options') }}"
+    ];
     const manualSyncBtn = document.getElementById('manualSyncBtn');
     const manualSyncResult = document.getElementById('manualSyncResult');
     const syncLogsBtn = document.getElementById('loadTallySyncLogsBtn');
@@ -289,6 +292,38 @@
         }
 
         return { text, json };
+    };
+
+    const postMasterOptions = async (payload) => {
+        let lastError = null;
+
+        for (const url of masterOptionsUrls) {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken(),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const parsed = await parseResponse(response);
+                const message = parsed.json?.message || parsed.text || `HTTP ${response.status}`;
+
+                if (response.status === 404 && String(message).toLowerCase().includes('could not be found')) {
+                    lastError = new Error(message);
+                    continue;
+                }
+
+                return { response, ...parsed };
+            } catch (error) {
+                lastError = error;
+            }
+        }
+
+        throw lastError || new Error('Unable to reach Tally master options endpoint.');
     };
 
     const normalizeHostInput = () => {
@@ -547,21 +582,11 @@
             fetchMastersBtn.innerText = 'Fetching...';
 
             try {
-                const response = await fetch(masterOptionsUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': getCsrfToken(),
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify({
-                        host: host,
-                        xml_port: xmlPort,
-                        company_name: companyName
-                    })
+                const { response, text, json } = await postMasterOptions({
+                    host: host,
+                    xml_port: xmlPort,
+                    company_name: companyName
                 });
-
-                const { text, json } = await parseResponse(response);
                 if (!json) {
                     throw new Error((text || `HTTP ${response.status}`).substring(0, 300));
                 }

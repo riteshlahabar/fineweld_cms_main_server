@@ -159,14 +159,16 @@ class AppSettingsController extends Controller
             $host = trim((string) $validatedData['host']);
             $xmlPort = (int) $validatedData['xml_port'];
             $companyName = trim((string) ($validatedData['company_name'] ?? ''));
-            $result = $tallyClient->testXmlConnection($host, $xmlPort, $companyName);
+            $result = $tallyClient->fetchCurrentCompany($host, $xmlPort);
             $isSuccess = (bool) ($result['status'] ?? false);
+            $activeCompanyName = (string) ($result['current_company'] ?? '');
 
             if ($isSuccess) {
                 Log::info('Tally XML connection test successful', [
                     'host' => $host,
                     'xml_port' => $xmlPort,
                     'company_name' => $companyName,
+                    'active_company_name' => $activeCompanyName,
                     'parsed' => $result['parsed'] ?? [],
                     'user_id' => auth()->id(),
                 ]);
@@ -189,10 +191,10 @@ class AppSettingsController extends Controller
                 'details' => [
                     'host' => $host,
                     'xml_port' => $xmlPort,
-                    'company_name' => $companyName,
+                    'company_name' => $activeCompanyName ?: $companyName,
                     'endpoint' => $result['endpoint'] ?? null,
                     'http_status' => $result['http_status'] ?? null,
-                    'tally_message' => $result['parsed']['message'] ?? null,
+                    'tally_message' => $activeCompanyName !== '' ? 'Active company: '.$activeCompanyName : ($result['parsed']['message'] ?? null),
                     'tally_errors' => $result['parsed']['line_errors'] ?? [],
                     'response_excerpt' => Str::limit($responseExcerpt, 500, ''),
                 ],
