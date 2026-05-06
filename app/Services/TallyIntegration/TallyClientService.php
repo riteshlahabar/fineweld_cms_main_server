@@ -59,28 +59,24 @@ class TallyClientService
     public function importData(string $reportName, string $requestDataXml, string $context = 'generic', ?string $companyName = null): array
     {
         $reportName = trim($reportName);
-        $staticVariables = '';
         $companyName = $this->resolveCompanyName($companyName);
 
-        if (! empty($companyName)) {
-            $staticVariables = '<STATICVARIABLES><SVCURRENTCOMPANY>'.$this->xmlEscape($companyName).'</SVCURRENTCOMPANY></STATICVARIABLES>';
+        $result = $this->sendEnvelope($this->importEnvelope($reportName, $requestDataXml, $companyName), $context);
+
+        if (! ($result['status'] ?? false) && $companyName && $this->isCompanySelectionFailure($result)) {
+            $fallback = $this->sendEnvelope($this->importEnvelope($reportName, $requestDataXml, null), $context.'_active_company_fallback');
+            if ($fallback['status'] ?? false) {
+                $fallback['message'] = "Saved company '{$companyName}' was not accepted by Tally. Retried with active Tally company. ".$fallback['message'];
+
+                return $fallback;
+            }
+
+            $fallback['message'] = trim(($result['message'] ?? 'Company selection failed').'; active company fallback: '.($fallback['message'] ?? 'Failed.'));
+
+            return $fallback;
         }
 
-        $xmlEnvelope = '<?xml version="1.0" encoding="UTF-8"?>'
-            .'<ENVELOPE>'
-            .'<HEADER><TALLYREQUEST>Import Data</TALLYREQUEST></HEADER>'
-            .'<BODY>'
-            .'<IMPORTDATA>'
-            .'<REQUESTDESC>'
-            .'<REPORTNAME>'.$this->xmlEscape($reportName).'</REPORTNAME>'
-            .$staticVariables
-            .'</REQUESTDESC>'
-            .'<REQUESTDATA>'.$requestDataXml.'</REQUESTDATA>'
-            .'</IMPORTDATA>'
-            .'</BODY>'
-            .'</ENVELOPE>';
-
-        return $this->sendEnvelope($xmlEnvelope, $context);
+        return $result;
     }
 
     public function testXmlConnection(string $host, int $xmlPort = 9000, ?string $companyName = null): array
@@ -220,6 +216,7 @@ class TallyClientService
     {
         $currentCompany = $this->fetchCurrentCompany($host, $xmlPort);
         $resolvedCompanyName = trim((string) (($currentCompany['current_company'] ?? '') ?: ($companyName ?: ($this->defaultCompanyName() ?? ''))));
+        $this->rememberActiveCompanyName($resolvedCompanyName);
 
         $ledgers = $this->fetchLedgers($resolvedCompanyName, $host, $xmlPort);
         $groups = $this->fetchGroups($resolvedCompanyName, $host, $xmlPort);
@@ -493,6 +490,61 @@ class TallyClientService
         }
 
         return '';
+    }
+
+    private function importEnvelope(string $reportName, string $requestDataXml, ?string $companyName): string
+    {
+        $staticVariables = '';
+        $companyName = trim((string) ($companyName ?? ''));
+
+        if ($companyName !== '') {
+            $staticVariables = '<STATICVARIABLES><SVCURRENTCOMPANY>'.$this->xmlEscape($companyName).'</SVCURRENTCOMPANY></STATICVARIABLES>';
+        }
+
+        return '<?xml version="1.0" encoding="UTF-8"?>'
+            .'<ENVELOPE>'
+            .'<HEADER><TALLYREQUEST>Import Data</TALLYREQUEST></HEADER>'
+            .'<BODY>'
+            .'<IMPORTDATA>'
+            .'<REQUESTDESC>'
+            .'<REPORTNAME>'.$this->xmlEscape($reportName).'</REPORTNAME>'
+            .$staticVariables
+            .'</REQUESTDESC>'
+            .'<REQUESTDATA>'.$requestDataXml.'</REQUESTDATA>'
+            .'</IMPORTDATA>'
+            .'</BODY>'
+            .'</ENVELOPE>';
+    }
+
+    private function isCompanySelectionFailure(array $result): bool
+    {
+        $message = strtolower((string) ($result['message'] ?? ''));
+        $lineErrors = implode(' ', (array) data_get($result, 'parsed.line_errors', []));
+
+        return str_contains($message, 'svcurrentcompany')
+            || str_contains(strtolower($lineErrors), 'svcurrentcompany')
+            || str_contains($message, 'could not set');
+    }
+
+    private function rememberActiveCompanyName(string $companyName): void
+    {
+        $companyName = trim($companyName);
+        if ($companyName === '' || ! Schema::hasTable('tally_integration_settings') || ! Schema::hasColumn('tally_integration_settings', 'company_name')) {
+            return;
+        }
+
+        try {
+            $settings = $this->activeSettings();
+            if ($settings && trim((string) $settings->company_name) !== $companyName) {
+                $settings->company_name = $companyName;
+                $settings->save();
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Unable to remember active Tally company name', [
+                'company_name' => $companyName,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     private function fetchMasterCollection(string $collectionName, string $masterType, array $nativeMethods, ?string $companyName, ?string $host, ?int $xmlPort, string $context): array
