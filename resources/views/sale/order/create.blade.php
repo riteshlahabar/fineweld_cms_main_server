@@ -79,7 +79,7 @@
                                                 <x-label for="order_status" name="{{ __('sale.order_status') }}" />
                                                 <x-dropdown-general optionNaming="saleOrderStatus" selected="" dropdownName='order_status'/>
                                             </div>
-                                            {{--<x-shipping-address />--}}
+                                            <x-bill-ship-address />
                                             
                                             @if(app('company')['is_enable_secondary_currency'])
                                             <div class="col-md-4">

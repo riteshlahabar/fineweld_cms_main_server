@@ -27,9 +27,9 @@
             <table class="addresses">
                 <tr>
                     <td class="address">
-                        <span class="fw-bold cu-fs-18">{{ __('app.order_from') }}</span><br>
+                        <span class="fw-bold cu-fs-18">{{ __('app.bill_to') }}</span><br>
                         <span>{{ $order->party->company_name }}<br>
-                        {{ $order->party->billing_address }}</span>
+                        {!! nl2br(e($order->party->billing_address)) !!}</span>
                         @if(!empty($order->party->tax_number))
                             <br><b>GSTN:</b> {{ $order->party->tax_number }}
                         @endif

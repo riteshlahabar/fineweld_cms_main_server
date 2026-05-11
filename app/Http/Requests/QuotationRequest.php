@@ -44,6 +44,8 @@ class QuotationRequest extends FormRequest
             'round_off' => ['nullable', Rule::requiredIf(fn () => empty($this->input('round_off'))), 'numeric'],
             'grand_total' => ['required', 'numeric'],
             'note' => ['nullable', 'string', 'max:250'],
+            'billing_address' => ['nullable', 'string'],
+            'shipping_address' => ['nullable', 'string'],
             'state_id' => ['nullable', 'integer', Rule::exists('states', 'id')],
             'row_count' => ['required', 'integer', 'min:1'],
             'currency_id' => ['nullable', 'integer', 'min:1'],

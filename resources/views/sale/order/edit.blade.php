@@ -76,6 +76,7 @@
                                                 <x-label for="order_status" name="{{ __('sale.order_status') }}" />
                                                 <x-dropdown-general optionNaming="saleOrderStatus" selected="{{ $order->order_status }}" dropdownName='order_status'/>
                                             </div>
+                                            <x-bill-ship-address :billingAddress="$order->party->billing_address ?? ''" :shippingAddress="$order->party->shipping_address ?? ''" />
                                             @if(app('company')['is_enable_secondary_currency'])
                                             <div class="col-md-4">
                                                 <x-label for="invoice_currency_id" name="{{ __('currency.exchange_rate') }}" />

@@ -58,29 +58,17 @@
             <table class="addresses">
                 <tr>
                     <td class="address">
-                        {{--<span class="fw-bold cu-fs-18">{{ __('sale.quotation.for') }}</span> <br>--}}
-                        
-                        <span class="fw-bold cu-fs-18">To,</span> <br>
+                        <span class="fw-bold cu-fs-18">{{ __('app.bill_to') }}</span> <br>
                         <span>{{ $quotation->party->company_name }}<br>
                         {!! nl2br(e($quotation->party->billing_address)) !!}</span>
                         {{-- Party Tax/GST Number --}}
                         @include('print.common.party-tax-details', ['model' => $quotation])
                     </td>
                     <td class="address">
-    <span>
-        Dear Sir,<br>
-
-        With reference to our discussion, we are pleased to quote you for Spares 350 Amps for OTC Torch for delivery to the following shipping address:
-    </span>
-</td>
-                    
-                    {{--<td class="address">
-    <span class="fw-bold cu-fs-18">{{ __('app.ship_to') }}</span><br>
-    <span>
-        {{ $quotation->party->company_name }}<br>
-       {!! nl2br(e($quotation->party->shipping_address)) !!}
-    </span>
-</td>--}}
+                        <span class="fw-bold cu-fs-18">{{ __('app.ship_to') }}</span><br>
+                        <span>{{ $quotation->party->company_name }}<br>
+                        {!! nl2br(e($quotation->party->shipping_address)) !!}</span>
+                    </td>
                 </tr>
             </table>
 

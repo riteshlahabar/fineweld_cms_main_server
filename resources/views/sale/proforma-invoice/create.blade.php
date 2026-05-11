@@ -81,7 +81,7 @@
                                                 <x-dropdown-states selected="" dropdownName='state_id'/>
                                             </div>
                                             @endif
-                                             {{--<x-shipping-address />--}}
+                                             <x-bill-ship-address />
 
 
 

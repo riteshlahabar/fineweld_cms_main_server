@@ -418,6 +418,12 @@ $(document).on('select2:select', '.party-ajax', function (e) {
 
     let data = e.params.data;
 
+    if(data.billing_address){
+        $('#billing_address').val(data.billing_address);
+    } else {
+        $('#billing_address').val('');
+    }
+
     if(data.shipping_address){
         $('#shipping_address').val(data.shipping_address);
     } else {

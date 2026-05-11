@@ -17,6 +17,7 @@ use App\Services\GeneralDataService;
 use App\Services\ItemTransactionService;
 use App\Services\PaymentTransactionService;
 use App\Services\PaymentTypeService;
+use App\Services\PartyService;
 use App\Services\StatusHistoryService;
 use App\Traits\FormatNumber;
 use App\Traits\FormatsDateInputs;
@@ -51,6 +52,8 @@ class SaleOrderController extends Controller
 
     public $statusHistoryService;
 
+    private $partyService;
+
     public function __construct(PaymentTypeService $paymentTypeService,
         PaymentTransactionService $paymentTransactionService,
         AccountTransactionService $accountTransactionService,
@@ -58,7 +61,8 @@ class SaleOrderController extends Controller
         SaleOrderEmailNotificationService $saleOrderEmailNotificationService,
         SaleOrderSmsNotificationService $saleOrderSmsNotificationService,
         GeneralDataService $generalDataService,
-        StatusHistoryService $statusHistoryService
+        StatusHistoryService $statusHistoryService,
+        PartyService $partyService
     ) {
         $this->companyId = App::APP_SETTINGS_RECORD_ID->value;
         $this->paymentTypeService = $paymentTypeService;
@@ -69,6 +73,7 @@ class SaleOrderController extends Controller
         $this->saleOrderSmsNotificationService = $saleOrderSmsNotificationService;
         $this->generalDataService = $generalDataService;
         $this->statusHistoryService = $statusHistoryService;
+        $this->partyService = $partyService;
     }
 
     /**
@@ -274,6 +279,9 @@ class SaleOrderController extends Controller
             DB::beginTransaction();
             // Get the validated data from the expenseRequest
             $validatedData = $request->validated();
+            $billingAddress = $validatedData['billing_address'] ?? null;
+            $shippingAddress = $validatedData['shipping_address'] ?? null;
+            unset($validatedData['billing_address'], $validatedData['shipping_address']);
 
             if ($request->operation == 'save') {
                 // Create a new expense record using Eloquent and save it
@@ -323,6 +331,12 @@ class SaleOrderController extends Controller
              * Record Status Update History
              */
             $this->statusHistoryService->RecordStatusHistory($newSaleOrder);
+
+            $this->partyService->updateBillingAndShippingAddress(
+                $request->party_id,
+                $billingAddress,
+                $shippingAddress
+            );
 
             $request->request->add(['modelName' => $newSaleOrder]);
 

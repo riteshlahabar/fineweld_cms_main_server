@@ -73,9 +73,13 @@
                                     <main>
                                         <div class="row contacts">
                                             <div class="col invoice-to">
-                                                <div class="text-gray-light fw-bold text-uppercase">{{ __('app.order_from') }}:</div>
+                                                <div class="text-gray-light fw-bold text-uppercase">{{ __('app.bill_to') }}:</div>
                                                 <h2 class="to">{{ $order->party->company_name ?? '' }}</h2>
-                                                <div class="address">{{ $order->party->invoiceing_address }}</div>
+                                                <div class="address">{{ $order->party->billing_address }}</div>
+                                            </div>
+                                            <div class="col invoice-to">
+                                                <div class="text-gray-light fw-bold text-uppercase">{{ __('app.ship_to') }}:</div>
+                                                <div class="address">{{ $order->party->shipping_address }}</div>
                                             </div>
 
                                             <div class="col invoice-details">

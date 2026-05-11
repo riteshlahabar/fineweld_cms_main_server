@@ -202,17 +202,42 @@ class PartyService
         }
     }
     
-   public function updateShippingAddress($partyId, $shippingAddress)
-{
-    if (!$partyId || !$shippingAddress) {
-        return false;
+    public function updateShippingAddress($partyId, $shippingAddress)
+    {
+        if (! $partyId || ! $shippingAddress) {
+            return false;
+        }
+
+        Party::where('id', $partyId)
+            ->update([
+                'shipping_address' => $shippingAddress,
+            ]);
+
+        return true;
     }
 
-    Party::where('id', $partyId)
-        ->update([
-            'shipping_address' => $shippingAddress
-        ]);
+    public function updateBillingAndShippingAddress($partyId, $billingAddress = null, $shippingAddress = null)
+    {
+        if (! $partyId) {
+            return false;
+        }
 
-    return true;
-}
+        $addresses = [];
+
+        if ($billingAddress !== null) {
+            $addresses['billing_address'] = $billingAddress;
+        }
+
+        if ($shippingAddress !== null) {
+            $addresses['shipping_address'] = $shippingAddress;
+        }
+
+        if (empty($addresses)) {
+            return false;
+        }
+
+        Party::where('id', $partyId)->update($addresses);
+
+        return true;
+    }
 }

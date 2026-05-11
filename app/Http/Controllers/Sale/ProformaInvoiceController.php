@@ -18,6 +18,7 @@ use App\Services\GeneralDataService;
 use App\Services\ItemTransactionService;
 use App\Services\PaymentTransactionService;
 use App\Services\PaymentTypeService;
+use App\Services\PartyService;
 use App\Services\StatusHistoryService;
 use App\Traits\FormatNumber;
 use App\Traits\FormatsDateInputs;
@@ -52,6 +53,8 @@ class ProformaInvoiceController extends Controller
 
     public $statusHistoryService;
 
+    private $partyService;
+
     public function __construct(PaymentTypeService $paymentTypeService,
         PaymentTransactionService $paymentTransactionService,
         AccountTransactionService $accountTransactionService,
@@ -59,7 +62,8 @@ class ProformaInvoiceController extends Controller
         QuotationEmailNotificationService $quotationEmailNotificationService,
         QuotationSmsNotificationService $quotationSmsNotificationService,
         GeneralDataService $generalDataService,
-        StatusHistoryService $statusHistoryService
+        StatusHistoryService $statusHistoryService,
+        PartyService $partyService
     ) {
         $this->companyId = App::APP_SETTINGS_RECORD_ID->value;
         $this->paymentTypeService = $paymentTypeService;
@@ -70,6 +74,7 @@ class ProformaInvoiceController extends Controller
         $this->quotationSmsNotificationService = $quotationSmsNotificationService;
         $this->generalDataService = $generalDataService;
         $this->statusHistoryService = $statusHistoryService;
+        $this->partyService = $partyService;
     }
 
     /**
@@ -342,6 +347,9 @@ class ProformaInvoiceController extends Controller
             DB::beginTransaction();
             // Get the validated data from the expenseRequest
             $validatedData = $request->validated();
+            $billingAddress = $validatedData['billing_address'] ?? null;
+            $shippingAddress = $validatedData['shipping_address'] ?? null;
+            unset($validatedData['billing_address'], $validatedData['shipping_address']);
             $validatedData['note'] = json_encode($request->input('terms', []));
 
             if (in_array($request->operation, ['save', 'convert'])) {
@@ -392,6 +400,12 @@ class ProformaInvoiceController extends Controller
              * Record Status Update History
              */
             $this->statusHistoryService->RecordStatusHistory($newQuotation);
+
+            $this->partyService->updateBillingAndShippingAddress(
+                $request->party_id,
+                $billingAddress,
+                $shippingAddress
+            );
 
             $request->request->add(['modelName' => $newQuotation]);
 

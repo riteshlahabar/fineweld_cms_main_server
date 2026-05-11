@@ -88,7 +88,7 @@
                                             </div>
                                             @endif
                                             
-                                            {{--<x-shipping-address :shippingAddress="$quotation->party->shipping_address ?? ''" />--}}
+                                            <x-bill-ship-address :billingAddress="$quotation->party->billing_address ?? ''" :shippingAddress="$quotation->party->shipping_address ?? ''" />
 
 
                                     </div>
