@@ -33,7 +33,7 @@ class TallySyncService
 
         $itemName = (string) $this->mappingService->valueForTarget('item', $item, 'NAME', 'name', $item->name);
         $baseUnit = (string) $this->mappingService->valueForTarget('item', $item, 'BASEUNITS', 'baseUnit.name', $item->baseUnit?->name ?: 'Nos');
-        $stockGroup = (string) $this->mappingService->valueForTarget('item', $item, 'PARENT', 'category.name', $item->category?->name ?: 'Primary');
+        $stockGroup = $this->normalizeStockGroupName((string) $this->mappingService->valueForTarget('item', $item, 'PARENT', 'category.name', $item->category?->name ?: ''));
         $alias = (string) $this->mappingService->valueForTarget('item', $item, 'ALIAS', 'item_code', $item->item_code ?: '');
         $hsnCode = (string) $this->mappingService->valueForTarget('item', $item, 'HSNCODE', 'hsn', $item->hsn ?: '');
         $description = (string) $this->mappingService->valueForTarget('item', $item, 'DESCRIPTION', 'description', $item->description ?: '');
@@ -42,7 +42,7 @@ class TallySyncService
 
         $mappedPayload = [
             'NAME' => $itemName,
-            'PARENT' => $stockGroup,
+            'PARENT' => $stockGroup !== '' ? $stockGroup : 'Primary',
             'BASEUNITS' => $baseUnit,
             'ALIAS' => $alias,
             'HSNCODE' => $hsnCode,
@@ -703,8 +703,8 @@ class TallySyncService
 
     private function syncStockGroupMaster(string $stockGroupName, ?string $companyName = null): array
     {
-        $stockGroupName = trim($stockGroupName);
-        if ($stockGroupName === '' || strcasecmp($stockGroupName, 'Primary') === 0) {
+        $stockGroupName = $this->normalizeStockGroupName($stockGroupName);
+        if ($stockGroupName === '') {
             return [
                 'status' => true,
                 'message' => 'Stock group is Primary or empty; no transfer required.',
@@ -720,7 +720,7 @@ class TallySyncService
                 $xml = '<TALLYMESSAGE xmlns:UDF="TallyUDF">';
                 $xml .= '<STOCKGROUP NAME="'.$this->esc($stockGroupName).'" ACTION="'.$this->esc($action).'">';
                 $xml .= '<NAME>'.$this->esc($stockGroupName).'</NAME>';
-                $xml .= '<PARENT>Primary</PARENT>';
+                $xml .= '<PARENT></PARENT>';
                 $xml .= '<ISADDABLE>Yes</ISADDABLE>';
                 $xml .= '</STOCKGROUP>';
                 $xml .= '</TALLYMESSAGE>';
@@ -730,6 +730,13 @@ class TallySyncService
         );
 
         return $this->allowAlreadyExistsDependency($result, 'Stock group already exists in Tally.');
+    }
+
+    private function normalizeStockGroupName(?string $stockGroupName): string
+    {
+        $stockGroupName = trim((string) $stockGroupName);
+
+        return strcasecmp($stockGroupName, 'Primary') === 0 ? '' : $stockGroupName;
     }
 
     private function syncLedgerMaster(string $ledgerName, string $parentLedgerName, ?string $companyName = null, bool $affectsStock = false): array

@@ -31,7 +31,7 @@ class TallyJsonMiddlewareService
     {
         $itemName = trim((string) ($payload['item_name'] ?? $payload['name'] ?? ''));
         $unit = trim((string) ($payload['unit'] ?? 'Nos'));
-        $stockGroup = trim((string) ($payload['stock_group'] ?? $payload['parent'] ?? 'Primary'));
+        $stockGroup = $this->normalizeStockGroupName((string) ($payload['stock_group'] ?? $payload['parent'] ?? ''));
         $rate = (float) ($payload['rate'] ?? 0);
 
         $dependencies = [
@@ -74,7 +74,7 @@ class TallyJsonMiddlewareService
         foreach ($items as $index => $item) {
             $unit = trim((string) ($item['unit'] ?? 'Nos'));
             $itemName = trim((string) ($item['name'] ?? $item['item_name'] ?? ''));
-            $stockGroup = trim((string) ($item['stock_group'] ?? 'Primary'));
+            $stockGroup = $this->normalizeStockGroupName((string) ($item['stock_group'] ?? ''));
             $dependencies['item_'.$index.'_unit'] = $this->ensureUnit($unit);
             $dependencies['item_'.$index] = $this->ensureStockItem($itemName, $stockGroup, $unit, (float) ($item['rate'] ?? 0));
         }
@@ -212,8 +212,8 @@ class TallyJsonMiddlewareService
 
     private function ensureStockGroup(string $stockGroup): array
     {
-        $stockGroup = trim($stockGroup);
-        if ($stockGroup === '' || strcasecmp($stockGroup, 'Primary') === 0) {
+        $stockGroup = $this->normalizeStockGroupName($stockGroup);
+        if ($stockGroup === '') {
             return ['status' => true, 'message' => 'Stock group is Primary or empty; no transfer required.'];
         }
 
@@ -271,7 +271,7 @@ class TallyJsonMiddlewareService
 
     private function stockGroupXml(string $stockGroup, string $action): string
     {
-        return '<TALLYMESSAGE xmlns:UDF="TallyUDF"><STOCKGROUP NAME="'.$this->esc($stockGroup).'" ACTION="'.$this->esc($action).'"><NAME>'.$this->esc($stockGroup).'</NAME><PARENT>Primary</PARENT><ISADDABLE>Yes</ISADDABLE></STOCKGROUP></TALLYMESSAGE>';
+        return '<TALLYMESSAGE xmlns:UDF="TallyUDF"><STOCKGROUP NAME="'.$this->esc($stockGroup).'" ACTION="'.$this->esc($action).'"><NAME>'.$this->esc($stockGroup).'</NAME><PARENT></PARENT><ISADDABLE>Yes</ISADDABLE></STOCKGROUP></TALLYMESSAGE>';
     }
 
     private function stockItemXml(string $itemName, string $stockGroup, string $unit, string $action, float $rate = 0): string
@@ -279,7 +279,7 @@ class TallyJsonMiddlewareService
         $xml = '<TALLYMESSAGE xmlns:UDF="TallyUDF">';
         $xml .= '<STOCKITEM NAME="'.$this->esc($itemName).'" ACTION="'.$this->esc($action).'">';
         $xml .= '<NAME>'.$this->esc($itemName).'</NAME>';
-        $xml .= '<PARENT>'.$this->esc($stockGroup ?: 'Primary').'</PARENT>';
+        $xml .= '<PARENT>'.$this->esc($this->normalizeStockGroupName($stockGroup)).'</PARENT>';
         $xml .= '<BASEUNITS>'.$this->esc($unit ?: 'Nos').'</BASEUNITS>';
         if ($rate > 0) {
             $xml .= '<RATE>'.$this->esc($this->amount($rate).'/'.($unit ?: 'Nos')).'</RATE>';
@@ -494,5 +494,12 @@ class TallyJsonMiddlewareService
     private function esc(?string $value): string
     {
         return $this->client->xmlEscape($value);
+    }
+
+    private function normalizeStockGroupName(?string $stockGroupName): string
+    {
+        $stockGroupName = trim((string) $stockGroupName);
+
+        return strcasecmp($stockGroupName, 'Primary') === 0 ? '' : $stockGroupName;
     }
 }

@@ -478,15 +478,15 @@ class TallyClientService
             return [];
         }
 
-        return array_values(array_filter(array_map(static function ($line) {
-            return trim(html_entity_decode(strip_tags((string) $line)));
+        return array_values(array_filter(array_map(function ($line) {
+            return $this->cleanScalar(strip_tags((string) $line));
         }, $matches[1])));
     }
 
     private function extractTagText(string $xml, string $tag): string
     {
         if (preg_match('/<'.preg_quote($tag, '/').'\b[^>]*>\s*(.*?)\s*<\/'.preg_quote($tag, '/').'>/is', $xml, $matches)) {
-            return trim(html_entity_decode(strip_tags((string) $matches[1])));
+            return $this->cleanScalar(strip_tags((string) $matches[1]));
         }
 
         return '';

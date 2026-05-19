@@ -182,7 +182,7 @@
                             </tr>
                         </thead>
                         <tbody id="tallySyncLogsBody">
-                            <tr><td colspan="8" class="text-center text-muted">Click "Logs" to view date-wise transfer history.</td></tr>
+                            <tr><td colspan="9" class="text-center text-muted">Click "Logs" to view date-wise transfer history.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -465,7 +465,7 @@
         }
 
         if (!Array.isArray(logs) || logs.length === 0) {
-            syncLogsBody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No sync logs found.</td></tr>';
+            syncLogsBody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">No sync logs found.</td></tr>';
             return;
         }
 
