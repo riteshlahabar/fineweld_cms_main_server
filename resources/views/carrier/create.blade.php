@@ -46,6 +46,20 @@
                                         <x-input type="number" name="whatsapp" :required="false" value=""/>
                                     </div>
                                     <div class="col-md-6">
+    <x-label for="vehicle_type" name="Type of Vehicle" />
+    <x-input type="text" name="vehicle_type" :required="false" value=""/>
+</div>
+
+<div class="col-md-6">
+    <x-label for="vehicle_no" name="Vehicle No" />
+    <x-input type="text" name="vehicle_no" :required="false" value=""/>
+</div>
+
+<div class="col-md-6">
+    <x-label for="transporter_id" name="Transporter Id" />
+    <x-input type="text" name="transporter_id" :required="false" value=""/>
+</div>
+                                    <div class="col-md-6">
                                         <x-label for="status" name="{{ __('app.status') }}" />
                                         <x-dropdown-status selected="" dropdownName='status'/>
                                     </div>

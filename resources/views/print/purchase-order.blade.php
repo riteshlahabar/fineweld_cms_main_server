@@ -26,29 +26,83 @@
 
 
 
-            <table class="addresses">
-                <tr>
-                    <td class="address">
-                        <span class="fw-bold cu-fs-18">{{ __('app.order_to') }}</span><br>
-                        <span>{{ $order->party?->company_name }}<br>
-{{ $order->party?->billing_address }}</span>
-                        {{-- Party Tax/GST Number --}}
-                        @include('print.common.party-tax-details', ['model' => $order])
-                    </td>
-                    {{--<td class="address">
-                        <span class="fw-bold cu-fs-18">{{ __('app.ship_from') }}</span><br>
-                        <span>{{ $order->party->shipping_address }}</span>
-                    </td>--}}
-                    
-                    <td class="address">
-    <span class="fw-bold cu-fs-18">{{ __('app.ship_to') }}</span><br>
-    <span>
-        {{ $order->party->company_name }}<br>
-       {!! nl2br(e($order->party->shipping_address)) !!}
-    </span>
-</td>
-                </tr>
-            </table>
+            <table class="addresses" style="width:100%; border-collapse:separate; border-spacing:3px;">
+    <tr>
+        {{-- Supplier / Vendor --}}
+        <td class="address" style="width:33.33%; vertical-align:top;">
+            <span class="fw-bold cu-fs-18">To</span><br>
+
+            <b>{{ $order->party?->company_name }}</b><br>
+
+            @if(!empty($order->party?->billing_address))
+                <b>Address :</b> {!! nl2br(e($order->party?->billing_address)) !!}<br>
+            @endif
+
+            @if(!empty($order->party?->company_pan))
+                <b>PAN No. :</b> {{ $order->party?->company_pan }}<br>
+            @endif
+
+            @if(!empty($order->party?->company_gst))
+                <b>GST No. :</b> {{ $order->party?->company_gst }}<br>
+            @endif
+
+            @if(!empty($order->party?->primary_mobile))
+                <b>Phone :</b> {{ $order->party?->primary_mobile }}<br>
+            @endif
+
+            @if(!empty($order->party?->primary_name))
+                <b>Contact Person :</b> {{ $order->party?->primary_name }}<br>
+            @endif
+
+            @if(!empty($order->party?->primary_email))
+                <b>Email :</b> {{ $order->party?->primary_email }}
+            @endif
+        </td>
+
+        {{-- Our Company Billing Address --}}
+        <td class="address" style="width:33.33%; vertical-align:top;">
+            <span class="fw-bold cu-fs-18">Bill To</span><br>
+
+            <b>{{ data_get(app('company'), 'name') }}</b><br>
+
+            @if(!empty(data_get(app('company'), 'address')))
+                <b>Address :</b> {!! nl2br(e(data_get(app('company'), 'address'))) !!}<br>
+            @endif
+
+            @if(!empty(data_get(app('company'), 'tax_number')) && data_get(app('company'), 'tax_type') != 'no-tax')
+                <b>GST No. :</b> {{ data_get(app('company'), 'tax_number') }}<br>
+            @endif
+
+            @if(!empty(data_get(app('company'), 'mobile')))
+                <b>Contact No. :</b> {{ data_get(app('company'), 'mobile') }}<br>
+            @endif
+
+            @if(!empty(data_get(app('company'), 'email')))
+                <b>Email :</b> {{ data_get(app('company'), 'email') }}
+            @endif
+        </td>
+
+        {{-- Our Company Shipping Address --}}
+        <td class="address" style="width:33.33%; vertical-align:top;">
+            <span class="fw-bold cu-fs-18">Ship To</span><br>
+
+            <b>{{ data_get(app('company'), 'name') }}</b><br>
+
+            @if(!empty(data_get(app('company'), 'address')))
+                <b>Address :</b> {!! nl2br(e(data_get(app('company'), 'address'))) !!}<br>
+            @endif
+
+            @if(!empty(data_get(app('company'), 'mobile')))
+                <b>Contact No. :</b> {{ data_get(app('company'), 'mobile') }}<br>
+            @endif
+
+            @if(!empty(data_get(app('company'), 'email')))
+                <b>Email :</b> {{ data_get(app('company'), 'email') }}
+            @endif
+        </td>
+    </tr>
+</table>
+            
 
 
          @php

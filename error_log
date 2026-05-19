@@ -1,2 +1,57 @@
 [09-Feb-2026 17:03:24 Asia/Kolkata] PHP Fatal error:  Cannot use App\Models\SupportPortal\Ticket as Ticket because the name is already in use in /home/turnkeyi/public_html/fineweilds.turnkeyinfotech.live/app/Http/Controllers/SupportPortal/TicketController.php on line 9
 [09-Feb-2026 17:03:34 Asia/Kolkata] PHP Fatal error:  Cannot use App\Models\SupportPortal\Ticket as Ticket because the name is already in use in /home/turnkeyi/public_html/fineweilds.turnkeyinfotech.live/app/Http/Controllers/SupportPortal/TicketController.php on line 9
+[21-Apr-2026 08:46:44 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/artisan(20): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:50:14 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/artisan(20): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:50:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/artisan(20): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:50:47 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/artisan(20): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:50:47 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/artisan(20): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:50:47 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/artisan(20): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:50:48 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/artisan(20): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:51:35 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/artisan(20): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:55:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/artisan(20): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:55:37 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/artisan(20): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:58:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/artisan(20): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14

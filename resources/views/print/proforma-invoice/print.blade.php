@@ -6,14 +6,12 @@
     @include('print.common.css')
 </head>
 <body onload="window.print();">
+
+    <div style="width:100%; height:260mm; overflow:hidden; page-break-after:always; break-after:page; text-align:center;">
+        <img src="{{ $quotationBannerImages['ad'] }}" style="max-width:100%; max-height:260mm; object-fit:contain; display:block; margin:0 auto;">
+    </div>
+
     <div class="invoice-container">
-        
-        
-       <div style="text-align:center;">
-    <img src="{{ asset('advertisement/quotation-ad.jpg') }}" style="width:100%;"></div>
-<div style="page-break-after: always;"></div>
-
-
         <span class="invoice-name">{{ $invoiceData['name'] }}</span>
         <div class="invoice">
             {{--<table class="header">
@@ -32,7 +30,7 @@
 
 <tr>
 <td colspan="2" style="text-align:center; border:none;">
-    <img src="{{ asset('advertisement/quotation-header.jpg') }}" style="width:100%;">
+    <img src="{{ $quotationBannerImages['header'] }}" style="width:100%;">
 </td>
 <tr>
 <td colspan="2" style="text-align:center; padding:8px 0; font-size:14px;">
@@ -470,9 +468,11 @@
             </tbody>
         </table>
         @endif
+        
+        
 
         {{-- @include('print.common.terms-conditions') --}}
-        
+    {{--    
       @php
 $terms = json_decode($quotation->note, true);
 @endphp
@@ -521,11 +521,11 @@ $terms = json_decode($quotation->note, true);
     </td>
 </tr>
 @endif
-
     </tbody>
-
 </table>
 @endif
+--}}
+
 
         @include('print.common.bank-signature')
 

@@ -5,6 +5,43 @@
 		<!--start page wrapper -->
 		<div class="page-wrapper">
 			<div class="page-content">
+			    <div class="card mb-3">
+    <div class="card-body">
+        <form method="GET" action="{{ route('dashboard') }}">
+            <div class="row align-items-end">
+
+                <div class="col-md-3">
+                    <label class="form-label">From Date</label>
+                    <input type="date"
+                           name="from_date"
+                           class="form-control"
+                           value="{{ request('from_date') }}">
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">To Date</label>
+                    <input type="date"
+                           name="to_date"
+                           class="form-control"
+                           value="{{ request('to_date') }}">
+                </div>
+
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary">
+                        Filter
+                    </button>
+
+                    <a href="{{ route('dashboard') }}"
+                       class="btn btn-secondary">
+                        Reset
+                    </a>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+			    
 			    
 			    
 			    @if(auth()->check())
@@ -196,6 +233,12 @@
 								@foreach($trendingItems as $item)
 								  <li class="list-group-item d-flex bg-transparent justify-content-between align-items-center border-top">
 								    {{ $item['name'] }}
+
+@if(!empty($item['category_name']))
+    <small class="text-muted">
+        ({{ $item['category_name'] }})
+    </small>
+@endif
 								    <span class="badge bg-success rounded-pill">{{ $formatNumber->formatQuantity($item['total_quantity']) }}</span>
 								  </li>
 								@endforeach
@@ -339,6 +382,8 @@
                                     <th>{{ __('app.date') }}</th>
                                     <th>{{ __('sale.order.code') }}</th>
                                     <th>{{ __('customer.customer') }}</th>
+                                    <th>Pending Item</th>
+<th>Pending Quantity</th>
                                     <th>{{ __('app.total') }}</th>
                                     <th>{{ __('payment.balance') }}</th>
                                     <th>{{ __('app.status') }}</th>
@@ -354,13 +399,33 @@
                                             </a>
                                         </td>
                                         <td>{{ $order->party?->getFullName() }}</td>
-                                        <td>{{ $formatNumber->formatWithPrecision($order->grand_total) }}</td>
+
+<td>
+    @forelse($order->itemTransaction as $transaction)
+        <div>{{ $transaction->item?->name ?? '-' }}</div>
+    @empty
+        -
+    @endforelse
+</td>
+
+<td>
+    @forelse($order->itemTransaction as $transaction)
+        <div>
+            {{ $formatNumber->formatQuantity($transaction->quantity) }}
+            {{ $transaction->unit?->name }}
+        </div>
+    @empty
+        -
+    @endforelse
+</td>
+
+<td>{{ $formatNumber->formatWithPrecision($order->grand_total) }}</td>
                                         <td>{{ $formatNumber->formatWithPrecision($order->grand_total - $order->paid_amount) }}</td>
                                         <td><span class="badge rounded-pill text-warning bg-light-warning p-2 text-uppercase px-3">{{ $order->order_status }}</span></td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center text-muted">{{ __('app.no_records_found') }}</td>
+                                        <td colspan="8" class="text-center text-muted">{{ __('app.no_records_found') }}</td>
                                     </tr>
                                 @endforelse
                             </tbody>

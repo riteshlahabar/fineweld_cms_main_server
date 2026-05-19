@@ -178,7 +178,11 @@ class SalePaymentController extends Controller
                 }
             }
 
-            $paymentTransaction->delete();
+            if ($paymentTransaction->payment_image && file_exists(public_path('payment_images/'.$paymentTransaction->payment_image))) {
+    unlink(public_path('payment_images/'.$paymentTransaction->payment_image));
+}
+
+$paymentTransaction->delete();
 
             /**
              * Update Sale Model
@@ -236,6 +240,7 @@ class SalePaymentController extends Controller
                 'receipt_no' => 'nullable|string|max:255',
                 'payment_type_id' => 'required|integer',
                 'payment' => 'required|numeric|gt:0',
+'payment_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
             ];
 
             // validation message
@@ -265,6 +270,23 @@ class SalePaymentController extends Controller
             if (! $transaction = $this->paymentTransactionService->recordPayment($sale, $paymentsArray)) {
                 throw new \Exception(__('payment.failed_to_record_payment_transactions'));
             }
+            
+            if ($request->hasFile('payment_image')) {
+    $folderPath = public_path('payment_images');
+
+    if (! is_dir($folderPath)) {
+        mkdir($folderPath, 0755, true);
+    }
+
+    $file = $request->file('payment_image');
+    $fileName = 'sale-payment-'.$transaction->id.'-'.time().'.'.$file->getClientOriginalExtension();
+
+    $file->move($folderPath, $fileName);
+
+    $transaction->update([
+        'payment_image' => $fileName,
+    ]);
+}
 
             /**
              * Update Sale Model
@@ -338,9 +360,18 @@ class SalePaymentController extends Controller
 
         return DataTables::of($data)
             ->addIndexColumn()
-            ->addColumn('created_at', function ($row) {
-                return $row->created_at->format(app('company')['date_format']);
-            })
+            ->addColumn('payment_image', function ($row) {
+    if (empty($row->payment_image) || ! file_exists(public_path('payment_images/'.$row->payment_image))) {
+        return '-';
+    }
+
+    $imageUrl = asset('payment_images/'.$row->payment_image);
+
+    return '<img src="'.$imageUrl.'"
+                 class="payment-image-thumb"
+                 data-full-image="'.$imageUrl.'"
+                 style="width:45px; height:45px; object-fit:cover; border-radius:6px; cursor:pointer;">';
+})
             ->addColumn('username', function ($row) {
                 return $row->user->username ?? '';
             })
@@ -377,7 +408,7 @@ class SalePaymentController extends Controller
 
                 return $actionBtn;
             })
-            ->rawColumns(['action'])
+            ->rawColumns(['payment_image', 'action'])
             ->make(true);
     }
 }

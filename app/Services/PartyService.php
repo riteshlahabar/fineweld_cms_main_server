@@ -90,7 +90,7 @@ class PartyService
     /**
      * Calculate Balance of the Party
      * */
-    public function getPartyBalance($partyIds)
+    public function getPartyBalance($partyIds, $fromDate = null, $toDate = null)
     {
         if (empty($partyIds)) {
             return ['balance' => 0, 'status' => ''];
@@ -98,6 +98,9 @@ class PartyService
 
         // Retrieve opening balance from PartyTransaction
         $openingBalance = PartyTransaction::whereIn('party_id', $partyIds)
+    ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+        $query->whereBetween('transaction_date', [$fromDate, $toDate]);
+    })
             ->selectRaw('COALESCE(SUM(to_receive) - SUM(to_pay), 0) as opening_balance')
             ->first()
             ->opening_balance ?? 0;
@@ -107,6 +110,9 @@ class PartyService
          * For Customers Sale Adjustments
          * */
         $partyPaymentReceiveSum = PartyPayment::whereIn('party_id', $partyIds)
+    ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+        $query->whereBetween('transaction_date', [$fromDate, $toDate]);
+    })
             ->where('payment_direction', 'receive')
             ->selectRaw('
 									(SELECT SUM(amount) FROM party_payments
@@ -129,6 +135,9 @@ class PartyService
          * For suppliers, Purchase adjustments
          * */
         $partyPaymentPaySum = PartyPayment::whereIn('party_id', $partyIds)
+    ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+        $query->whereBetween('transaction_date', [$fromDate, $toDate]);
+    })
             ->where('payment_direction', 'pay')
             ->selectRaw('
 									(SELECT SUM(amount) FROM party_payments
@@ -148,16 +157,25 @@ class PartyService
 
         // Sale & Sale Payments
         $saleBalance = Sale::whereIn('party_id', $partyIds)
+    ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+        $query->whereBetween('sale_date', [$fromDate, $toDate]);
+    })
             ->selectRaw('coalesce(sum(grand_total - paid_amount), 0) as total')
             ->value('total');
 
         // Sale Return & its Payments
-        $saleReturnBalance = SaleReturn::whereIn('party_id', $partyIds)
+       $saleReturnBalance = SaleReturn::whereIn('party_id', $partyIds)
+    ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+        $query->whereBetween('return_date', [$fromDate, $toDate]);
+    })
             ->selectRaw('coalesce(sum(grand_total - paid_amount), 0) as total')
             ->value('total');
 
         // Purchase & its Payments
         $purchaseBalance = Purchase::whereIn('party_id', $partyIds)
+    ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+        $query->whereBetween('purchase_date', [$fromDate, $toDate]);
+    })
             ->selectRaw('coalesce(sum((grand_total - shipping_charge) -
 									CASE
 										WHEN paid_amount >= (grand_total - shipping_charge)
@@ -168,6 +186,9 @@ class PartyService
 
         // Purchase Return & its Payments
         $purchaseReturnBalance = PurchaseReturn::whereIn('party_id', $partyIds)
+    ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+        $query->whereBetween('return_date', [$fromDate, $toDate]);
+    })
             ->selectRaw('coalesce(sum(grand_total - paid_amount), 0) as total')
             ->value('total');
 

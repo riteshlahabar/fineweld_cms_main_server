@@ -110,3 +110,1003 @@
 [14-Feb-2026 10:24:41 Asia/Kolkata] PHP Fatal error:  Cannot declare class App\Http\Controllers\Api\EngineerTicketController, because the name is already in use in /home/turnkeyi/public_html/fineweilds.turnkeyinfotech.live/app/Http/Controllers/Api/Engineer/EngineerTicketController.php on line 9
 [14-Feb-2026 10:24:51 Asia/Kolkata] PHP Fatal error:  Cannot declare class App\Http\Controllers\Api\EngineerTicketController, because the name is already in use in /home/turnkeyi/public_html/fineweilds.turnkeyinfotech.live/app/Http/Controllers/Api/Engineer/EngineerTicketController.php on line 9
 [09-Mar-2026 11:41:52 Asia/Kolkata] PHP Fatal error:  Trait "App\Http\Controllers\Api\Engineer\App\Models\SupportPortal\Ticket" not found in /home/turnkeyi/public_html/fineweilds.turnkeyinfotech.live/app/Http/Controllers/Api/Engineer/TicketVisitController.php on line 17
+[21-Apr-2026 08:45:49 UTC] PHP Warning:  require(/home/fineweld/public_html/cms.fineweldsystems.com/public/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php on line 34
+[21-Apr-2026 08:45:49 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/fineweld/public_html/cms.fineweldsystems.com/public/../vendor/autoload.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php on line 34
+[21-Apr-2026 08:45:52 UTC] PHP Warning:  require(/home/fineweld/public_html/cms.fineweldsystems.com/public/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php on line 34
+[21-Apr-2026 08:45:52 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/fineweld/public_html/cms.fineweldsystems.com/public/../vendor/autoload.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php on line 34
+[21-Apr-2026 08:45:53 UTC] PHP Warning:  require(/home/fineweld/public_html/cms.fineweldsystems.com/public/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php on line 34
+[21-Apr-2026 08:45:53 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/fineweld/public_html/cms.fineweldsystems.com/public/../vendor/autoload.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php on line 34
+[21-Apr-2026 08:46:12 UTC] PHP Warning:  require(/home/fineweld/public_html/cms.fineweldsystems.com/public/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php on line 34
+[21-Apr-2026 08:46:12 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/fineweld/public_html/cms.fineweldsystems.com/public/../vendor/autoload.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php on line 34
+[21-Apr-2026 08:46:25 UTC] PHP Warning:  require(/home/fineweld/public_html/cms.fineweldsystems.com/public/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php on line 34
+[21-Apr-2026 08:46:25 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/fineweld/public_html/cms.fineweldsystems.com/public/../vendor/autoload.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php on line 34
+[21-Apr-2026 08:46:49 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:46:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:47:38 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:48:30 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:48:34 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:48:38 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:48:38 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:48:40 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:48:41 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:49:54 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:50:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:52:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:52:34 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:54:14 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:54:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:54:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:54:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:54:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:55:07 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:55:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:55:40 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:55:41 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:55:42 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:56:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php:14
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/bootstrap/app.php on line 14
+[21-Apr-2026 08:59:04 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "view" does not exist in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1161
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1161): ReflectionClass->__construct()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#17 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#18 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#19 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [view] does not exist. in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1163
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#17 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#18 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1163
+[21-Apr-2026 08:59:06 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "view" does not exist in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1161
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1161): ReflectionClass->__construct()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#17 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#18 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#19 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [view] does not exist. in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1163
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#17 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#18 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1163
+[21-Apr-2026 09:04:33 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "view" does not exist in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1161
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1161): ReflectionClass->__construct()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#17 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#18 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#19 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [view] does not exist. in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1163
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#17 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#18 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1163
+[21-Apr-2026 09:04:41 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "view" does not exist in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1161
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1161): ReflectionClass->__construct()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#17 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#18 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#19 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [view] does not exist. in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1163
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#17 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#18 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1163
+[21-Apr-2026 09:06:25 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "view" does not exist in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1161
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1161): ReflectionClass->__construct()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#17 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#18 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#19 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [view] does not exist. in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1163
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#17 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#18 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1163
+[21-Apr-2026 09:07:01 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "view" does not exist in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1161
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1161): ReflectionClass->__construct()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#17 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#18 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#19 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [view] does not exist. in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1163
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#17 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#18 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1163
+[21-Apr-2026 09:07:31 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "view" does not exist in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1161
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1161): ReflectionClass->__construct()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#17 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#18 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#19 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [view] does not exist. in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1163
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#17 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#18 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1163
+[21-Apr-2026 09:08:01 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "view" does not exist in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1161
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1161): ReflectionClass->__construct()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#17 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#18 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#19 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [view] does not exist. in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1163
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#17 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#18 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1163
+[21-Apr-2026 09:08:02 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "view" does not exist in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1161
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1161): ReflectionClass->__construct()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#17 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#18 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#19 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [view] does not exist. in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1163
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#17 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#18 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1163
+[21-Apr-2026 09:08:03 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "view" does not exist in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1161
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1161): ReflectionClass->__construct()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#17 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#18 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#19 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [view] does not exist. in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1163
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#17 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#18 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1163
+[21-Apr-2026 09:08:04 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "view" does not exist in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1161
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1161): ReflectionClass->__construct()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#17 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#18 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#19 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [view] does not exist. in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1163
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#17 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#18 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1163
+[21-Apr-2026 09:08:04 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "view" does not exist in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1161
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1161): ReflectionClass->__construct()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#17 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#18 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#19 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [view] does not exist. in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1163
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#17 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#18 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1163
+[21-Apr-2026 09:08:04 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "view" does not exist in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1161
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1161): ReflectionClass->__construct()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#17 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#18 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#19 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [view] does not exist. in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1163
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#17 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#18 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1163
+[21-Apr-2026 09:08:04 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "view" does not exist in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1161
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1161): ReflectionClass->__construct()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#17 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#18 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#19 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [view] does not exist. in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1163
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#17 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#18 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1163
+[21-Apr-2026 09:08:04 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "view" does not exist in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1161
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1161): ReflectionClass->__construct()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#17 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#18 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#19 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [view] does not exist. in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1163
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#17 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#18 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1163
+[21-Apr-2026 09:08:05 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "view" does not exist in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1161
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1161): ReflectionClass->__construct()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#17 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#18 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#19 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [view] does not exist. in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1163
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#17 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#18 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1163
+[21-Apr-2026 09:08:05 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "view" does not exist in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1161
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1161): ReflectionClass->__construct()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#17 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#18 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#19 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [view] does not exist. in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1163
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#17 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#18 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1163
+[21-Apr-2026 09:08:15 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "view" does not exist in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1161
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1161): ReflectionClass->__construct()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#17 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#18 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#19 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [view] does not exist. in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1163
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#17 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#18 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1163
+[21-Apr-2026 09:08:18 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "view" does not exist in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1161
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1161): ReflectionClass->__construct()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#17 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#18 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#19 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [view] does not exist. in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1163
+Stack trace:
+#0 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(972): Illuminate\Container\Container->build()
+#1 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(903): Illuminate\Foundation\Application->resolve()
+#3 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1856): Illuminate\Foundation\Application->make()
+#5 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(240): Illuminate\Container\Container->offsetGet()
+#6 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(211): Illuminate\Support\Facades\Facade::resolveFacadeInstance()
+#7 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(357): Illuminate\Support\Facades\Facade::getFacadeRoot()
+#8 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(17): Illuminate\Support\Facades\Facade::__callStatic()
+#9 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(948): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#10 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(923): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#11 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(848): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#12 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(739): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#13 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(627): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#14 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#15 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#16 /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#17 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#18 {main}
+  thrown in /home/fineweld/public_html/cms.fineweldsystems.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1163

@@ -36,6 +36,9 @@ class CarrierRequest extends FormRequest
             'address' => ['nullable', 'string', 'max:500'],
             'note' => ['nullable', 'string', 'max:500'],
             'status' => ['required'],
+            'vehicle_type' => ['nullable', 'string', 'max:100'],
+'vehicle_no' => ['nullable', 'string', 'max:100'],
+'transporter_id' => ['nullable', 'string', 'max:100'],
         ];
 
         if ($this->isMethod('PUT')) {

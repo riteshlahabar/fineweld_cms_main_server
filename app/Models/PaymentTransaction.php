@@ -32,6 +32,7 @@ class PaymentTransaction extends Model
         'reference_no',
         'note',
         'payment_from_unique_code',
+        'payment_image',
     ];
 
     /**

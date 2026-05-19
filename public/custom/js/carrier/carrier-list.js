@@ -12,7 +12,7 @@ $(function() {
         //Delete previous data
         tableId.DataTable().destroy();
 
-        var exportColumns = [2,3,4,5,6,7,8,9,10];//Index Starts from 0
+        var exportColumns = [2,3,4,5,6,7,8,9,10,11,12,13];//Index Starts from 0
 
         var table = tableId.DataTable({
             processing: true,
@@ -35,6 +35,9 @@ $(function() {
                 {data: 'name', name: 'name',},
                 {data: "mobile", name: "mobile"},
                 {data: "whatsapp", name: "whatsapp"},
+                {data: "vehicle_type", name: "vehicle_type"},
+{data: "vehicle_no", name: "vehicle_no"},
+{data: "transporter_id", name: "transporter_id"},
                 {data: "email", name: "email"},
                 {
                     data: 'status',

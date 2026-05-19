@@ -29,6 +29,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mpdf\Mpdf;
 use Yajra\DataTables\Facades\DataTables;
+use App\Models\QuotationBanner;
 
 class ProformaInvoiceController extends Controller
 {
@@ -302,10 +303,12 @@ class ProformaInvoiceController extends Controller
         $batchTrackingRowCount = (new GeneralDataService)->getBatchTranckingRowCount();
 
         $invoiceData = [
-            'name' => 'Proforma Invoice',
-        ];
+    'name' => 'Proforma Invoice',
+];
 
-        return view('print.proforma-invoice.print', compact('isPdf', 'invoiceData', 'quotation', 'selectedPaymentTypesArray', 'batchTrackingRowCount'));
+$quotationBannerImages = $this->quotationBannerImageSources($isPdf);
+
+return view('print.proforma-invoice.print', compact('isPdf', 'invoiceData', 'quotation', 'selectedPaymentTypesArray', 'batchTrackingRowCount', 'quotationBannerImages'));
         // return view('sale.proforma-invoice.unused-print', compact('order','selectedPaymentTypesArray','batchTrackingRowCount'));
     }
 
@@ -314,7 +317,7 @@ class ProformaInvoiceController extends Controller
      * */
     public function generatePdf($id)
     {
-        $html = $this->print($id, isPdf: true);
+       $html = $this->print($id, isPdf: true)->render();
 
         $mpdf = new Mpdf([
             'mode' => 'utf-8',
@@ -980,5 +983,33 @@ class ProformaInvoiceController extends Controller
         ]);
 
     }
+    
+    private function quotationBannerImageSources(bool $isPdf): array
+{
+    $banner = QuotationBanner::first();
+
+    $folder = 'quotation_banner';
+
+    $adFile = $banner?->quotation_ad_banner ?: 'quotation-ad.jpg';
+    $headerFile = $banner?->quotation_header_banner ?: 'quotation-header.jpg';
+
+    if (! file_exists(public_path($folder.'/'.$adFile))) {
+        $adFile = 'quotation-ad.jpg';
+    }
+
+    if (! file_exists(public_path($folder.'/'.$headerFile))) {
+        $headerFile = 'quotation-header.jpg';
+    }
+
+    return [
+        'ad' => $isPdf
+            ? public_path($folder.'/'.$adFile)
+            : asset($folder.'/'.$adFile),
+
+        'header' => $isPdf
+            ? public_path($folder.'/'.$headerFile)
+            : asset($folder.'/'.$headerFile),
+    ];
+}
 }
 

@@ -172,6 +172,7 @@ $(function() {
 
         //Invoice Id
         makePaymentForm.find('input[name="invoice_id"]').val(response.data.invoice_id);
+        makePaymentForm.find('input[name="payment_image"]').val('');
 
         //Form Name
         $('.form-heading').html(response.data.form_heading);

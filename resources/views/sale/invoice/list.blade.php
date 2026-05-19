@@ -70,9 +70,11 @@
                                     <tr>
                                         <th class="d-none"><!-- Which Stores ID & it is used for sorting --></th>
                                         <th><input class="form-check-input row-select" type="checkbox"></th>
-                                        <th>{{ __('sale.code') }}</th>
+                                        <th>Sale Invoice No.</th>
+<th>Sale Order No.</th>
                                         <th>{{ __('app.date') }}</th>
                                         <th>{{ __('supplier.supplier') }}</th>
+                                        <th>GST No.</th>
                                         <th>{{ __('app.total') }}</th>
                                         <th>{{ __('payment.balance') }}</th>
                                         <th>{{ __('app.created_by') }}</th>
