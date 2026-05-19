@@ -178,7 +178,7 @@ class TallyClientService
         return $this->fetchMasterCollection(
             collectionName: 'StockItems',
             masterType: 'StockItem',
-            nativeMethods: ['Name', 'Parent', 'MasterID', 'GUID', 'BaseUnits', 'HSNCode', 'ClosingBalance', 'ClosingRate', 'ClosingValue'],
+            nativeMethods: ['Name', 'Alias', 'PartNo', 'PartNumber', 'Parent', 'MasterID', 'GUID', 'BaseUnits', 'HSNCode', 'ClosingBalance', 'ClosingRate', 'ClosingValue'],
             companyName: $companyName,
             host: $host,
             xmlPort: $xmlPort,
@@ -275,6 +275,9 @@ class TallyClientService
             ],
             'stock_item' => [
                 'NAME',
+                'ALIAS',
+                'PARTNO',
+                'PARTNUMBER',
                 'PARENT',
                 'BASEUNITS',
                 'HSNCODE',
@@ -683,33 +686,57 @@ class TallyClientService
         }
 
         $fields = [];
+        $directFields = [];
         foreach ($node->children() as $child) {
-            $key = strtoupper($child->getName());
-            $value = $this->cleanScalar((string) $child);
-            if ($value === '') {
-                continue;
-            }
-
-            if (array_key_exists($key, $fields)) {
-                if (! is_array($fields[$key])) {
-                    $fields[$key] = [$fields[$key]];
-                }
-                $fields[$key][] = $value;
-            } else {
-                $fields[$key] = $value;
-            }
+            $this->appendFieldValue(
+                $directFields,
+                strtoupper($child->getName()),
+                $this->cleanScalar((string) $child),
+            );
+            $this->collectMasterFields($child, $fields);
         }
 
-        $name = $this->fieldValue($fields, 'NAME') ?: ($attributes['name'] ?? '');
+        $name = $this->fieldValue($directFields, 'NAME') ?: ($attributes['name'] ?? $this->fieldValue($fields, 'NAME'));
 
         return [
             'name' => $name,
-            'parent' => $this->fieldValue($fields, 'PARENT'),
-            'master_id' => $this->fieldValue($fields, 'MASTERID'),
-            'guid' => $this->fieldValue($fields, 'GUID'),
+            'parent' => $this->fieldValue($directFields, 'PARENT') ?: $this->fieldValue($fields, 'PARENT'),
+            'master_id' => $this->fieldValue($directFields, 'MASTERID') ?: $this->fieldValue($fields, 'MASTERID'),
+            'guid' => $this->fieldValue($directFields, 'GUID') ?: $this->fieldValue($fields, 'GUID'),
             'reserved_name' => $attributes['reservedname'] ?? '',
             'fields' => $fields,
         ];
+    }
+
+    private function collectMasterFields(\SimpleXMLElement $node, array &$fields): void
+    {
+        $this->appendFieldValue(
+            $fields,
+            strtoupper($node->getName()),
+            $this->cleanScalar((string) $node),
+        );
+
+        foreach ($node->children() as $child) {
+            $this->collectMasterFields($child, $fields);
+        }
+    }
+
+    private function appendFieldValue(array &$fields, string $key, string $value): void
+    {
+        if ($value === '') {
+            return;
+        }
+
+        if (array_key_exists($key, $fields)) {
+            if (! is_array($fields[$key])) {
+                $fields[$key] = [$fields[$key]];
+            }
+            $fields[$key][] = $value;
+
+            return;
+        }
+
+        $fields[$key] = $value;
     }
 
     private function fieldValue(array $fields, string $key): string
