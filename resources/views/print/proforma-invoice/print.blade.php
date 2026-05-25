@@ -7,10 +7,6 @@
 </head>
 <body onload="window.print();">
 
-    <div style="width:100%; height:260mm; overflow:hidden; page-break-after:always; break-after:page; text-align:center;">
-        <img src="{{ $quotationBannerImages['ad'] }}" style="max-width:100%; max-height:260mm; object-fit:contain; display:block; margin:0 auto;">
-    </div>
-
     <div class="invoice-container">
         <span class="invoice-name">{{ $invoiceData['name'] }}</span>
         <div class="invoice">
