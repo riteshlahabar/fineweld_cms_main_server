@@ -44,6 +44,7 @@ class QuotationRequest extends FormRequest
             'round_off' => ['nullable', Rule::requiredIf(fn () => empty($this->input('round_off'))), 'numeric'],
             'grand_total' => ['required', 'numeric'],
             'note' => ['nullable', 'string', 'max:250'],
+            'shipping_charge' => ['nullable', 'numeric', 'min:0'],
             'billing_address' => ['nullable', 'string'],
             'shipping_address' => ['nullable', 'string'],
             'state_id' => ['nullable', 'integer', Rule::exists('states', 'id')],
@@ -74,6 +75,7 @@ class QuotationRequest extends FormRequest
         $this->merge([
             'quotation_date' => $this->toSystemDateFormat($quotationDate),
             'quotation_code' => $this->getOrderCode(),
+            'shipping_charge' => $this->input('shipping_charge') ?? 0,
             'state_id' => (! empty($this->input('state_id'))) ? $this->input('state_id') : null,
         ]);
 

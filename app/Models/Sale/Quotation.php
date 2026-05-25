@@ -37,6 +37,7 @@ class Quotation extends Model
         'party_id',
         'state_id',
         'note',
+        'shipping_charge',
         'round_off',
         'grand_total',
         'paid_amount',

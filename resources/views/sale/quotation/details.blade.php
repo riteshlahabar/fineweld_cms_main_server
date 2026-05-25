@@ -223,6 +223,12 @@
                                                     <td colspan="{{ $columnCount }}" class="tfoot-first-td">{{ __('tax.tax') }}</td>
                                                     <td>{{ $formatNumber->formatWithPrecision($taxAmount) }}</td>
                                                 </tr>
+                                                @if($quotation->shipping_charge > 0)
+                                                <tr>
+                                                    <td colspan="{{ $columnCount }}" class="tfoot-first-td">{{ __('carrier.shipping_charge') }}</td>
+                                                    <td>{{ $formatNumber->formatWithPrecision($quotation->shipping_charge) }}</td>
+                                                </tr>
+                                                @endif
                                                 <tr>
                                                     <td colspan="{{ $columnCount }}" class="tfoot-first-td">{{ __('app.round_off') }}</td>
                                                     <td>{{ $formatNumber->formatWithPrecision($quotation->round_off) }}</td>

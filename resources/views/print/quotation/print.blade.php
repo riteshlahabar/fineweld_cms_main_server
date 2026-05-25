@@ -277,8 +277,9 @@
                 @endphp
 
                 @php
+                    $hasShippingCharge = $quotation->shipping_charge > 0;
                     $noteColumns = 4 + $totalBatchTrackingRowCount + app('company')['show_hsn'] + app('company')['show_mrp'] - ((app('company')['tax_type'] =='no-tax') ? 1 : 0) - (app('company')['show_discount'] ? 0 : 1);
-                    $noteRosSpan = 4 - ((app('company')['tax_type'] =='no-tax') ? 1 : 0);
+                    $noteRosSpan = 4 - ((app('company')['tax_type'] =='no-tax') ? 1 : 0) + ($hasShippingCharge ? 1 : 0);
 
                     $amountInWordsRowSpan = 1 + app('company')['show_mrp'] + app('company')['show_party_due_payment'] + app('company')['is_enable_secondary_currency'];
                 @endphp
@@ -300,6 +301,12 @@
                 <tr>
                     <td colspan="2" class="text-end fw-bold">{{ __('tax.tax') }}</td>
                     <td colspan="1" class="text-end">{{ $formatNumber->formatWithPrecision($taxAmount) }}</td>
+                </tr>
+                @endif
+                @if($hasShippingCharge)
+                <tr>
+                    <td colspan="2" class="text-end fw-bold">{{ __('carrier.shipping_charge') }}</td>
+                    <td colspan="1" class="text-end">{{ $formatNumber->formatWithPrecision($quotation->shipping_charge) }}</td>
                 </tr>
                 @endif
                 <tr>

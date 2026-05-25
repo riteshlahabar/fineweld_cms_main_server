@@ -213,6 +213,16 @@ value="{{ $terms['courier'] ?? '' }}">
                                             <div class="col-md-4 mt-4">
                                                 <table class="table mb-0 table-striped">
                                                    <tbody>
+                                                      @if(app('company')['is_enable_carrier_charge'])
+                                                       <tr>
+                                                         <td class="w-50">
+                                                            <span class="fw-bold">{{ __('carrier.shipping_charge') }}</span>
+                                                        </td>
+                                                         <td class="w-50">
+                                                            <x-input type="text" additionalClasses="text-end cu_numeric" name="shipping_charge" :required="true" placeholder="Shipping Charge" value="{{ $formatNumber->formatWithPrecision($quotation->shipping_charge ?? 0, comma:false) }}"/>
+                                                        </td>
+                                                      </tr>
+                                                      @endif
                                                       <tr>
                                                          <td class="w-50">
                                                             <div class="form-check">
