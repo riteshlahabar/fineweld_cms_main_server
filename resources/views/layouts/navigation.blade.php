@@ -19,7 +19,7 @@
 						<div class="menu-title">{{ __('app.dashboard') }}</div>
 					</a>
 				</li>
-
+<li><a href="https://hrms.fineweldsystems.com/" target="_blank"><div class="parent-icon"><i class='bx bx-home-alt'></i></div><div class="menu-title">HRMS Dashboard</div></a></li>
 				@canany(['customer.create', 'customer.view', 'supplier.create', 'supplier.view'])
 				<li>
 					<a href="javascript:;" class="has-arrow">
@@ -62,11 +62,15 @@
 						__('sale.sale') }}</div>
 					</a>
 					<ul>
-						@can('sale.invoice.create')
-						<li class="{{ request()->is('pos*') ? 'mm-active' : '' }}">
-											<a href="{{ route('pos.create') }}"><i class='bx bx-radio-circle'></i>{{ __('sale.pos') }}</a>
-										</li>
-						@endcan
+						{{-- 
+@can('sale.invoice.create')
+    <li class="{{ request()->is('pos*') ? 'mm-active' : '' }}">
+        <a href="{{ route('pos.create') }}">
+            <i class='bx bx-radio-circle'></i>{{ __('sale.pos') }}
+        </a>
+    </li>
+@endcan 
+--}}
 
                         @can('sale.invoice.view')
 						<li class="{{ request()->is('sale/invoice/*') ? 'mm-active' : '' }}">
@@ -968,6 +972,15 @@
 						</li>
 					</ul>
 					@endcanany
+					@canany(['app.settings.edit'])
+<ul>
+    <li class="{{ request()->is('settings/quatation-banner') ? 'mm-active' : '' }}">
+        <a href="{{ route('settings.quotation.banner') }}">
+            <i class='bx bx-radio-circle'></i>Quotation Banner
+        </a>
+    </li>
+</ul>
+@endcanany
 					@canany(['tax.view'])
 					<ul>
 						<li class="{{ request()->is('tax*') ? 'mm-active' : '' }}">

@@ -71,6 +71,7 @@
                                             <th>{{ __('payment.paid') }}</th>
                                             <th>{{ __('app.created_by') }}</th>
                                             <th>{{ __('app.created_at') }}</th>
+                                            <th class="text-center">Image</th>
                                             <th>{{ __('app.action') }}</th>
                                         </tr>
                                     </thead>
@@ -84,6 +85,20 @@
                 <!--end row-->
             </div>
         </div>
+        
+        <div class="modal fade" id="paymentImageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Payment Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="paymentFullImage" src="" style="max-width:100%; height:auto;">
+            </div>
+        </div>
+    </div>
+</div>
 
         @endsection
 @section('js')

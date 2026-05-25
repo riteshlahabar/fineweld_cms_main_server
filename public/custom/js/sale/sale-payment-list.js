@@ -39,7 +39,8 @@ $(function() {
 
                 {data: 'username', name: 'username'},
                 {data: 'created_at', name: 'created_at'},
-                {data: 'action', name: 'action', orderable: false, searchable: false},
+{data: 'payment_image', name: 'payment_image', orderable: false, searchable: false, className: 'text-center'},
+{data: 'action', name: 'action', orderable: false, searchable: false},
             ],
 
             dom: "<'row' "+
@@ -255,4 +256,8 @@ $(function() {
         loadDatatables();
     });
 
+$(document).on('click', '.payment-image-thumb', function() {
+    $('#paymentFullImage').attr('src', $(this).data('full-image'));
+    $('#paymentImageModal').modal('show');
+});
 });

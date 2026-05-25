@@ -10,7 +10,7 @@
         
         
        <div style="text-align:center;">
-    <img src="{{ asset('advertisement/quotation-ad.jpg') }}" style="width:100%;"></div>
+    <img src="{{ $quotationBannerImages['ad'] }}" style="width:100%; height:100%; object-fit:contain; display:block;"></div>
 <div style="page-break-after: always;"></div>
 
 
@@ -32,7 +32,7 @@
 
 <tr>
 <td colspan="2" style="text-align:center; border:none;">
-    <img src="{{ asset('advertisement/quotation-header.jpg') }}" style="width:100%;">
+    <img src="{{ asset('quotation_banner/quotation-header.jpg') }}" style="width:100%;">
 </td>
 <tr>
 <td colspan="2" style="text-align:center; padding:8px 0; font-size:14px;">
@@ -143,17 +143,22 @@
                 <tr>
                     <td class="no">{{ $i++ }}</td>
                     <td class="text-left">
-                        <!-- Service Name -->
-                        <b>{{ $transaction->item->name }}</b>
-                        <!-- Description -->
-                        <x-description-points :description="$transaction->description" />
-                        {{-- Show Brand Name --}}
-                        @include('print.common.brand-details', ['model' => $transaction])
-                        <small>
-                            @if ($transaction->itemSerialTransaction->count() > 0)
-                                <br>{{ $transaction->itemSerialTransaction->pluck('itemSerialMaster.serial_code')->implode(',') }}<br>
-                            @endif
-                        </small>
+                       <!-- Service Name -->
+<b>{{ $transaction->item->name }}</b>
+<!-- Description -->
+<x-description-points :description="$transaction->description" />
+{{-- Show Brand Name --}}
+@include('print.common.brand-details', ['model' => $transaction])
+
+@if(!empty($transaction->item->item_code))
+    <br><small><b>Code:</b> {{ $transaction->item->item_code }}</small>
+@endif
+
+<small>
+    @if ($transaction->itemSerialTransaction->count() > 0)
+        <br>{{ $transaction->itemSerialTransaction->pluck('itemSerialMaster.serial_code')->implode(',') }}<br>
+    @endif
+</small>
 
                    </td>
                    @if(app('company')['show_hsn'])

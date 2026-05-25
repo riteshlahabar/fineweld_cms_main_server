@@ -21,6 +21,7 @@ use App\Services\TallyIntegration\TallySyncService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
@@ -170,7 +171,7 @@ class AppSettingsController extends Controller
                     'company_name' => $companyName,
                     'active_company_name' => $activeCompanyName,
                     'parsed' => $result['parsed'] ?? [],
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                 ]);
             } else {
                 Log::warning('Tally XML connection test failed', [
@@ -179,7 +180,7 @@ class AppSettingsController extends Controller
                     'company_name' => $companyName,
                     'message' => $result['message'] ?? null,
                     'parsed' => $result['parsed'] ?? [],
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                 ]);
             }
 
@@ -204,7 +205,7 @@ class AppSettingsController extends Controller
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
             ]);
 
             return response()->json([
@@ -235,7 +236,7 @@ class AppSettingsController extends Controller
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
             ]);
 
             return response()->json([
@@ -256,7 +257,7 @@ class AppSettingsController extends Controller
                 'column' => (int) $request->input('column', 0),
                 'context' => mb_substr((string) $request->input('context', ''), 0, 255),
                 'url' => mb_substr((string) $request->input('url', ''), 0, 2000),
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
                 'ip' => $request->ip(),
                 'user_agent' => mb_substr((string) $request->userAgent(), 0, 1000),
             ]);
@@ -269,7 +270,7 @@ class AppSettingsController extends Controller
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
             ]);
 
             return response()->json([
@@ -372,6 +373,12 @@ class AppSettingsController extends Controller
             ->map(function (TallySyncLog $log) {
                 $responsePayload = json_decode((string) $log->response_payload, true) ?: [];
                 $requestPayload = json_decode((string) $log->request_payload, true) ?: [];
+                $failedDependency = $this->firstFailedDependencyPayload($responsePayload['dependency_sync'] ?? null);
+                $parsed = $responsePayload['parsed'] ?? ($failedDependency['parsed'] ?? $failedDependency['tally_response'] ?? []);
+                $lineErrors = data_get($responsePayload, 'parsed.line_errors', []);
+                if (empty($lineErrors)) {
+                    $lineErrors = data_get($parsed, 'line_errors', []);
+                }
 
                 return [
                     'id' => $log->id,
@@ -383,10 +390,10 @@ class AppSettingsController extends Controller
                     'voucher_no' => data_get($requestPayload, 'mapped_payload.VOUCHERNUMBER', data_get($requestPayload, 'mapped_payload.NAME', '')),
                     'voucher_type' => data_get($requestPayload, 'mapped_payload.VOUCHERTYPENAME', $log->entity_type),
                     'amount' => data_get($requestPayload, 'mapped_payload.AMOUNT', ''),
-                    'tally_created' => data_get($responsePayload, 'parsed.created', 0),
-                    'tally_altered' => data_get($responsePayload, 'parsed.altered', 0),
-                    'tally_errors' => data_get($responsePayload, 'parsed.errors', 0),
-                    'tally_line_errors' => data_get($responsePayload, 'parsed.line_errors', []),
+                    'tally_created' => data_get($parsed, 'created', 0),
+                    'tally_altered' => data_get($parsed, 'altered', 0),
+                    'tally_errors' => data_get($parsed, 'errors', 0),
+                    'tally_line_errors' => $lineErrors,
                     'synced_at' => optional($log->synced_at)->toDateTimeString(),
                     'created_at' => optional($log->created_at)->toDateTimeString(),
                 ];
@@ -397,6 +404,26 @@ class AppSettingsController extends Controller
             'message' => 'Tally sync logs fetched successfully.',
             'data' => $logs,
         ]);
+    }
+
+    private function firstFailedDependencyPayload($dependency): array
+    {
+        if (! is_array($dependency)) {
+            return [];
+        }
+
+        if (array_key_exists('status', $dependency) && ! (bool) ($dependency['status'] ?? false)) {
+            return $dependency;
+        }
+
+        foreach ($dependency as $nestedDependency) {
+            $failedDependency = $this->firstFailedDependencyPayload($nestedDependency);
+            if (! empty($failedDependency)) {
+                return $failedDependency;
+            }
+        }
+
+        return [];
     }
 
     public function tallyIntegrationStore(Request $request)
@@ -669,4 +696,3 @@ class AppSettingsController extends Controller
         return response()->download($file);
     }
 }
-

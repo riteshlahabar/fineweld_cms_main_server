@@ -1069,7 +1069,7 @@ $this->partyService->updateShippingAddress(
     public function datatableList(Request $request)
     {
 
-        $data = Sale::with('user', 'party')
+        $data = Sale::with('user', 'party', 'saleOrder', 'quotation')
             ->when($request->party_id, function ($query) use ($request) {
                 return $query->where('party_id', $request->party_id);
             })
@@ -1087,14 +1087,18 @@ $this->partyService->updateShippingAddress(
             });
 
         return DataTables::of($data)
-            ->filter(function ($query) use ($request) {
+    ->orderColumn('count_id', function ($query, $order) {
+        $query->orderByRaw('CAST(count_id AS UNSIGNED) '.$order);
+    })
+    ->filter(function ($query) use ($request) { 
                 if ($request->has('search') && $request->search['value']) {
                     $searchTerm = $request->search['value'];
                     $query->where(function ($q) use ($searchTerm) {
                         $q->where('sale_code', 'like', "%{$searchTerm}%")
                             ->orWhere('grand_total', 'like', "%{$searchTerm}%")
                             ->orWhereHas('party', function ($partyQuery) use ($searchTerm) {
-    $partyQuery->where('company_name', 'like', "%{$searchTerm}%");
+    $partyQuery->where('company_name', 'like', "%{$searchTerm}%")
+        ->orWhere('company_gst', 'like', "%{$searchTerm}%");
 })
 
                             ->orWhereHas('user', function ($userQuery) use ($searchTerm) {
@@ -1116,6 +1120,17 @@ $this->partyService->updateShippingAddress(
             ->addColumn('sale_code', function ($row) {
                 return $row->sale_code;
             })
+            ->addColumn('sale_order_no', function ($row) {
+    if ($row->saleOrder) {
+        return $row->saleOrder->order_code;
+    }
+
+    if ($row->quotation?->sale_order_id) {
+        return SaleOrder::whereKey($row->quotation->sale_order_id)->value('order_code') ?? '-';
+    }
+
+    return '-';
+})
             ->addColumn('status', function ($row) {
                 if ($row->saleOrder) {
                     return [
@@ -1164,6 +1179,9 @@ $this->partyService->updateShippingAddress(
             })
             ->addColumn('party_name', function ($row) {
     return $row->party->company_name ?? '';
+})
+->addColumn('party_gst', function ($row) {
+    return $row->party->company_gst ?? '';
 })
             ->addColumn('grand_total', function ($row) {
                 return $this->formatWithPrecision($row->grand_total);

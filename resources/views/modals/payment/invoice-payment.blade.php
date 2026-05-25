@@ -40,10 +40,22 @@
                             <x-input type="text" additionalClasses="cu_numeric text-end" name="payment" value=""/>
                         </div>
                         <div class="col-md-6">
-                            <x-label for="payment_note" name="{{ __('payment.note') }}" />
-                            <x-textarea name="payment_note" value=""/>
-                        </div>
-                        <!-- Hidden Fields -->
+    <x-label for="payment_note" name="{{ __('payment.note') }}" />
+    <x-textarea name="payment_note" value=""/>
+</div>
+
+@if(($payment_for ?? '') === 'sale-invoice')
+<div class="col-md-6">
+    <x-label for="payment_image" name="Payment Image / Cheque Photo" />
+    <input type="file"
+           name="payment_image"
+           id="payment_image"
+           class="form-control"
+           accept="image/*">
+</div>
+@endif
+
+<!-- Hidden Fields -->
                         <x-input type="hidden" name="invoice_id" value=""/>
                 </div>
                 <div class="modal-footer">

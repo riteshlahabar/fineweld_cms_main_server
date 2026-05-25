@@ -12,7 +12,7 @@ $(function() {
         //Delete previous data
         tableId.DataTable().destroy();
 
-        var exportColumns = [2,3,4,5,6,7,8];//Index Starts from 0
+      var exportColumns = [2,3,4,5,6,7,8,9,10];//Index Starts from 0
 
         var table = tableId.DataTable({
             processing: true,
@@ -29,7 +29,7 @@ $(function() {
                         },
                 },
             columns: [
-                {targets: 0, data:'id', orderable:true, visible:false},
+                {targets: 0, data:'count_id', name:'count_id', orderable:true, visible:false},
                 {
                     data: 'id',
                     orderable: false,
@@ -101,11 +101,14 @@ $(function() {
                                 </div>`;
                     }
                 },
+                
+                 {data: 'sale_order_no', name: 'sale_order_no', orderable: false},
 
                 {data: 'sale_date', name: 'sale_date'},
 
                 {data: 'party_name', name: 'party_name'},
-                {data: 'grand_total', name: 'grand_total', className: 'text-end'},
+{data: 'party_gst', name: 'party_gst'},
+{data: 'grand_total', name: 'grand_total', className: 'text-end'},
                 {data: 'balance', name: 'balance', className: 'text-end'},
 
                 {data: 'username', name: 'username'},

@@ -25,39 +25,64 @@ class DashboardController extends Controller
 
     public function index()
     {
+        
+        $fromDate = request('from_date');
+$toDate = request('to_date');
 
         $pendingSaleOrders = $this->applyDashboardOwnershipFilter(
-            Sale::query(),
+            Sale::query()
+    ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+        $query->whereBetween('sale_date', [$fromDate, $toDate]);
+    }),
             'sale.invoice.can.view.other.users.sale.invoices'
         )->count();
 
         $totalCompletedSaleOrders = $this->applyDashboardOwnershipFilter(
-            Sale::query(),
-            'sale.invoice.can.view.other.users.sale.invoices'
-        )->sum('grand_total');
+    Sale::query()
+        ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+            $query->whereBetween('sale_date', [$fromDate, $toDate]);
+        }),
+    'sale.invoice.can.view.other.users.sale.invoices'
+)->sum('grand_total');
 
         $totalCompletedSaleOrders = $this->formatWithPrecision($totalCompletedSaleOrders);
 
-        $partyBalance = $this->paymentReceivables();
+        $partyBalance = $this->paymentReceivables($fromDate, $toDate);
         $totalPaymentReceivables = $this->formatWithPrecision($partyBalance['receivable']);
         $totalPaymentPaybles = $this->formatWithPrecision($partyBalance['payable']);
 
         $pendingPurchaseOrders = $this->applyDashboardOwnershipFilter(
-            Purchase::query(),
+            Purchase::query()
+    ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+        $query->whereBetween('purchase_date', [$fromDate, $toDate]);
+    }),
             'purchase.bill.can.view.other.users.purchase.bills'
         )->count();
 
         $totalCompletedPurchaseOrders = $this->applyDashboardOwnershipFilter(
-            Purchase::query(),
-            'purchase.bill.can.view.other.users.purchase.bills'
-        )->sum('grand_total');
+    Purchase::query()
+        ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+            $query->whereBetween('purchase_date', [$fromDate, $toDate]);
+        }),
+    'purchase.bill.can.view.other.users.purchase.bills'
+)->sum('grand_total');
 
         $totalCompletedPurchaseOrders = $this->formatWithPrecision($totalCompletedPurchaseOrders);
 
-        $totalCustomers = $this->partyQueryByVendorRole('customer')->count();
+        $totalCustomers = $this->partyQueryByVendorRole('customer')
+    ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+        $query->whereBetween('created_at', [
+            $fromDate . ' 00:00:00',
+            $toDate . ' 23:59:59'
+        ]);
+    })
+    ->count();
 
         $totalExpense = $this->applyDashboardOwnershipFilter(
-            Expense::query(),
+            Expense::query()
+    ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+        $query->whereBetween('expense_date', [$fromDate, $toDate]);
+    }),
             'expense.can.view.other.users.expenses'
         )
             ->sum('grand_total');
@@ -65,23 +90,31 @@ class DashboardController extends Controller
         $totalExpense = $this->formatWithPrecision($totalExpense);
 
         $recentInvoices = $this->applyDashboardOwnershipFilter(
-            Sale::query(),
-            'sale.invoice.can.view.other.users.sale.invoices'
-        )
+    Sale::query()
+        ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+            $query->whereBetween('sale_date', [$fromDate, $toDate]);
+        }),
+    'sale.invoice.can.view.other.users.sale.invoices'
+)
             ->orderByDesc('id')
             ->limit(10)
             ->get();
 
         $pendingSaleOrderRecords = $this->applyDashboardOwnershipFilter(
-            SaleOrder::query()->where('order_status', 'Pending'),
-            'sale.order.can.view.other.users.sale.orders'
-        )
-            ->with(['party', 'user'])
-            ->orderByDesc('id')
-            ->limit(10)
-            ->get();
+    SaleOrder::query()->where('order_status', 'Pending'),
+    'sale.order.can.view.other.users.sale.orders'
+)
+    ->with([
+        'party',
+        'user',
+        'itemTransaction.item',
+        'itemTransaction.unit',
+    ])
+    ->orderByDesc('id')
+    ->limit(10)
+    ->get();
 
-        $saleVsPurchase = $this->saleVsPurchase();
+        $saleVsPurchase = $this->saleVsPurchase($fromDate, $toDate);
         $trendingItems = $this->trendingItems();
         $lowStockItems = $this->getLowStockItemRecords();
 
@@ -105,7 +138,7 @@ class DashboardController extends Controller
         ));
     }
 
-    public function saleVsPurchase()
+    public function saleVsPurchase($fromDate = null, $toDate = null)
     {
         $labels = [];
         $sales = [];
@@ -118,7 +151,10 @@ class DashboardController extends Controller
             $labels[] = $month;
 
             // Get value for this month, e.g. from database
-            $saleQuery = Sale::query()
+           $saleQuery = Sale::query()
+    ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+        $query->whereBetween('sale_date', [$fromDate, $toDate]);
+    })
                 ->where(function ($query) use ($monthDate) {
                     $query->where(function ($subQuery) use ($monthDate) {
                         $subQuery->whereNotNull('sale_date')
@@ -140,6 +176,9 @@ class DashboardController extends Controller
             $sales[] = $saleQuery->count();
 
             $purchaseQuery = Purchase::query()
+    ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+        $query->whereBetween('purchase_date', [$fromDate, $toDate]);
+    })
                 ->where(function ($query) use ($monthDate) {
                     $query->where(function ($subQuery) use ($monthDate) {
                         $subQuery->whereNotNull('purchase_date')
@@ -183,12 +222,23 @@ class DashboardController extends Controller
     {
         // Get top 4 trending items (adjust limit as needed)
         $query = ItemTransaction::query()
-            ->select([
-                'items.name',
-                DB::raw('SUM(item_transactions.quantity) as total_quantity'),
-            ])
-            ->join('items', 'items.id', '=', 'item_transactions.item_id')
-            ->where('item_transactions.transaction_type', getMorphedModelName(Sale::class));
+        ->when(request('from_date') && request('to_date'), function ($query) {
+    $query->whereBetween(
+        'item_transactions.created_at',
+        [
+            request('from_date') . ' 00:00:00',
+            request('to_date') . ' 23:59:59'
+        ]
+    );
+})
+    ->select([
+        'items.name',
+        'item_categories.name as category_name',
+        DB::raw('SUM(item_transactions.quantity) as total_quantity'),
+    ])
+    ->join('items', 'items.id', '=', 'item_transactions.item_id')
+    ->leftJoin('item_categories', 'item_categories.id', '=', 'items.item_category_id')
+    ->where('item_transactions.transaction_type', getMorphedModelName(Sale::class));
 
         $query = $this->applyDashboardOwnershipFilter(
             $query,
@@ -197,14 +247,18 @@ class DashboardController extends Controller
         );
 
         return $query
-            ->groupBy('item_transactions.item_id', 'items.name')
+            ->groupBy(
+    'item_transactions.item_id',
+    'items.name',
+    'item_categories.name'
+)
             ->orderByDesc('total_quantity')
             ->limit(4)
             ->get()
             ->toArray();
     }
 
-    public function paymentReceivables()
+    public function paymentReceivables($fromDate = null, $toDate = null)
     {
         $customerIds = $this->partyQueryByVendorRole('customer')->pluck('id');
 
@@ -213,8 +267,17 @@ class DashboardController extends Controller
         $customerIds = $customerIds->toArray();
         $supplierIds = $supplierIds->toArray();
 
-        $customerBalance = $this->partyService->getPartyBalance($customerIds);
-        $supplierBalance = $this->partyService->getPartyBalance($supplierIds);
+        $customerBalance = $this->partyService->getPartyBalance(
+    $customerIds,
+    $fromDate,
+    $toDate
+);
+
+$supplierBalance = $this->partyService->getPartyBalance(
+    $supplierIds,
+    $fromDate,
+    $toDate
+);
 
         return [
             'payable' => abs($supplierBalance['balance']),

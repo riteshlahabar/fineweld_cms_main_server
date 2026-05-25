@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Schema;
 
 class TallySyncService
 {
+    private array $tallyStockItemsCache = [];
+
     public function __construct(
         private readonly TallyClientService $client,
         private readonly TallyMappingService $mappingService,
@@ -31,25 +33,64 @@ class TallySyncService
             );
         }
 
-        $itemName = (string) $this->mappingService->valueForTarget('item', $item, 'NAME', 'name', $item->name);
-        $baseUnit = (string) $this->mappingService->valueForTarget('item', $item, 'BASEUNITS', 'baseUnit.name', $item->baseUnit?->name ?: 'Nos');
-        $stockGroup = (string) $this->mappingService->valueForTarget('item', $item, 'PARENT', 'category.name', $item->category?->name ?: 'Primary');
-        $alias = (string) $this->mappingService->valueForTarget('item', $item, 'ALIAS', 'item_code', $item->item_code ?: '');
+        $itemName = trim((string) $this->mappingService->valueForTarget('item', $item, 'NAME', 'name', $item->name));
+        $baseUnit = trim((string) $this->mappingService->valueForTarget('item', $item, 'BASEUNITS', 'baseUnit.name', $item->baseUnit?->name ?: 'Nos'));
+        $stockGroup = $this->normalizeStockGroupName((string) $this->mappingService->valueForTarget('item', $item, 'PARENT', 'category.name', $item->category?->name ?: ''));
+        $alias = trim((string) $this->mappingService->valueForTarget('item', $item, 'ALIAS', 'item_code', $item->item_code ?: ''));
         $hsnCode = (string) $this->mappingService->valueForTarget('item', $item, 'HSNCODE', 'hsn', $item->hsn ?: '');
         $description = (string) $this->mappingService->valueForTarget('item', $item, 'DESCRIPTION', 'description', $item->description ?: '');
         $rate = (float) $this->mappingService->valueForTarget('item', $item, 'RATE', 'sale_price', $item->sale_price ?: 0);
         $openingQty = (float) ($item->itemGeneralQuantities?->sum('quantity') ?? 0);
+        $aliasNames = $this->uniqueFilledValues([$alias, $item->item_code, $item->sku]);
 
         $mappedPayload = [
             'NAME' => $itemName,
-            'PARENT' => $stockGroup,
+            'PARENT' => $stockGroup !== '' ? $stockGroup : 'Primary',
             'BASEUNITS' => $baseUnit,
             'ALIAS' => $alias,
+            'ALIASES' => $aliasNames,
             'HSNCODE' => $hsnCode,
             'DESCRIPTION' => $description,
             'RATE' => $rate,
             'OPENINGBALANCE' => $openingQty,
         ];
+
+        if ($itemName === '') {
+            return $this->finalizeAndReturn(
+                entityType: 'item',
+                entityId: $item->id,
+                operation: $operation,
+                success: false,
+                message: 'Item name is empty for Tally sync.',
+                requestPayload: [
+                    'mapped_payload' => $mappedPayload,
+                ],
+            );
+        }
+
+        $tallyStockItemResolution = $this->resolveExistingTallyStockItem($item, $itemName, $companyName);
+        if ((bool) ($tallyStockItemResolution['found'] ?? false)) {
+            $tallyItemName = (string) $tallyStockItemResolution['name'];
+            $mappedPayload['TALLY_ITEM_NAME'] = $tallyItemName;
+
+            $response = $this->finalizeAndReturn(
+                entityType: 'item',
+                entityId: $item->id,
+                operation: $operation,
+                success: true,
+                message: 'Stock item already exists in Tally as "'.$tallyItemName.'".',
+                requestPayload: [
+                    'mapped_payload' => $mappedPayload,
+                ],
+                responsePayload: [
+                    'resolved_tally_stock_item' => $tallyStockItemResolution,
+                ],
+            );
+            $response['tally_item_name'] = $tallyItemName;
+            $response['matched_tally_stock_item'] = $tallyStockItemResolution;
+
+            return $response;
+        }
 
         $dependencySync = [
             'unit' => $this->syncUnitMaster($baseUnit, $companyName),
@@ -67,6 +108,7 @@ class TallySyncService
                     'mapped_payload' => $mappedPayload,
                 ],
                 responsePayload: [
+                    'tally_stock_item_resolution' => $tallyStockItemResolution,
                     'dependency_sync' => $dependencySync,
                 ],
             );
@@ -77,7 +119,7 @@ class TallySyncService
             context: 'item_sync',
             operation: $operation,
             companyName: $companyName,
-            buildMessageXml: function (string $action) use ($itemName, $stockGroup, $baseUnit, $alias, $hsnCode, $description, $rate, $openingQty) {
+            buildMessageXml: function (string $action) use ($itemName, $stockGroup, $baseUnit, $alias, $aliasNames, $hsnCode, $description, $rate, $openingQty) {
                 $xml = '<TALLYMESSAGE xmlns:UDF="TallyUDF">';
                 $xml .= '<STOCKITEM NAME="'.$this->esc($itemName).'" ACTION="'.$this->esc($action).'">';
                 $xml .= '<NAME>'.$this->esc($itemName).'</NAME>';
@@ -85,6 +127,14 @@ class TallySyncService
                 $xml .= '<BASEUNITS>'.$this->esc($baseUnit).'</BASEUNITS>';
                 if ($alias !== '') {
                     $xml .= '<ALIAS>'.$this->esc($alias).'</ALIAS>';
+                }
+                $aliasXmlNames = array_values(array_filter($aliasNames, static fn (string $aliasName) => strcasecmp($aliasName, $itemName) !== 0));
+                if (! empty($aliasXmlNames)) {
+                    $xml .= '<LANGUAGENAME.LIST><NAME.LIST TYPE="String">';
+                    foreach ($aliasXmlNames as $aliasName) {
+                        $xml .= '<NAME>'.$this->esc($aliasName).'</NAME>';
+                    }
+                    $xml .= '</NAME.LIST></LANGUAGENAME.LIST>';
                 }
                 if ($hsnCode !== '') {
                     $xml .= '<HSNCODE>'.$this->esc($hsnCode).'</HSNCODE>';
@@ -105,7 +155,7 @@ class TallySyncService
             }
         );
 
-        return $this->finalizeAndReturn(
+        $response = $this->finalizeAndReturn(
             entityType: 'item',
             entityId: $item->id,
             operation: $operation,
@@ -119,9 +169,13 @@ class TallySyncService
                 'response_body' => $result['response_body'] ?? null,
                 'parsed' => $result['parsed'] ?? [],
                 'http_status' => $result['http_status'] ?? null,
+                'tally_stock_item_resolution' => $tallyStockItemResolution,
                 'dependency_sync' => $dependencySync,
             ],
         );
+        $response['tally_item_name'] = $itemName;
+
+        return $response;
     }
 
     public function syncPartyById(int $partyId, string $operation = 'upsert', ?string $companyName = null): array
@@ -257,9 +311,14 @@ class TallySyncService
         // Ensure dependencies in Tally: Party + Items
         $partySync = $this->syncPartyById((int) $sale->party_id, 'upsert', $companyName);
         $itemSyncSummary = [];
+        $tallyItemNames = [];
         $itemIds = $lineRecords->pluck('item_id')->filter()->unique()->values();
         foreach ($itemIds as $itemId) {
-            $itemSyncSummary[] = $this->syncItemById((int) $itemId, 'upsert', $companyName);
+            $itemSyncResult = $this->syncItemById((int) $itemId, 'upsert', $companyName);
+            $itemSyncSummary[] = $itemSyncResult;
+            if (($itemSyncResult['status'] ?? false) && ! empty($itemSyncResult['tally_item_name'])) {
+                $tallyItemNames[(int) $itemId] = (string) $itemSyncResult['tally_item_name'];
+            }
         }
 
         $dependencySync = [
@@ -319,7 +378,8 @@ class TallySyncService
 
         $inventoryEntryXml = '';
         foreach ($lineRecords as $line) {
-            $itemName = (string) $this->mappingService->valueForTarget('sale_item', $line, 'STOCKITEMNAME', 'item.name', $line->item?->name ?: '');
+            $mappedItemName = (string) $this->mappingService->valueForTarget('sale_item', $line, 'STOCKITEMNAME', 'item.name', $line->item?->name ?: '');
+            $itemName = (string) ($tallyItemNames[(int) $line->item_id] ?? $mappedItemName);
             if ($itemName === '') {
                 continue;
             }
@@ -374,6 +434,7 @@ class TallySyncService
             'AMOUNT' => $grandTotal,
             'DATE' => $dateYmd,
             'ITEMS_COUNT' => $lineRecords->count(),
+            'TALLY_ITEM_NAMES' => $tallyItemNames,
         ];
 
         $result = $this->pushWithFallback(
@@ -458,8 +519,13 @@ class TallySyncService
 
         $partySync = $this->syncPartyById((int) $purchase->party_id, 'upsert', $companyName);
         $itemSyncSummary = [];
+        $tallyItemNames = [];
         foreach ($lineRecords->pluck('item_id')->filter()->unique()->values() as $itemId) {
-            $itemSyncSummary[] = $this->syncItemById((int) $itemId, 'upsert', $companyName);
+            $itemSyncResult = $this->syncItemById((int) $itemId, 'upsert', $companyName);
+            $itemSyncSummary[] = $itemSyncResult;
+            if (($itemSyncResult['status'] ?? false) && ! empty($itemSyncResult['tally_item_name'])) {
+                $tallyItemNames[(int) $itemId] = (string) $itemSyncResult['tally_item_name'];
+            }
         }
 
         $purchaseLedgerName = $this->client->settingValue('purchase_ledger_name', 'Purchase');
@@ -482,7 +548,8 @@ class TallySyncService
         $inventoryEntryXml = '';
 
         foreach ($lineRecords as $line) {
-            $itemName = (string) ($line->item?->name ?: '');
+            $fallbackItemName = (string) ($line->item?->name ?: '');
+            $itemName = (string) ($tallyItemNames[(int) $line->item_id] ?? $fallbackItemName);
             if ($itemName === '') {
                 continue;
             }
@@ -546,6 +613,7 @@ class TallySyncService
                 'AMOUNT' => $grandTotal,
                 'DATE' => $dateYmd,
                 'ITEMS_COUNT' => $lineRecords->count(),
+                'TALLY_ITEM_NAMES' => $tallyItemNames,
             ],
             'request_xml' => $result['request_xml'] ?? null,
         ], [
@@ -671,6 +739,176 @@ class TallySyncService
         return $alterResult;
     }
 
+    private function resolveExistingTallyStockItem(Item $item, string $preferredName, ?string $companyName = null): array
+    {
+        $candidates = $this->tallyStockItemCandidates($item, $preferredName);
+        if (empty($candidates)) {
+            return [
+                'found' => false,
+                'message' => 'No item name, code, or SKU candidate available for Tally stock item lookup.',
+                'candidates' => [],
+            ];
+        }
+
+        $stockItems = $this->cachedTallyStockItems($companyName);
+        if (! (bool) ($stockItems['status'] ?? false)) {
+            return [
+                'found' => false,
+                'message' => $stockItems['message'] ?? 'Unable to fetch Tally stock items for lookup.',
+                'candidates' => $candidates,
+                'fetch_status' => false,
+            ];
+        }
+
+        foreach (($stockItems['data'] ?? []) as $stockItem) {
+            $match = $this->matchTallyStockItem($stockItem, $candidates);
+            if (! $match) {
+                continue;
+            }
+
+            return [
+                'found' => true,
+                'name' => (string) ($stockItem['name'] ?? $match['value']),
+                'candidate' => $match['candidate'],
+                'matched_value' => $match['value'],
+                'matched_by' => $match['field'],
+                'match_type' => $match['type'],
+                'master_id' => $stockItem['master_id'] ?? '',
+                'guid' => $stockItem['guid'] ?? '',
+                'parent' => $stockItem['parent'] ?? '',
+                'candidates' => $candidates,
+            ];
+        }
+
+        return [
+            'found' => false,
+            'message' => 'No existing Tally stock item matched CMS item name/code/SKU.',
+            'candidates' => $candidates,
+            'fetch_status' => true,
+            'tally_items_count' => count($stockItems['data'] ?? []),
+        ];
+    }
+
+    private function cachedTallyStockItems(?string $companyName): array
+    {
+        $cacheKey = strtolower(trim((string) ($companyName ?: $this->client->defaultCompanyName() ?: 'active_company')));
+
+        if (! array_key_exists($cacheKey, $this->tallyStockItemsCache)) {
+            $this->tallyStockItemsCache[$cacheKey] = $this->client->fetchStockItems($companyName);
+        }
+
+        return $this->tallyStockItemsCache[$cacheKey];
+    }
+
+    private function tallyStockItemCandidates(Item $item, string $preferredName): array
+    {
+        return $this->uniqueFilledValues([
+            $preferredName,
+            $item->name,
+            $item->item_code,
+            $item->sku,
+        ]);
+    }
+
+    private function matchTallyStockItem(array $stockItem, array $candidates): ?array
+    {
+        $candidateExact = [];
+        $candidateCompact = [];
+        foreach ($candidates as $candidate) {
+            $exact = $this->normalizeLookupValue($candidate);
+            $compact = $this->compactLookupValue($candidate);
+            if ($exact !== '') {
+                $candidateExact[$exact] = $candidate;
+            }
+            if (strlen($compact) >= 4) {
+                $candidateCompact[$compact] = $candidate;
+            }
+        }
+
+        foreach ($this->stockItemLookupValues($stockItem) as $field => $value) {
+            $exact = $this->normalizeLookupValue($value);
+            if ($exact !== '' && array_key_exists($exact, $candidateExact)) {
+                return [
+                    'field' => $field,
+                    'value' => $value,
+                    'candidate' => $candidateExact[$exact],
+                    'type' => 'exact',
+                ];
+            }
+
+            $compact = $this->compactLookupValue($value);
+            if (strlen($compact) >= 4 && array_key_exists($compact, $candidateCompact)) {
+                return [
+                    'field' => $field,
+                    'value' => $value,
+                    'candidate' => $candidateCompact[$compact],
+                    'type' => 'normalized',
+                ];
+            }
+        }
+
+        return null;
+    }
+
+    private function stockItemLookupValues(array $stockItem): array
+    {
+        $values = [];
+        foreach (['name', 'reserved_name'] as $key) {
+            if (! empty($stockItem[$key])) {
+                $values[$key] = (string) $stockItem[$key];
+            }
+        }
+
+        foreach (($stockItem['fields'] ?? []) as $key => $value) {
+            $key = strtoupper((string) $key);
+            if (! $this->isStockItemLookupField($key)) {
+                continue;
+            }
+
+            foreach (array_values((array) $value) as $index => $fieldValue) {
+                $fieldValue = trim((string) $fieldValue);
+                if ($fieldValue !== '') {
+                    $values[$key.'_'.$index] = $fieldValue;
+                }
+            }
+        }
+
+        return $values;
+    }
+
+    private function isStockItemLookupField(string $field): bool
+    {
+        return in_array($field, ['NAME', 'ALIAS', 'PARTNO', 'PARTNUMBER', 'STOCKITEMNAME', 'MAILINGNAME', 'ORIGINALNAME', 'SKU', 'ITEMCODE', 'ITEM_CODE'], true)
+            || str_contains($field, 'ALIAS')
+            || str_contains($field, 'PART')
+            || str_contains($field, 'SKU');
+    }
+
+    private function uniqueFilledValues(array $values): array
+    {
+        $unique = [];
+        foreach ($values as $value) {
+            $value = trim((string) $value);
+            if ($value === '') {
+                continue;
+            }
+
+            $unique[strtolower($value)] = $value;
+        }
+
+        return array_values($unique);
+    }
+
+    private function normalizeLookupValue(?string $value): string
+    {
+        return strtolower(trim(preg_replace('/\s+/', ' ', (string) $value) ?? ''));
+    }
+
+    private function compactLookupValue(?string $value): string
+    {
+        return strtolower(preg_replace('/[^a-zA-Z0-9]/', '', (string) $value) ?? '');
+    }
+
     private function syncUnitMaster(string $unitName, ?string $companyName = null): array
     {
         $unitName = trim($unitName);
@@ -703,8 +941,8 @@ class TallySyncService
 
     private function syncStockGroupMaster(string $stockGroupName, ?string $companyName = null): array
     {
-        $stockGroupName = trim($stockGroupName);
-        if ($stockGroupName === '' || strcasecmp($stockGroupName, 'Primary') === 0) {
+        $stockGroupName = $this->normalizeStockGroupName($stockGroupName);
+        if ($stockGroupName === '') {
             return [
                 'status' => true,
                 'message' => 'Stock group is Primary or empty; no transfer required.',
@@ -720,7 +958,7 @@ class TallySyncService
                 $xml = '<TALLYMESSAGE xmlns:UDF="TallyUDF">';
                 $xml .= '<STOCKGROUP NAME="'.$this->esc($stockGroupName).'" ACTION="'.$this->esc($action).'">';
                 $xml .= '<NAME>'.$this->esc($stockGroupName).'</NAME>';
-                $xml .= '<PARENT>Primary</PARENT>';
+                $xml .= '<PARENT></PARENT>';
                 $xml .= '<ISADDABLE>Yes</ISADDABLE>';
                 $xml .= '</STOCKGROUP>';
                 $xml .= '</TALLYMESSAGE>';
@@ -730,6 +968,13 @@ class TallySyncService
         );
 
         return $this->allowAlreadyExistsDependency($result, 'Stock group already exists in Tally.');
+    }
+
+    private function normalizeStockGroupName(?string $stockGroupName): string
+    {
+        $stockGroupName = trim((string) $stockGroupName);
+
+        return strcasecmp($stockGroupName, 'Primary') === 0 ? '' : $stockGroupName;
     }
 
     private function syncLedgerMaster(string $ledgerName, string $parentLedgerName, ?string $companyName = null, bool $affectsStock = false): array

@@ -79,6 +79,7 @@ use App\Http\Controllers\SupportPortal\LiveMapController;
 use App\Services\SupportPortal\FirebaseService;
 use Illuminate\Http\Request;
 use App\Models\SupportPortal\AdminDevice;
+use App\Http\Controllers\Settings\QuotationBannerController;
 
 
 /*
@@ -155,6 +156,16 @@ Route::get('/language/switch/{id}', [LanguageController::class, 'switchLanguage'
 
 Route::get('/theme/switch/{theme_name}', [LanguageController::class, 'switchTheme'])
     ->name('theme.switch');
+    
+    
+Route::middleware(['auth', 'can:app.settings.edit'])->group(function () {
+    Route::get('settings/quatation-banner', [QuotationBannerController::class, 'index'])
+        ->name('settings.quotation.banner');
+
+    Route::post('settings/quatation-banner', [QuotationBannerController::class, 'store'])
+        ->name('settings.quotation.banner.store');
+});    
+    
 
 Route::middleware('auth')->group(function () {
 
