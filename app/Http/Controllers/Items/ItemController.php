@@ -505,6 +505,9 @@ class ItemController extends Controller
                         ->where('warehouse_id', $warehouseId)
                         ->where('quantity', '>', 0);
                 });
+            })
+            ->when(! $warehouseId, function ($query) {
+                return $query->where('current_stock', '>', 0);
             });
 
         // Handle ordering by quantity (current_stock) if requested and warehouse_id is selected
