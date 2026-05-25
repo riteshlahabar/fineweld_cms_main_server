@@ -498,6 +498,13 @@ class ItemController extends Controller
             })
             ->when($request->created_by, function ($query) use ($request) {
                 return $query->where('created_by', $request->created_by);
+            })
+            ->when($warehouseId, function ($query) use ($warehouseId) {
+                return $query->whereHas('itemGeneralQuantities', function ($warehouseStockQuery) use ($warehouseId) {
+                    $warehouseStockQuery
+                        ->where('warehouse_id', $warehouseId)
+                        ->where('quantity', '>', 0);
+                });
             });
 
         // Handle ordering by quantity (current_stock) if requested and warehouse_id is selected
