@@ -81,6 +81,10 @@
                                                 <x-dropdown-states selected="" dropdownName='state_id'/>
                                             </div>
                                             @endif
+                                            <div class="col-md-4">
+                                                <x-label for="kind_attention" name="Kind Attention" />
+                                                <textarea name="kind_attention" class="form-control" rows="3" placeholder="Name - Mobile&#10;Name - Mobile"></textarea>
+                                            </div>
                                              {{--<x-shipping-address />--}}
 
 

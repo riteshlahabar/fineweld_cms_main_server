@@ -79,6 +79,10 @@
                                                 <x-dropdown-states selected="{{ $quotation->state_id }}" dropdownName='state_id'/>
                                             </div>
                                             @endif
+                                            <div class="col-md-4">
+                                                <x-label for="kind_attention" name="Kind Attention" />
+                                                <textarea name="kind_attention" class="form-control" rows="3" placeholder="Name - Mobile&#10;Name - Mobile">{{ $quotation->kind_attention ?? '' }}</textarea>
+                                            </div>
                                             
                                             {{--<x-shipping-address :shippingAddress="$quotation->party->shipping_address ?? ''" />--}}
 

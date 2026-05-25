@@ -67,12 +67,11 @@
                         @include('print.common.party-tax-details', ['model' => $quotation])
                     </td>
                     <td class="address">
-    <span>
-        Dear Sir,<br>
-
-        With reference to our discussion, we are pleased to quote you for Spares 350 Amps for OTC Torch for delivery to the following shipping address:
-    </span>
-</td>
+                        <span class="fw-bold cu-fs-18">Kind Atten:</span><br>
+                        <span>
+                            {!! !empty($quotation->kind_attention) ? nl2br(e($quotation->kind_attention)) : '-' !!}
+                        </span>
+                    </td>
                     
                     {{--<td class="address">
     <span class="fw-bold cu-fs-18">{{ __('app.ship_to') }}</span><br>
@@ -83,6 +82,10 @@
 </td>--}}
                 </tr>
             </table>
+            <div style="margin-top: 6px;">
+                Dear Sir,<br>
+                With reference to our discussion, we are pleased to quote you for Spares 350 Amps for OTC Torch for delivery to the following shipping address:
+            </div>
 
 
          @php
