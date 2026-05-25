@@ -81,11 +81,13 @@
     </span>
 </td>--}}
                 </tr>
+                <tr>
+                    <td colspan="2" class="address">
+                        Dear Sir,<br>
+                        With reference to our discussion, we are pleased to quote you for Spares 350 Amps for OTC Torch for delivery to the following shipping address:
+                    </td>
+                </tr>
             </table>
-            <div style="margin-top: 6px;">
-                Dear Sir,<br>
-                With reference to our discussion, we are pleased to quote you for Spares 350 Amps for OTC Torch for delivery to the following shipping address:
-            </div>
 
 
          @php
