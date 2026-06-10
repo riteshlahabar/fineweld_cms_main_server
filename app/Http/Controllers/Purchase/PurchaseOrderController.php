@@ -7,6 +7,7 @@ use App\Enums\ItemTransactionUniqueCode;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PurchaseOrderRequest;
 use App\Models\Items\Item;
+use App\Models\Items\ItemTransaction;
 use App\Models\Prefix;
 use App\Models\Purchase\Purchase;
 use App\Models\Purchase\PurchaseOrder;
@@ -15,6 +16,7 @@ use App\Services\CacheService;
 use App\Services\Communication\Email\PurchaseOrderEmailNotificationService;
 use App\Services\Communication\Sms\PurchaseOrderSmsNotificationService;
 use App\Services\GeneralDataService;
+use App\Services\ItemService;
 use App\Services\ItemTransactionService;
 use App\Services\PaymentTransactionService;
 use App\Services\PaymentTypeService;
@@ -37,6 +39,8 @@ class PurchaseOrderController extends Controller
     protected $companyId;
 
     private $paymentTypeService;
+
+    private array $itemQuantityMetricsCache = [];
 
     private $paymentTransactionService;
 
@@ -590,7 +594,7 @@ class PurchaseOrderController extends Controller
     public function datatableList(Request $request)
     {
 
-        $data = PurchaseOrder::with('user', 'party', 'purchase.itemTransaction', 'itemTransaction.unit')
+        $data = PurchaseOrder::with('user', 'party', 'itemTransaction.item')
             ->when($request->party_id, function ($query) use ($request) {
                 return $query->where('party_id', $request->party_id);
             })
@@ -646,30 +650,23 @@ class PurchaseOrderController extends Controller
 })
             ->addColumn('actual_quantity', function ($row) {
                 return $row->itemTransaction->map(function ($transaction) {
-                    return '<div>'.$this->formatQuantity($transaction->quantity).' '.e($transaction->unit?->name ?? '').'</div>';
+                    $metrics = $this->getOverallItemQuantityMetrics($transaction->item_id);
+
+                    return '<div>'.$metrics['actual_stock_formatted'].'</div>';
                 })->implode('');
             })
             ->addColumn('purchased_quantity', function ($row) {
-                $purchasedQuantities = $row->purchase?->itemTransaction
-                    ? $row->purchase->itemTransaction->groupBy('item_id')->map(fn ($items) => $items->sum('quantity'))
-                    : collect();
+                return $row->itemTransaction->map(function ($transaction) {
+                    $metrics = $this->getOverallItemQuantityMetrics($transaction->item_id);
 
-                return $row->itemTransaction->map(function ($transaction) use ($purchasedQuantities) {
-                    $purchasedQuantity = (float) ($purchasedQuantities[$transaction->item_id] ?? 0);
-
-                    return '<div>'.$this->formatQuantity($purchasedQuantity).' '.e($transaction->unit?->name ?? '').'</div>';
+                    return '<div>'.$metrics['purchased_quantity_formatted'].'</div>';
                 })->implode('');
             })
             ->addColumn('pending_quantity', function ($row) {
-                $purchasedQuantities = $row->purchase?->itemTransaction
-                    ? $row->purchase->itemTransaction->groupBy('item_id')->map(fn ($items) => $items->sum('quantity'))
-                    : collect();
+                return $row->itemTransaction->map(function ($transaction) {
+                    $metrics = $this->getOverallItemQuantityMetrics($transaction->item_id);
 
-                return $row->itemTransaction->map(function ($transaction) use ($purchasedQuantities) {
-                    $purchasedQuantity = (float) ($purchasedQuantities[$transaction->item_id] ?? 0);
-                    $pendingQuantity = max((float) $transaction->quantity - $purchasedQuantity, 0);
-
-                    return '<div>'.$this->formatQuantity($pendingQuantity).' '.e($transaction->unit?->name ?? '').'</div>';
+                    return '<div>'.$metrics['pending_purchase_quantity_formatted'].'</div>';
                 })->implode('');
             })
                     // ->addColumn('status', function ($row) {
@@ -760,6 +757,30 @@ class PurchaseOrderController extends Controller
             })
             ->rawColumns(['actual_quantity', 'purchased_quantity', 'pending_quantity', 'action'])
             ->make(true);
+    }
+
+    private function getOverallItemQuantityMetrics(int $itemId): array
+    {
+        if (isset($this->itemQuantityMetricsCache[$itemId])) {
+            return $this->itemQuantityMetricsCache[$itemId];
+        }
+
+        $actualStock = (float) Item::whereKey($itemId)->value('current_stock');
+        $purchasedQuantity = (float) ItemTransaction::where('item_id', $itemId)
+            ->where('unique_code', ItemTransactionUniqueCode::PURCHASE->value)
+            ->sum('quantity');
+        $purchaseOrderQuantity = (float) ItemTransaction::where('item_id', $itemId)
+            ->where('unique_code', ItemTransactionUniqueCode::PURCHASE_ORDER->value)
+            ->sum('quantity');
+        $pendingPurchaseQuantity = max($purchaseOrderQuantity - $purchasedQuantity, 0);
+
+        $itemService = app(ItemService::class);
+
+        return $this->itemQuantityMetricsCache[$itemId] = [
+            'actual_stock_formatted' => $itemService->getQuantityInUnit($actualStock, $itemId),
+            'purchased_quantity_formatted' => $itemService->getQuantityInUnit($purchasedQuantity, $itemId),
+            'pending_purchase_quantity_formatted' => $itemService->getQuantityInUnit($pendingPurchaseQuantity, $itemId),
+        ];
     }
 
     /**
