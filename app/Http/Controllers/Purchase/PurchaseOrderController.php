@@ -590,7 +590,7 @@ class PurchaseOrderController extends Controller
     public function datatableList(Request $request)
     {
 
-        $data = PurchaseOrder::with('user', 'party', 'purchase')
+        $data = PurchaseOrder::with('user', 'party', 'purchase.itemTransaction', 'itemTransaction.unit')
             ->when($request->party_id, function ($query) use ($request) {
                 return $query->where('party_id', $request->party_id);
             })
@@ -615,8 +615,9 @@ class PurchaseOrderController extends Controller
                         $q->where('order_code', 'like', "%{$searchTerm}%")
                             ->orWhere('grand_total', 'like', "%{$searchTerm}%")
                             ->orWhereHas('party', function ($partyQuery) use ($searchTerm) {
-                                $partyQuery->where('first_name', 'like', "%{$searchTerm}%")
-                                    ->orWhere('last_name', 'like', "%{$searchTerm}%");
+                                $partyQuery->where('company_name', 'like', "%{$searchTerm}%")
+                                    ->orWhere('company_gst', 'like', "%{$searchTerm}%")
+                                    ->orWhere('mobile', 'like', "%{$searchTerm}%");
                             })
                             ->orWhereHas('user', function ($userQuery) use ($searchTerm) {
                                 $userQuery->where('username', 'like', "%{$searchTerm}%");
@@ -643,11 +644,33 @@ class PurchaseOrderController extends Controller
             ->addColumn('party_name', function ($row) {
     return $row->party->company_name ?? '';
 })
-            ->addColumn('grand_total', function ($row) {
-                return $this->formatWithPrecision($row->grand_total);
+            ->addColumn('actual_quantity', function ($row) {
+                return $row->itemTransaction->map(function ($transaction) {
+                    return '<div>'.$this->formatQuantity($transaction->quantity).' '.e($transaction->unit?->name ?? '').'</div>';
+                })->implode('');
             })
-            ->addColumn('balance', function ($row) {
-                return $this->formatWithPrecision($row->grand_total - $row->paid_amount);
+            ->addColumn('purchased_quantity', function ($row) {
+                $purchasedQuantities = $row->purchase?->itemTransaction
+                    ? $row->purchase->itemTransaction->groupBy('item_id')->map(fn ($items) => $items->sum('quantity'))
+                    : collect();
+
+                return $row->itemTransaction->map(function ($transaction) use ($purchasedQuantities) {
+                    $purchasedQuantity = (float) ($purchasedQuantities[$transaction->item_id] ?? 0);
+
+                    return '<div>'.$this->formatQuantity($purchasedQuantity).' '.e($transaction->unit?->name ?? '').'</div>';
+                })->implode('');
+            })
+            ->addColumn('pending_quantity', function ($row) {
+                $purchasedQuantities = $row->purchase?->itemTransaction
+                    ? $row->purchase->itemTransaction->groupBy('item_id')->map(fn ($items) => $items->sum('quantity'))
+                    : collect();
+
+                return $row->itemTransaction->map(function ($transaction) use ($purchasedQuantities) {
+                    $purchasedQuantity = (float) ($purchasedQuantities[$transaction->item_id] ?? 0);
+                    $pendingQuantity = max((float) $transaction->quantity - $purchasedQuantity, 0);
+
+                    return '<div>'.$this->formatQuantity($pendingQuantity).' '.e($transaction->unit?->name ?? '').'</div>';
+                })->implode('');
             })
                     // ->addColumn('status', function ($row) {
                     //     return [
@@ -735,7 +758,7 @@ class PurchaseOrderController extends Controller
 
                 return $actionBtn;
             })
-            ->rawColumns(['action'])
+            ->rawColumns(['actual_quantity', 'purchased_quantity', 'pending_quantity', 'action'])
             ->make(true);
     }
 

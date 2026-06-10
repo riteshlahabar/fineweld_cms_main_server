@@ -12,7 +12,7 @@
                                         ]"/>
                 @php
                     $isConvertOperation = (($quotation->operation ?? 'update') === 'convert');
-                    $saleOrderNumber = old('sale_order_code', $quotation->saleOrder->order_code ?? ($isConvertOperation ? $quotation->order_code : ''));
+                    $saleOrderNumber = old('sale_order_code', data_get($quotation, 'saleOrder.order_code') ?? ($isConvertOperation ? ($quotation->order_code ?? '') : ''));
                 @endphp
                 <div class="row">
                     <form class="g-3 needs-validation" id="invoiceForm" action="{{ $isConvertOperation ? route('sale.proforma.store') : route('sale.proforma.update') }}" enctype="multipart/form-data">

@@ -728,7 +728,8 @@ class SaleReturnController extends Controller
                             ->orWhereHas('party', function ($partyQuery) use ($searchTerm) {
                                 $partyQuery->where('company_name', 'like', "%{$searchTerm}%")
                                     ->orWhere('company_gst', 'like', "%{$searchTerm}%")
-                                    ->orWhere('mobile', 'like', "%{$searchTerm}%");
+                                    ->orWhere('primary_mobile', 'like', "%{$searchTerm}%")
+                                    ->orWhere('secondary_mobile', 'like', "%{$searchTerm}%");
                             })
                             ->orWhereHas('user', function ($userQuery) use ($searchTerm) {
                                 $userQuery->where('username', 'like', "%{$searchTerm}%");

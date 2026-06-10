@@ -220,6 +220,7 @@ class PurchaseController extends Controller
     public function edit($id): View
     {
         $purchase = Purchase::with(['party',
+            'purchaseOrder',
             'itemTransaction' => [
                 'item.brand',
                 'warehouse',

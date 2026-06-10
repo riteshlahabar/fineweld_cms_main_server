@@ -590,7 +590,7 @@ class SaleOrderController extends Controller
     {
         $hasProformaColumn = Schema::hasColumn('quotations', 'sale_order_id');
 
-        $relationships = ['user', 'party', 'sale'];
+        $relationships = ['user', 'party', 'sale.itemTransaction', 'itemTransaction.unit'];
         if ($hasProformaColumn) {
             $relationships[] = 'quotation';
         }
@@ -623,7 +623,8 @@ class SaleOrderController extends Controller
                             ->orWhereHas('party', function ($partyQuery) use ($searchTerm) {
                                 $partyQuery->where('company_name', 'like', "%{$searchTerm}%")
                                     ->orWhere('company_gst', 'like', "%{$searchTerm}%")
-                                    ->orWhere('mobile', 'like', "%{$searchTerm}%");
+                                    ->orWhere('primary_mobile', 'like', "%{$searchTerm}%")
+                                    ->orWhere('secondary_mobile', 'like', "%{$searchTerm}%");
                             })
                             ->orWhereHas('user', function ($userQuery) use ($searchTerm) {
                                 $userQuery->where('username', 'like', "%{$searchTerm}%");
@@ -650,11 +651,33 @@ class SaleOrderController extends Controller
             ->addColumn('party_name', function ($row) {
     return $row->party->company_name ?? '';
 })
-            ->addColumn('grand_total', function ($row) {
-                return $this->formatWithPrecision($row->grand_total);
+            ->addColumn('actual_quantity', function ($row) {
+                return $row->itemTransaction->map(function ($transaction) {
+                    return '<div>'.$this->formatQuantity($transaction->quantity).' '.e($transaction->unit?->name ?? '').'</div>';
+                })->implode('');
             })
-            ->addColumn('balance', function ($row) {
-                return $this->formatWithPrecision($row->grand_total - $row->paid_amount);
+            ->addColumn('sold_quantity', function ($row) {
+                $soldQuantities = $row->sale?->itemTransaction
+                    ? $row->sale->itemTransaction->groupBy('item_id')->map(fn ($items) => $items->sum('quantity'))
+                    : collect();
+
+                return $row->itemTransaction->map(function ($transaction) use ($soldQuantities) {
+                    $soldQuantity = (float) ($soldQuantities[$transaction->item_id] ?? 0);
+
+                    return '<div>'.$this->formatQuantity($soldQuantity).' '.e($transaction->unit?->name ?? '').'</div>';
+                })->implode('');
+            })
+            ->addColumn('pending_quantity', function ($row) {
+                $soldQuantities = $row->sale?->itemTransaction
+                    ? $row->sale->itemTransaction->groupBy('item_id')->map(fn ($items) => $items->sum('quantity'))
+                    : collect();
+
+                return $row->itemTransaction->map(function ($transaction) use ($soldQuantities) {
+                    $soldQuantity = (float) ($soldQuantities[$transaction->item_id] ?? 0);
+                    $pendingQuantity = max((float) $transaction->quantity - $soldQuantity, 0);
+
+                    return '<div>'.$this->formatQuantity($pendingQuantity).' '.e($transaction->unit?->name ?? '').'</div>';
+                })->implode('');
             })
             ->addColumn('status', function ($row) use ($hasProformaColumn) {
                 if ($hasProformaColumn && $row->quotation) {
@@ -752,7 +775,7 @@ class SaleOrderController extends Controller
 
                 return $actionBtn;
             })
-            ->rawColumns(['action'])
+            ->rawColumns(['actual_quantity', 'sold_quantity', 'pending_quantity', 'action'])
             ->make(true);
     }
 

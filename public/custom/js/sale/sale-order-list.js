@@ -72,8 +72,9 @@ $(function() {
                 {data: 'order_date', name: 'order_date'},
                 {data: 'due_date', name: 'due_date'},
                 {data: 'party_name', name: 'party_name'},
-                {data: 'grand_total', name: 'grand_total', className: 'text-end'},
-                {data: 'balance', name: 'balance', className: 'text-end'},
+                {data: 'actual_quantity', name: 'actual_quantity', orderable: false, searchable: false},
+                {data: 'sold_quantity', name: 'sold_quantity', orderable: false, searchable: false},
+                {data: 'pending_quantity', name: 'pending_quantity', orderable: false, searchable: false},
                 {
                     data: null,
                     name: 'order_status',

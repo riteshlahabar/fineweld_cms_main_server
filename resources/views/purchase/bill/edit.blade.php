@@ -5,6 +5,9 @@
         <!--start page wrapper -->
         <div class="page-wrapper">
             <div class="page-content">
+                @php
+                    $purchaseOrderNumber = old('purchase_order_code', data_get($purchase, 'purchaseOrder.order_code') ?? (($purchase->operation ?? '') === 'convert' ? ($purchase->order_code ?? '') : ''));
+                @endphp
                 <x-breadcrumb :langArray="[
                                             'purchase.purchase',
                                             'purchase.bills',
@@ -74,6 +77,10 @@
                                                     <span class="input-group-text">#</span>
                                                     <x-input type="text" name="count_id" :required="true" placeholder="Serial Number" value="{{ $purchase->count_id }}"/>
                                                 </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <x-label for="purchase_order_code" name="Purchase Order No." />
+                                                <x-input type="text" name="purchase_order_code" :required="false" placeholder="-" value="{{ $purchaseOrderNumber }}" readonly />
                                             </div>
                                             <div class="col-md-4">
                                                 <x-label for="reference_no" name="{{ __('supplier.supplier_invoice_number') }}" />

@@ -72,8 +72,9 @@
                                             <th>{{ __('app.date') }}</th>
                                             <th>{{ __('app.due_date') }}</th>
                                             <th>{{ __('customer.customer') }}</th>
-                                            <th>{{ __('app.total') }}</th>
-                                            <th>{{ __('payment.balance') }}</th>
+                                            <th>Actual Quantity</th>
+                                            <th>Sold Quantity</th>
+                                            <th>Pending Quantity</th>
                                             <th>{{ __('app.status') }}</th>
                                             <th>{{ __('app.created_by') }}</th>
                                             <th>{{ __('app.created_at') }}</th>
