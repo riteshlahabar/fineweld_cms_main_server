@@ -684,8 +684,9 @@ $quotationBannerImages = $this->quotationBannerImageSources($isPdf);
                             ->orWhere('grand_total', 'like', "%{$searchTerm}%")
                             ->orWhere('quotation_status', 'like', "%{$searchTerm}%")
                             ->orWhereHas('party', function ($partyQuery) use ($searchTerm) {
-                                $partyQuery->where('first_name', 'like', "%{$searchTerm}%")
-                                    ->orWhere('last_name', 'like', "%{$searchTerm}%");
+                                $partyQuery->where('company_name', 'like', "%{$searchTerm}%")
+                                    ->orWhere('company_gst', 'like', "%{$searchTerm}%")
+                                    ->orWhere('mobile', 'like', "%{$searchTerm}%");
                             })
                             ->orWhereHas('user', function ($userQuery) use ($searchTerm) {
                                 $userQuery->where('username', 'like', "%{$searchTerm}%");

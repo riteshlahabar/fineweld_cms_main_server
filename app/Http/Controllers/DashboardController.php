@@ -7,6 +7,7 @@ use App\Models\Items\Item;
 use App\Models\Items\ItemTransaction;
 use App\Models\Party\Party;
 use App\Models\Purchase\Purchase;
+use App\Models\Purchase\PurchaseOrder;
 use App\Models\Sale\Sale;
 use App\Models\Sale\SaleOrder;
 use App\Services\PartyService;
@@ -109,6 +110,22 @@ $toDate = request('to_date');
         'user',
         'itemTransaction.item',
         'itemTransaction.unit',
+        'sale.itemTransaction',
+    ])
+    ->orderByDesc('id')
+    ->limit(10)
+    ->get();
+
+        $pendingPurchaseOrderRecords = $this->applyDashboardOwnershipFilter(
+    PurchaseOrder::query()->where('order_status', 'Pending'),
+    'purchase.order.can.view.other.users.purchase.orders'
+)
+    ->with([
+        'party',
+        'user',
+        'itemTransaction.item',
+        'itemTransaction.unit',
+        'purchase.itemTransaction',
     ])
     ->orderByDesc('id')
     ->limit(10)
@@ -135,6 +152,7 @@ $toDate = request('to_date');
             'lowStockItems',
             'recentInvoices',
             'pendingSaleOrderRecords',
+            'pendingPurchaseOrderRecords',
         ));
     }
 

@@ -1,5 +1,11 @@
 "use strict";
 
+if ($.fn.dataTable) {
+    $.extend(true, $.fn.dataTable.defaults, {
+        lengthMenu: [[10, 20, 50, 100, 1000, -1], [10, 20, 50, 100, 1000, "All"]]
+    });
+}
+
 async function confirmAction(title = "Are you sure?") {
     return new Promise((resolve) => {
         /* Confirm before Proceeding */

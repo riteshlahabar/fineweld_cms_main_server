@@ -464,6 +464,7 @@ class ItemController extends Controller
         $accessibleWarehouseIds = auth()->user()?->getAccessibleWarehouses()->pluck('id') ?? collect();
         $warehouseId = ($requestedWarehouseId && $accessibleWarehouseIds->contains((int) $requestedWarehouseId)) ? (int) $requestedWarehouseId : null;
         $selectedWarehouseName = $warehouseId ? CacheService::get('warehouse')->firstWhere('id', $warehouseId)?->name : '';
+        $zeroStockOnly = $request->boolean('zero_stock_only');
 
         $data = Item::with([
             'user',
@@ -499,15 +500,25 @@ class ItemController extends Controller
             ->when($request->created_by, function ($query) use ($request) {
                 return $query->where('created_by', $request->created_by);
             })
-            ->when($warehouseId, function ($query) use ($warehouseId) {
+            ->when($warehouseId, function ($query) use ($warehouseId, $zeroStockOnly) {
+                if ($zeroStockOnly) {
+                    return $query->whereDoesntHave('itemGeneralQuantities', function ($warehouseStockQuery) use ($warehouseId) {
+                        $warehouseStockQuery
+                            ->where('warehouse_id', $warehouseId)
+                            ->where('quantity', '>', 0);
+                    });
+                }
+
                 return $query->whereHas('itemGeneralQuantities', function ($warehouseStockQuery) use ($warehouseId) {
                     $warehouseStockQuery
                         ->where('warehouse_id', $warehouseId)
                         ->where('quantity', '>', 0);
                 });
             })
-            ->when(! $warehouseId, function ($query) {
-                return $query->where('current_stock', '>', 0);
+            ->when(! $warehouseId, function ($query) use ($zeroStockOnly) {
+                return $zeroStockOnly
+                    ? $query->where('current_stock', '=', 0)
+                    : $query->where('current_stock', '>', 0);
             });
 
         // Handle ordering by quantity (current_stock) if requested and warehouse_id is selected

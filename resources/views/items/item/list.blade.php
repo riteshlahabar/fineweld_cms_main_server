@@ -95,11 +95,47 @@
 											<th>{{ __('app.action') }}</th>
 										</tr>
 									</thead>
-								</table>
-							</div>
+                                </table>
+                            </div>
                         </form>
 					</div>
 				</div>
+
+                    <div class="card mt-4">
+                        <div class="card-header px-4 py-3">
+                            <h5 class="mb-0 text-uppercase">Zero Stock Items</h5>
+                        </div>
+                        <div class="card-body">
+                            <form class="row g-3 needs-validation" id="zeroStockDatatableForm" action="{{ route('item.delete') }}" enctype="multipart/form-data">
+                                @csrf
+                                @method('POST')
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-bordered border w-100" id="datatableZeroStock">
+                                        <thead>
+                                            <tr>
+                                                <th class="d-none"><!-- Which Stores ID & it is used for sorting --></th>
+                                                <th><input class="form-check-input row-select" type="checkbox"></th>
+                                                <th>{{ __('app.name') }}</th>
+                                                <th>{{ __('item.code') }}</th>
+                                                <th>{{ __('item.item_location') }}</th>
+                                                <th>{{ __('warehouse.warehouse') }}</th>
+                                                <th class="{{ !app('company')['show_sku']?'d-none':'' }}">{{ __('item.sku') }}</th>
+                                                <th>{{ __('item.brand.brand') }}</th>
+                                                <th>{{ __('item.category.category') }}</th>
+                                                <th>{{ __('item.sale_price') }}</th>
+                                                <th>{{ __('item.purchase_price') }}</th>
+                                                <th>{{ __('item.quantity') }}</th>
+                                                <th>{{ __('item.tracking_type') }}</th>
+                                                <th>{{ __('app.created_by') }}</th>
+                                                <th>{{ __('app.created_at') }}</th>
+                                                <th>{{ __('app.action') }}</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
 					</div>
 				</div>
 				<!--end row-->

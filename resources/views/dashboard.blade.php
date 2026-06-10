@@ -383,9 +383,9 @@
                                     <th>{{ __('sale.order.code') }}</th>
                                     <th>{{ __('customer.customer') }}</th>
                                     <th>Pending Item</th>
-<th>Pending Quantity</th>
-                                    <th>{{ __('app.total') }}</th>
-                                    <th>{{ __('payment.balance') }}</th>
+                                    <th>Actual Quantity</th>
+                                    <th>Sold Quantity</th>
+                                    <th>Pending Quantity</th>
                                     <th>{{ __('app.status') }}</th>
                                 </tr>
                             </thead>
@@ -399,6 +399,12 @@
                                             </a>
                                         </td>
                                         <td>{{ $order->party?->getFullName() }}</td>
+
+@php
+    $soldQuantities = $order->sale?->itemTransaction
+        ? $order->sale->itemTransaction->groupBy('item_id')->map(fn ($items) => $items->sum('quantity'))
+        : collect();
+@endphp
 
 <td>
     @forelse($order->itemTransaction as $transaction)
@@ -419,8 +425,139 @@
     @endforelse
 </td>
 
-<td>{{ $formatNumber->formatWithPrecision($order->grand_total) }}</td>
-                                        <td>{{ $formatNumber->formatWithPrecision($order->grand_total - $order->paid_amount) }}</td>
+<td>
+    @forelse($order->itemTransaction as $transaction)
+        @php
+            $soldQuantity = (float) ($soldQuantities[$transaction->item_id] ?? 0);
+        @endphp
+        <div>
+            {{ $formatNumber->formatQuantity($soldQuantity) }}
+            {{ $transaction->unit?->name }}
+        </div>
+    @empty
+        -
+    @endforelse
+</td>
+
+<td>
+    @forelse($order->itemTransaction as $transaction)
+        @php
+            $soldQuantity = (float) ($soldQuantities[$transaction->item_id] ?? 0);
+            $pendingQuantity = max((float) $transaction->quantity - $soldQuantity, 0);
+        @endphp
+        <div>
+            {{ $formatNumber->formatQuantity($pendingQuantity) }}
+            {{ $transaction->unit?->name }}
+        </div>
+    @empty
+        -
+    @endforelse
+</td>
+                                        <td><span class="badge rounded-pill text-warning bg-light-warning p-2 text-uppercase px-3">{{ $order->order_status }}</span></td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted">{{ __('app.no_records_found') }}</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                </div>
+                @endcan
+
+                @can('purchase.order.view')
+                 <div class="card radius-10 mt-4">
+                    <div class="card-header">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h6 class="mb-0">Pending Purchase Orders</h6>
+                            </div>
+                            <div class="font-13 ms-auto">
+                                <a href="{{ route('purchase.order.list') }}" class="btn btn-sm btn-outline-primary">{{ __('app.view_all') }}</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead class="table-light">
+                                <tr class="text-uppercase">
+                                    <th>{{ __('app.date') }}</th>
+                                    <th>{{ __('purchase.order.code') }}</th>
+                                    <th>{{ __('supplier.supplier') }}</th>
+                                    <th>Pending Item</th>
+                                    <th>Actual Quantity</th>
+                                    <th>Purchased Quantity</th>
+                                    <th>Pending Quantity</th>
+                                    <th>{{ __('app.status') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($pendingPurchaseOrderRecords as $order)
+                                    <tr>
+                                        <td>{{ $order->formatted_order_date }}</td>
+                                        <td>
+                                            <a href="{{ route('purchase.order.details', ['id' => $order->id]) }}">
+                                                {{ $order->order_code }}
+                                            </a>
+                                        </td>
+                                        <td>{{ $order->party?->getFullName() }}</td>
+
+@php
+    $purchasedQuantities = $order->purchase?->itemTransaction
+        ? $order->purchase->itemTransaction->groupBy('item_id')->map(fn ($items) => $items->sum('quantity'))
+        : collect();
+@endphp
+
+<td>
+    @forelse($order->itemTransaction as $transaction)
+        <div>{{ $transaction->item?->name ?? '-' }}</div>
+    @empty
+        -
+    @endforelse
+</td>
+
+<td>
+    @forelse($order->itemTransaction as $transaction)
+        <div>
+            {{ $formatNumber->formatQuantity($transaction->quantity) }}
+            {{ $transaction->unit?->name }}
+        </div>
+    @empty
+        -
+    @endforelse
+</td>
+
+<td>
+    @forelse($order->itemTransaction as $transaction)
+        @php
+            $purchasedQuantity = (float) ($purchasedQuantities[$transaction->item_id] ?? 0);
+        @endphp
+        <div>
+            {{ $formatNumber->formatQuantity($purchasedQuantity) }}
+            {{ $transaction->unit?->name }}
+        </div>
+    @empty
+        -
+    @endforelse
+</td>
+
+<td>
+    @forelse($order->itemTransaction as $transaction)
+        @php
+            $purchasedQuantity = (float) ($purchasedQuantities[$transaction->item_id] ?? 0);
+            $pendingQuantity = max((float) $transaction->quantity - $purchasedQuantity, 0);
+        @endphp
+        <div>
+            {{ $formatNumber->formatQuantity($pendingQuantity) }}
+            {{ $transaction->unit?->name }}
+        </div>
+    @empty
+        -
+    @endforelse
+</td>
                                         <td><span class="badge rounded-pill text-warning bg-light-warning p-2 text-uppercase px-3">{{ $order->order_status }}</span></td>
                                     </tr>
                                 @empty

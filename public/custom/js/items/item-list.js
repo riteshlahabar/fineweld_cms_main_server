@@ -1,16 +1,28 @@
 $(function() {
     "use strict";
 
-    const tableId = $('#datatable');
-
-    const datatableForm = $("#datatableForm");
+    const tableConfigs = [
+        {
+            tableId: $('#datatable'),
+            form: $("#datatableForm"),
+            zeroStockOnly: false
+        },
+        {
+            tableId: $('#datatableZeroStock'),
+            form: $("#zeroStockDatatableForm"),
+            zeroStockOnly: true
+        }
+    ];
 
     /**
      *Server Side Datatable Records
     */
-    function loadDatatables(){
-        //Delete previous data
-        tableId.DataTable().destroy();
+    function loadDatatable(tableConfig){
+        const tableId = tableConfig.tableId;
+
+        if ($.fn.DataTable.isDataTable(tableId)) {
+            tableId.DataTable().destroy();
+        }
 
         var exportColumns = [2,3,4,5,6,7,8,9,10,11,12,13];//Index Starts from 0
 
@@ -27,6 +39,7 @@ $(function() {
                             created_by : $('#user_id').val(),
                             warehouse_id : $('#warehouse_id').val(),
                             tracking_type : $('#tracking_type').val(),
+                            zero_stock_only : tableConfig.zeroStockOnly ? 1 : 0,
                         },
                 },
             columns: [
@@ -88,9 +101,9 @@ $(function() {
                 {
                     className: 'btn btn-outline-danger buttons-copy buttons-html5 multi_delete',
                     text: 'Delete',
-                    action: function ( e, dt, node, config ) {
+                    action: function () {
                         //Confirm user then trigger submit event
-                       requestDeleteRecords();
+                       requestDeleteRecords(tableConfig.form);
                     }
                 },
                 // Apply exportOptions only to Copy button
@@ -151,39 +164,46 @@ $(function() {
         table.on('click', '.deleteRequest', function () {
               let deleteId = $(this).attr('data-delete-id');
 
-              deleteRequest(deleteId);
+              deleteRequest(tableConfig.form, deleteId);
 
         });
 
         //Adding Space on top & bottom of the table attributes
-        $('.dataTables_length, .dataTables_filter, .dataTables_info, .dataTables_paginate').wrap("<div class='card-body py-3'>");
+        tableId.closest('.dataTables_wrapper').find('.dataTables_length, .dataTables_filter, .dataTables_info, .dataTables_paginate').wrap("<div class='card-body py-3'>");
 
+        return table;
+    }
+
+    function loadDatatables(){
+        tableConfigs.forEach(loadDatatable);
     }
 
     // Handle header checkbox click event
-    tableId.find('thead').on('click', '.row-select', function() {
-        var isChecked = $(this).prop('checked');
-        tableId.find('tbody .row-select').prop('checked', isChecked);
+    tableConfigs.forEach(function(config) {
+        config.tableId.find('thead').on('click', '.row-select', function() {
+            var isChecked = $(this).prop('checked');
+            config.tableId.find('tbody .row-select').prop('checked', isChecked);
+        });
     });
 
     /**
      * @return count
      * How many checkbox are checked
     */
-   function countCheckedCheckbox(){
-        var checkedCount = $('input[name="record_ids[]"]:checked').length;
+   function countCheckedCheckbox(form){
+        var checkedCount = form.find('input[name="record_ids[]"]:checked').length;
         return checkedCount;
    }
 
    /**
     * Validate checkbox are checked
     */
-   async function validateCheckedCheckbox(){
+   async function validateCheckedCheckbox(form){
         const confirmed = await confirmAction();//Defined in ./common/common.js
         if (!confirmed) {
             return false;
         }
-        if(countCheckedCheckbox() == 0){
+        if(countCheckedCheckbox(form) == 0){
             iziToast.error({title: 'Warning', layout: 2, message: "Please select at least one record to delete"});
             return false;
         }
@@ -194,10 +214,10 @@ $(function() {
      * Function to single delete request
      * Call Delete Request
     */
-    async function deleteRequest(id) {
+    async function deleteRequest(form, id) {
         const confirmed = await confirmAction();//Defined in ./common/common.js
         if (confirmed) {
-            deleteRecord(id);
+            deleteRecord(form, id);
         }
     }
 
@@ -205,37 +225,38 @@ $(function() {
      * Create Ajax Request:
      * Multiple Data Delete
     */
-   async function requestDeleteRecords(){
+   async function requestDeleteRecords(form){
         //validate checkbox count
-        const confirmed = await confirmAction();//Defined in ./common/common.js
-        if (confirmed) {
+        const validated = await validateCheckedCheckbox(form);
+        if (validated) {
             //Submit delete records
-            datatableForm.trigger('submit');
+            form.trigger('submit');
         }
    }
-    datatableForm.on("submit", function(e) {
-        e.preventDefault();
+    tableConfigs.forEach(function(config) {
+        config.form.on("submit", function(e) {
+            e.preventDefault();
 
-            //Form posting Functionality
-            const form = $(this);
-            const formArray = {
-                formId: form.attr("id"),
-                csrf: form.find('input[name="_token"]').val(),
-                _method: form.find('input[name="_method"]').val(),
-                url: form.closest('form').attr('action'),
-                formObject : form,
-                formData : new FormData(document.getElementById(form.attr("id"))),
-            };
-            ajaxRequest(formArray); //Defined in ./common/common.js
+                //Form posting Functionality
+                const form = $(this);
+                const formArray = {
+                    formId: form.attr("id"),
+                    csrf: form.find('input[name="_token"]').val(),
+                    _method: form.find('input[name="_method"]').val(),
+                    url: form.closest('form').attr('action'),
+                    formObject : form,
+                    formData : new FormData(document.getElementById(form.attr("id"))),
+                };
+                ajaxRequest(formArray); //Defined in ./common/common.js
 
+        });
     });
 
     /**
      * Create AjaxRequest:
      * Single Data Delete
     */
-    function deleteRecord(id){
-        const form = datatableForm;
+    function deleteRecord(form, id){
         const formArray = {
             formId: form.attr("id"),
             csrf: form.find('input[name="_token"]').val(),
@@ -298,5 +319,4 @@ $(function() {
     $(document).on("change", '#brand_id, #item_category_id, #is_service, #user_id, #warehouse_id, #tracking_type', function function_name() {
         loadDatatables();
     });
-
 });

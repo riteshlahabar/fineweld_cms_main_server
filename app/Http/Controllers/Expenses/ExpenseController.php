@@ -14,6 +14,7 @@ use App\Services\PaymentTransactionService;
 use App\Services\PaymentTypeService;
 use App\Services\TallyIntegration\TallySyncService;
 use App\Traits\FormatNumber;
+use App\Traits\FormatsDateInputs;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -25,6 +26,7 @@ use Yajra\DataTables\Facades\DataTables;
 class ExpenseController extends Controller
 {
     use FormatNumber;
+    use FormatsDateInputs;
 
     protected $companyId;
 
@@ -441,6 +443,12 @@ class ExpenseController extends Controller
         $data = Expense::with('user', 'paymentTransaction.paymentType', 'category', 'subcategory')
             ->when($request->expense_category_id, function ($query) use ($request) {
                 return $query->where('expense_category_id', $request->expense_category_id);
+            })
+            ->when($request->from_date, function ($query) use ($request) {
+                return $query->where('expense_date', '>=', $this->toSystemDateFormat($request->from_date));
+            })
+            ->when($request->to_date, function ($query) use ($request) {
+                return $query->where('expense_date', '<=', $this->toSystemDateFormat($request->to_date));
             })
             ->when(! auth()->user()->can('expense.can.view.other.users.expenses'), function ($query) {
                 return $query->where('created_by', auth()->user()->id);

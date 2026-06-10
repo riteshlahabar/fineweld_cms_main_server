@@ -213,6 +213,7 @@ class SaleController extends Controller
             }
 
             $sale = $quotationQuery->with(['party',
+                'saleOrder',
                 'itemTransaction' => [
                     'item.brand',
                     'warehouse',
@@ -349,6 +350,8 @@ class SaleController extends Controller
     public function edit($id): View
     {
         $sale = Sale::with(['party',
+            'saleOrder',
+            'quotation.saleOrder',
             'itemTransaction' => [
                 'item.brand',
                 'tax',

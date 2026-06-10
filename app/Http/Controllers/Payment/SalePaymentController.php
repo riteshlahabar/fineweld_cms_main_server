@@ -359,6 +359,28 @@ $paymentTransaction->delete();
         )->with('transaction.party');
 
         return DataTables::of($data)
+            ->filter(function ($query) use ($request) {
+                if ($request->has('search') && ! empty($request->search['value'])) {
+                    $searchTerm = $request->search['value'];
+
+                    $query->where(function ($q) use ($searchTerm) {
+                        $q->where('transaction_date', 'like', "%{$searchTerm}%")
+                            ->orWhere('reference_no', 'like', "%{$searchTerm}%")
+                            ->orWhere('amount', 'like', "%{$searchTerm}%")
+                            ->orWhereHasMorph('transaction', [Sale::class], function (Builder $transactionQuery) use ($searchTerm) {
+                                $transactionQuery->where('sale_code', 'like', "%{$searchTerm}%")
+                                    ->orWhereHas('party', function ($partyQuery) use ($searchTerm) {
+                                        $partyQuery->where('company_name', 'like', "%{$searchTerm}%")
+                                            ->orWhere('company_gst', 'like', "%{$searchTerm}%")
+                                            ->orWhere('mobile', 'like', "%{$searchTerm}%");
+                                    });
+                            })
+                            ->orWhereHas('user', function ($userQuery) use ($searchTerm) {
+                                $userQuery->where('username', 'like', "%{$searchTerm}%");
+                            });
+                    });
+                }
+            })
             ->addIndexColumn()
             ->addColumn('payment_image', function ($row) {
     if (empty($row->payment_image) || ! file_exists(public_path('payment_images/'.$row->payment_image))) {

@@ -5,6 +5,10 @@
         <!--start page wrapper -->
         <div class="page-wrapper">
             <div class="page-content">
+                @php
+                    $saleOrderNumber = old('sale_order_code', data_get($sale, 'saleOrder.order_code') ?? data_get($sale, 'quotation.saleOrder.order_code') ?? (($sale->operation === 'convert' && ($sale->converting_from ?? '') === 'Sale Order') ? $sale->order_code : ''));
+                    $proformaInvoiceNumber = old('proforma_invoice_code', (! empty(data_get($sale, 'quotation.sale_order_id')) ? data_get($sale, 'quotation.quotation_code') : null) ?? (($sale->operation === 'convert' && ($sale->converting_from ?? '') === 'Proforma Invoice') ? ($sale->quotation_code ?? '') : ''));
+                @endphp
                 <x-breadcrumb :langArray="[
                                             'sale.sale',
                                             'sale.invoices',
@@ -73,12 +77,20 @@
                                             </div>
 
                                             <div class="col-md-4">
-                                                <x-label for="sale_code" name="{{ __('sale.code') }}" />
+                                                <x-label for="sale_code" name="Sale Invoice No." />
                                                 <div class="input-group mb-3">
                                                     <x-input type="text" name="prefix_code" :required="true" placeholder="Prefix Code" value="{{ $sale->prefix_code }}"/>
                                                     <span class="input-group-text">#</span>
                                                     <x-input type="text" name="count_id" :required="true" placeholder="Serial Number" value="{{ $sale->count_id }}"/>
                                                 </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <x-label for="sale_order_code" name="Sale Order No." />
+                                                <x-input type="text" name="sale_order_code" :required="false" placeholder="-" value="{{ $saleOrderNumber }}" readonly />
+                                            </div>
+                                            <div class="col-md-4">
+                                                <x-label for="proforma_invoice_code" name="Proforma Invoice No." />
+                                                <x-input type="text" name="proforma_invoice_code" :required="false" placeholder="-" value="{{ $proformaInvoiceNumber }}" readonly />
                                             </div>
                                             <div class="col-md-4">
                                                 <x-label for="reference_no" name="{{ __('app.reference_no') }}" />

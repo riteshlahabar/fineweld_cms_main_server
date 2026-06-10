@@ -12,6 +12,7 @@
                                         ]"/>
                 @php
                     $isConvertOperation = (($quotation->operation ?? 'update') === 'convert');
+                    $saleOrderNumber = old('sale_order_code', $quotation->saleOrder->order_code ?? ($isConvertOperation ? $quotation->order_code : ''));
                 @endphp
                 <div class="row">
                     <form class="g-3 needs-validation" id="invoiceForm" action="{{ $isConvertOperation ? route('sale.proforma.store') : route('sale.proforma.update') }}" enctype="multipart/form-data">
@@ -67,6 +68,10 @@
                                                     <span class="input-group-text">#</span>
                                                     <x-input type="text" name="count_id" :required="true" placeholder="Serial Number" value="{{ $quotation->count_id }}"/>
                                                 </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <x-label for="sale_order_code" name="Sale Order Number" />
+                                                <x-input type="text" name="sale_order_code" :required="false" value="{{ $saleOrderNumber }}" readonly />
                                             </div>
                                             <div class="col-md-4">
                                                 <x-label for="quotation_status" name="{{ __('sale.quotation.status') }}" />

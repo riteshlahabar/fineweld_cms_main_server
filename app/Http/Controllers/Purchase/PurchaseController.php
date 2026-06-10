@@ -161,7 +161,7 @@ class PurchaseController extends Controller
         // Convert Code adjustment - start
         $purchase->operation = 'convert';
         $purchase->formatted_purchase_date = $this->toSystemDateFormat($purchase->order_date);
-        $purchase->reference_no = '';
+        $purchase->reference_no = $purchase->order_code;
         // Convert Code adjustment - end
 
         $prefix = Prefix::findOrNew($this->companyId);

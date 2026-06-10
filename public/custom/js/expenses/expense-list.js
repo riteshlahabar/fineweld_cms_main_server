@@ -24,6 +24,8 @@ $(function() {
                     url: baseURL+'/expense/datatable-list',
                     data:{
                             expense_category_id : $('#expense_category_id').val(),
+                            from_date : $('input[name="from_date"]').val(),
+                            to_date : $('input[name="to_date"]').val(),
                         },
                 },
             columns: [
@@ -261,7 +263,7 @@ $(function() {
         loadDatatables();
 	} );
 
-    $(document).on("change", '#expense_category_id', function function_name() {
+    $(document).on("change", '#expense_category_id, input[name="from_date"], input[name="to_date"]', function function_name() {
         loadDatatables();
     });
 

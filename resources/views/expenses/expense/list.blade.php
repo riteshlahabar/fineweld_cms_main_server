@@ -32,6 +32,20 @@
                                 <x-label for="category_id" name="{{ __('expense.category.category') }}" />
                                 <x-dropdown-expense-category selected="" />
                             </div>
+                            <div class="col-md-3">
+                                <x-label for="from_date" name="{{ __('app.from_date') }}" />
+                                <div class="input-group">
+                                    <x-input type="text" additionalClasses="datepicker" name="from_date" value=""/>
+                                    <span class="input-group-text" role="button"><i class="fadeIn animated bx bx-calendar-alt"></i></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <x-label for="to_date" name="{{ __('app.to_date') }}" />
+                                <div class="input-group">
+                                    <x-input type="text" additionalClasses="datepicker" name="to_date" value=""/>
+                                    <span class="input-group-text" role="button"><i class="fadeIn animated bx bx-calendar-alt"></i></span>
+                                </div>
+                            </div>
                         </div>
                         <form class="row g-3 needs-validation" id="datatableForm" action="{{ route('expense.delete') }}" enctype="multipart/form-data">
                             {{-- CSRF Protection --}}
