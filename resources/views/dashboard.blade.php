@@ -400,12 +400,6 @@
                                         </td>
                                         <td>{{ $order->party?->getFullName() }}</td>
 
-@php
-    $soldQuantities = $order->sale?->itemTransaction
-        ? $order->sale->itemTransaction->groupBy('item_id')->map(fn ($items) => $items->sum('quantity'))
-        : collect();
-@endphp
-
 <td>
     @forelse($order->itemTransaction as $transaction)
         <div>{{ $transaction->item?->name ?? '-' }}</div>
@@ -416,10 +410,7 @@
 
 <td>
     @forelse($order->itemTransaction as $transaction)
-        <div>
-            {{ $formatNumber->formatQuantity($transaction->quantity) }}
-            {{ $transaction->unit?->name }}
-        </div>
+        <div>{{ $transaction->dashboard_actual_quantity }}</div>
     @empty
         -
     @endforelse
@@ -427,13 +418,7 @@
 
 <td>
     @forelse($order->itemTransaction as $transaction)
-        @php
-            $soldQuantity = (float) ($soldQuantities[$transaction->item_id] ?? 0);
-        @endphp
-        <div>
-            {{ $formatNumber->formatQuantity($soldQuantity) }}
-            {{ $transaction->unit?->name }}
-        </div>
+        <div>{{ $transaction->dashboard_completed_quantity }}</div>
     @empty
         -
     @endforelse
@@ -441,14 +426,7 @@
 
 <td>
     @forelse($order->itemTransaction as $transaction)
-        @php
-            $soldQuantity = (float) ($soldQuantities[$transaction->item_id] ?? 0);
-            $pendingQuantity = max((float) $transaction->quantity - $soldQuantity, 0);
-        @endphp
-        <div>
-            {{ $formatNumber->formatQuantity($pendingQuantity) }}
-            {{ $transaction->unit?->name }}
-        </div>
+        <div>{{ $transaction->dashboard_pending_quantity }}</div>
     @empty
         -
     @endforelse
@@ -505,12 +483,6 @@
                                         </td>
                                         <td>{{ $order->party?->getFullName() }}</td>
 
-@php
-    $purchasedQuantities = $order->purchase?->itemTransaction
-        ? $order->purchase->itemTransaction->groupBy('item_id')->map(fn ($items) => $items->sum('quantity'))
-        : collect();
-@endphp
-
 <td>
     @forelse($order->itemTransaction as $transaction)
         <div>{{ $transaction->item?->name ?? '-' }}</div>
@@ -521,10 +493,7 @@
 
 <td>
     @forelse($order->itemTransaction as $transaction)
-        <div>
-            {{ $formatNumber->formatQuantity($transaction->quantity) }}
-            {{ $transaction->unit?->name }}
-        </div>
+        <div>{{ $transaction->dashboard_actual_quantity }}</div>
     @empty
         -
     @endforelse
@@ -532,13 +501,7 @@
 
 <td>
     @forelse($order->itemTransaction as $transaction)
-        @php
-            $purchasedQuantity = (float) ($purchasedQuantities[$transaction->item_id] ?? 0);
-        @endphp
-        <div>
-            {{ $formatNumber->formatQuantity($purchasedQuantity) }}
-            {{ $transaction->unit?->name }}
-        </div>
+        <div>{{ $transaction->dashboard_completed_quantity }}</div>
     @empty
         -
     @endforelse
@@ -546,14 +509,7 @@
 
 <td>
     @forelse($order->itemTransaction as $transaction)
-        @php
-            $purchasedQuantity = (float) ($purchasedQuantities[$transaction->item_id] ?? 0);
-            $pendingQuantity = max((float) $transaction->quantity - $purchasedQuantity, 0);
-        @endphp
-        <div>
-            {{ $formatNumber->formatQuantity($pendingQuantity) }}
-            {{ $transaction->unit?->name }}
-        </div>
+        <div>{{ $transaction->dashboard_pending_quantity }}</div>
     @empty
         -
     @endforelse

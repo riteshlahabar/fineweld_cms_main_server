@@ -10,14 +10,18 @@ use App\Models\Purchase\Purchase;
 use App\Models\Purchase\PurchaseOrder;
 use App\Models\Sale\Sale;
 use App\Models\Sale\SaleOrder;
+use App\Services\ItemService;
 use App\Services\PartyService;
 use App\Traits\FormatNumber;
+use App\Enums\ItemTransactionUniqueCode;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
     use formatNumber;
+
+    private array $itemQuantityMetricsCache = [];
 
     public function __construct(public PartyService $partyService)
     {
@@ -110,11 +114,12 @@ $toDate = request('to_date');
         'user',
         'itemTransaction.item',
         'itemTransaction.unit',
-        'sale.itemTransaction',
     ])
     ->orderByDesc('id')
     ->limit(10)
     ->get();
+
+        $this->appendPendingSaleOrderMetrics($pendingSaleOrderRecords);
 
         $pendingPurchaseOrderRecords = $this->applyDashboardOwnershipFilter(
     PurchaseOrder::query()->where('order_status', 'Pending'),
@@ -125,11 +130,12 @@ $toDate = request('to_date');
         'user',
         'itemTransaction.item',
         'itemTransaction.unit',
-        'purchase.itemTransaction',
     ])
     ->orderByDesc('id')
     ->limit(10)
     ->get();
+
+        $this->appendPendingPurchaseOrderMetrics($pendingPurchaseOrderRecords);
 
         $saleVsPurchase = $this->saleVsPurchase($fromDate, $toDate);
         $trendingItems = $this->trendingItems();
@@ -324,6 +330,69 @@ $supplierBalance = $this->partyService->getPartyBalance(
         $vendorTypes = $role === 'supplier' ? ['supplier', 'both'] : ['customer', 'both'];
 
         return Party::query()->whereIn('vendor_type', $vendorTypes);
+    }
+
+    private function appendPendingSaleOrderMetrics($orders): void
+    {
+        $orders->each(function ($order) {
+            $order->itemTransaction->each(function ($transaction) {
+                $metrics = $this->getOverallItemQuantityMetrics(
+                    $transaction->item_id,
+                    ItemTransactionUniqueCode::SALE_ORDER->value,
+                    ItemTransactionUniqueCode::SALE->value
+                );
+
+                $transaction->setAttribute('dashboard_actual_quantity', $metrics['actual_stock_formatted']);
+                $transaction->setAttribute('dashboard_completed_quantity', $metrics['completed_quantity_formatted']);
+                $transaction->setAttribute('dashboard_pending_quantity', $metrics['pending_quantity_formatted']);
+            });
+        });
+    }
+
+    private function appendPendingPurchaseOrderMetrics($orders): void
+    {
+        $orders->each(function ($order) {
+            $order->itemTransaction->each(function ($transaction) {
+                $metrics = $this->getOverallItemQuantityMetrics(
+                    $transaction->item_id,
+                    ItemTransactionUniqueCode::PURCHASE_ORDER->value,
+                    ItemTransactionUniqueCode::PURCHASE->value
+                );
+
+                $transaction->setAttribute('dashboard_actual_quantity', $metrics['actual_stock_formatted']);
+                $transaction->setAttribute('dashboard_completed_quantity', $metrics['completed_quantity_formatted']);
+                $transaction->setAttribute('dashboard_pending_quantity', $metrics['pending_quantity_formatted']);
+            });
+        });
+    }
+
+    private function getOverallItemQuantityMetrics(
+        int $itemId,
+        string $orderedUniqueCode,
+        string $completedUniqueCode
+    ): array {
+        $cacheKey = $itemId.'-'.$orderedUniqueCode.'-'.$completedUniqueCode;
+
+        if (isset($this->itemQuantityMetricsCache[$cacheKey])) {
+            return $this->itemQuantityMetricsCache[$cacheKey];
+        }
+
+        $actualStock = (float) Item::whereKey($itemId)->value('current_stock');
+        $completedQuantity = (float) ItemTransaction::where('item_id', $itemId)
+            ->where('unique_code', $completedUniqueCode)
+            ->sum('quantity');
+        $orderedQuantity = (float) ItemTransaction::where('item_id', $itemId)
+            ->where('unique_code', $orderedUniqueCode)
+            ->sum('quantity');
+        $pendingQuantity = max($orderedQuantity - $completedQuantity, 0);
+
+        $itemService = app(ItemService::class);
+
+        return $this->itemQuantityMetricsCache[$cacheKey] = [
+            'actual_stock_formatted' => $itemService->getQuantityInUnit($actualStock, $itemId),
+            'completed_quantity_formatted' => $itemService->getQuantityInUnit($completedQuantity, $itemId),
+            'pending_quantity_formatted' => $itemService->getQuantityInUnit($pendingQuantity, $itemId),
+        ];
     }
 
     private function applyDashboardOwnershipFilter(
