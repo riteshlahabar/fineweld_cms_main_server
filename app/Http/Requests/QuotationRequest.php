@@ -46,6 +46,7 @@ class QuotationRequest extends FormRequest
             'note' => ['nullable', 'string', 'max:250'],
             'shipping_charge' => ['nullable', 'numeric', 'min:0'],
             'kind_attention' => ['nullable', 'string'],
+            'opening_statement' => ['nullable', 'string'],
             'billing_address' => ['nullable', 'string'],
             'shipping_address' => ['nullable', 'string'],
             'state_id' => ['nullable', 'integer', Rule::exists('states', 'id')],

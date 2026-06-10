@@ -83,8 +83,7 @@
                 </tr>
                 <tr>
                     <td colspan="2" class="address">
-                        Dear Sir,<br>
-                        With reference to our discussion, we are pleased to quote you for Spares 350 Amps for OTC Torch for delivery to the following shipping address:
+                        {!! nl2br(e($quotation->opening_statement ?: "Dear Sir,\nWith reference to our discussion, we are pleased to quote you for Spares 350 Amps for OTC Torch for delivery to the following shipping address:")) !!}
                     </td>
                 </tr>
             </table>

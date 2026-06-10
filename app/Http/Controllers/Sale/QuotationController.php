@@ -86,6 +86,7 @@ class QuotationController extends Controller
         $data = [
             'prefix_code' => $prefix->quotation,
             'count_id' => ($lastCountId + 1),
+            'opening_statement' => $this->defaultOpeningStatement(),
         ];
 
         return view('sale.quotation.create', compact('data', 'selectedPaymentTypesArray'));
@@ -150,6 +151,7 @@ class QuotationController extends Controller
         $quotation->quotation_date = now()->toDateString();
         $quotation->formatted_quotation_date = $this->toUserDateFormat($quotation->quotation_date);
         $quotation->quotation_status = data_get(collect($this->generalDataService->getQuotationStatus())->first(), 'id', '');
+        $quotation->opening_statement = $quotation->opening_statement ?: $this->defaultOpeningStatement();
 
         $prefix = Prefix::findOrNew($this->companyId);
         $lastCountId = $this->getLastCountId();
@@ -351,6 +353,7 @@ $quotationBannerImages = $this->quotationBannerImageSources($isPdf);
             // Get the validated data from the expenseRequest
             $validatedData = $request->validated();
             $validatedData['note'] = json_encode($request->terms);
+            $validatedData['opening_statement'] = $validatedData['opening_statement'] ?? $this->defaultOpeningStatement();
 
             if (in_array($request->operation, ['save', 'convert'])) {
                 // Create a new expense record using Eloquent and save it
@@ -369,6 +372,7 @@ $quotationBannerImages = $this->quotationBannerImageSources($isPdf);
                     'note' => $validatedData['note'],
                     'shipping_charge' => $validatedData['shipping_charge'],
                     'kind_attention' => $validatedData['kind_attention'] ?? null,
+                    'opening_statement' => $validatedData['opening_statement'],
                     'round_off' => $validatedData['round_off'],
                     'grand_total' => $validatedData['grand_total'],
                     'state_id' => $validatedData['state_id'],
@@ -995,4 +999,9 @@ $quotationBannerImages = $this->quotationBannerImageSources($isPdf);
             : asset($folder.'/'.$headerFile),
     ];
 }
+
+    private function defaultOpeningStatement(): string
+    {
+        return "Dear Sir,\nWith reference to our discussion, we are pleased to quote you for Spares 350 Amps for OTC Torch for delivery to the following shipping address:";
+    }
 }

@@ -39,6 +39,7 @@ class Quotation extends Model
         'note',
         'shipping_charge',
         'kind_attention',
+        'opening_statement',
         'round_off',
         'grand_total',
         'paid_amount',

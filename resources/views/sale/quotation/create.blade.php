@@ -85,6 +85,10 @@
                                                 <x-label for="kind_attention" name="Kind Attention" />
                                                 <textarea name="kind_attention" class="form-control" rows="3" placeholder="Name - Mobile&#10;Name - Mobile"></textarea>
                                             </div>
+                                            <div class="col-md-8">
+                                                <x-label for="opening_statement" name="Opening Statement" />
+                                                <textarea name="opening_statement" class="form-control" rows="4" placeholder="Enter quotation opening statement">{{ old('opening_statement', $data['opening_statement'] ?? '') }}</textarea>
+                                            </div>
                                              {{--<x-shipping-address />--}}
 
 

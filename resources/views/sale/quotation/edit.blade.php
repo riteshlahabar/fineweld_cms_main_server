@@ -83,6 +83,10 @@
                                                 <x-label for="kind_attention" name="Kind Attention" />
                                                 <textarea name="kind_attention" class="form-control" rows="3" placeholder="Name - Mobile&#10;Name - Mobile">{{ $quotation->kind_attention ?? '' }}</textarea>
                                             </div>
+                                            <div class="col-md-8">
+                                                <x-label for="opening_statement" name="Opening Statement" />
+                                                <textarea name="opening_statement" class="form-control" rows="4" placeholder="Enter quotation opening statement">{{ old('opening_statement', $quotation->opening_statement ?? "Dear Sir,\nWith reference to our discussion, we are pleased to quote you for Spares 350 Amps for OTC Torch for delivery to the following shipping address:") }}</textarea>
+                                            </div>
                                             
                                             {{--<x-shipping-address :shippingAddress="$quotation->party->shipping_address ?? ''" />--}}
 
