@@ -475,7 +475,7 @@ class ExpenseController extends Controller
                 return $row->paymentTransaction->pluck('paymentType.name')->implode(', ');
             })
             ->addColumn('expense_category', function ($row) {
-                return $row->category->name;
+                return $row->category->name ?? '';
             })
             ->addColumn('expense_subcategory', function ($row) {
                 return $row->subcategory->name ?? '';
