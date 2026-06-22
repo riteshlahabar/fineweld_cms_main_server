@@ -17,9 +17,7 @@ return new class extends Migration {
         ->constrained('parties')
         ->onDelete('cascade');
 
-    $table->foreignId('product_id')
-        ->constrained('products')
-        ->onDelete('cascade');
+    $table->unsignedBigInteger('product_id')->nullable();
 
     $table->text('problem');
     
