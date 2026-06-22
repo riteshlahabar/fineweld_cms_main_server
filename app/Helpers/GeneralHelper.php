@@ -46,6 +46,10 @@ if (! function_exists('getDatabaseMigrationAppVersion')) {
      */
     function getDatabaseMigrationAppVersion()
     {
+        if (! Schema::hasTable('versions')) {
+            return env('APP_VERSION', '1.0.0');
+        }
+
         // Get the application version from the database
         // get the last record of the version table
         $appVersion = DB::table('versions')
@@ -53,7 +57,7 @@ if (! function_exists('getDatabaseMigrationAppVersion')) {
             ->orderBy('id', 'desc')
             ->first();
 
-        return $appVersion->version;
+        return $appVersion?->version ?? env('APP_VERSION', '1.0.0');
 
         return env('APP_VERSION', '1.0.0'); // Default version if not set in .env
     }
