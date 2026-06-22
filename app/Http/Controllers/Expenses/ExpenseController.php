@@ -19,6 +19,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Mpdf\Mpdf;
 use Yajra\DataTables\Facades\DataTables;
@@ -439,82 +440,99 @@ class ExpenseController extends Controller
 
     public function datatableList(Request $request)
     {
+        try {
+            $data = Expense::with('user', 'paymentTransaction.paymentType', 'category', 'subcategory')
+                ->when($request->expense_category_id, function ($query) use ($request) {
+                    return $query->where('expense_category_id', $request->expense_category_id);
+                })
+                ->when($request->from_date, function ($query) use ($request) {
+                    return $query->where('expense_date', '>=', $this->toSystemDateFormat($request->from_date));
+                })
+                ->when($request->to_date, function ($query) use ($request) {
+                    return $query->where('expense_date', '<=', $this->toSystemDateFormat($request->to_date));
+                })
+                ->when(! auth()->user()->can('expense.can.view.other.users.expenses'), function ($query) {
+                    return $query->where('created_by', auth()->user()->id);
+                });
 
-        $data = Expense::with('user', 'paymentTransaction.paymentType', 'category', 'subcategory')
-            ->when($request->expense_category_id, function ($query) use ($request) {
-                return $query->where('expense_category_id', $request->expense_category_id);
-            })
-            ->when($request->from_date, function ($query) use ($request) {
-                return $query->where('expense_date', '>=', $this->toSystemDateFormat($request->from_date));
-            })
-            ->when($request->to_date, function ($query) use ($request) {
-                return $query->where('expense_date', '<=', $this->toSystemDateFormat($request->to_date));
-            })
-            ->when(! auth()->user()->can('expense.can.view.other.users.expenses'), function ($query) {
-                return $query->where('created_by', auth()->user()->id);
-            });
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('created_at', function ($row) {
+                    return $row->created_at?->format(app('company')['date_format']) ?? '';
+                })
+                ->addColumn('username', function ($row) {
+                    return $row->user->username ?? '';
+                })
+                ->addColumn('expense_date', function ($row) {
+                    return $row->formatted_expense_date ?? '';
+                })
+                ->addColumn('paid_amount', function ($row) {
+                    return $this->formatWithPrecision($row->paid_amount);
+                })
+                ->addColumn('expense_number', function ($row) {
+                    return $row->expense_code ?? '';
+                })
+                ->addColumn('payment_type', function ($row) {
+                    return $row->paymentTransaction
+                        ->map(fn ($paymentTransaction) => optional($paymentTransaction->paymentType)->name)
+                        ->filter()
+                        ->implode(', ');
+                })
+                ->addColumn('expense_category', function ($row) {
+                    return $row->category->name ?? '';
+                })
+                ->addColumn('expense_subcategory', function ($row) {
+                    return $row->subcategory->name ?? '';
+                })
+                ->addColumn('action', function ($row) {
+                    $id = $row->id;
 
-        return DataTables::of($data)
-            ->addIndexColumn()
-            ->addColumn('created_at', function ($row) {
-                return $row->created_at->format(app('company')['date_format']);
-            })
-            ->addColumn('username', function ($row) {
-                return $row->user->username ?? '';
-            })
-            ->addColumn('expense_date', function ($row) {
-                return $row->formatted_expense_date;
-            })
-            ->addColumn('paid_amount', function ($row) {
-                return $this->formatWithPrecision($row->paid_amount);
-            })
-            ->addColumn('expense_number', function ($row) {
-                return $row->expense_code;
-            })
-            ->addColumn('payment_type', function ($row) {
-                return $row->paymentTransaction->pluck('paymentType.name')->implode(', ');
-            })
-            ->addColumn('expense_category', function ($row) {
-                return $row->category->name ?? '';
-            })
-            ->addColumn('expense_subcategory', function ($row) {
-                return $row->subcategory->name ?? '';
-            })
-            ->addColumn('action', function ($row) {
-                $id = $row->id;
+                    $editUrl = route('expense.edit', ['id' => $id]);
+                    $deleteUrl = route('expense.delete', ['id' => $id]);
+                    $detailsUrl = route('expense.details', ['id' => $id]);
+                    $printUrl = route('expense.print', ['id' => $id]);
+                    $pdfUrl = route('expense.pdf', ['id' => $id]);
 
-                $editUrl = route('expense.edit', ['id' => $id]);
-                $deleteUrl = route('expense.delete', ['id' => $id]);
-                $detailsUrl = route('expense.details', ['id' => $id]);
-                $printUrl = route('expense.print', ['id' => $id]);
-                $pdfUrl = route('expense.pdf', ['id' => $id]);
+                    $actionBtn = '<div class="dropdown ms-auto">
+                                <a class="dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded font-22 text-option"></i>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" href="'.$editUrl.'"><i class="bi bi-trash"></i><i class="bx bx-edit"></i> '.__('app.edit').'</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="'.$detailsUrl.'"></i><i class="bx bx-receipt"></i> '.__('app.details').'</a>
+                                    </li>
+                                    <li>
+                                        <a target="_blank" class="dropdown-item" href="'.$printUrl.'"></i><i class="bx bx-printer "></i> '.__('app.print').'</a>
+                                    </li>
+                                    <li>
+                                        <a target="_blank" class="dropdown-item" href="'.$pdfUrl.'"></i><i class="bx bxs-file-pdf"></i> '.__('app.pdf').'</a>
+                                    </li>
+                                    <li>
+                                        <button type="button" class="dropdown-item text-danger deleteRequest" data-delete-id='.$id.'><i class="bx bx-trash"></i> '.__('app.delete').'</button>
+                                    </li>
+                                </ul>
+                            </div>';
 
-                $actionBtn = '<div class="dropdown ms-auto">
-                            <a class="dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded font-22 text-option"></i>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a class="dropdown-item" href="'.$editUrl.'"><i class="bi bi-trash"></i><i class="bx bx-edit"></i> '.__('app.edit').'</a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="'.$detailsUrl.'"></i><i class="bx bx-receipt"></i> '.__('app.details').'</a>
-                                </li>
-                                <li>
-                                    <a target="_blank" class="dropdown-item" href="'.$printUrl.'"></i><i class="bx bx-printer "></i> '.__('app.print').'</a>
-                                </li>
-                                <li>
-                                    <a target="_blank" class="dropdown-item" href="'.$pdfUrl.'"></i><i class="bx bxs-file-pdf"></i> '.__('app.pdf').'</a>
-                                </li>
-                                <li>
-                                    <button type="button" class="dropdown-item text-danger deleteRequest" data-delete-id='.$id.'><i class="bx bx-trash"></i> '.__('app.delete').'</button>
-                                </li>
-                            </ul>
-                        </div>';
+                    return $actionBtn;
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        } catch (\Throwable $e) {
+            Log::error('Expense datatable failed', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'user_id' => auth()->id(),
+                'request_url' => $request->fullUrl(),
+            ]);
 
-                return $actionBtn;
-            })
-            ->rawColumns(['action'])
-            ->make(true);
+            return response()->json([
+                'status' => false,
+                'message' => 'Expense datatable failed.',
+            ], 500);
+        }
     }
 
     public function delete(Request $request): JsonResponse
