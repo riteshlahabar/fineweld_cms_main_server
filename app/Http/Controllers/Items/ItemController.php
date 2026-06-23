@@ -334,11 +334,11 @@ class ItemController extends Controller
                 /**
                  * Record ItemTransactions
                  * */
-                // if($request->opening_quantity){
-                if (! $transaction = $this->recordInItemTransactionEntry($request)) {
-                    throw new \Exception(__('item.failed_to_record_item_transactions'));
+                if ($request->opening_quantity > 0) {
+                    if (! $transaction = $this->recordInItemTransactionEntry($request)) {
+                        throw new \Exception(__('item.failed_to_record_item_transactions'));
+                    }
                 }
-                // }
 
             }
 

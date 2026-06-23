@@ -64,8 +64,8 @@ class ItemRequest extends FormRequest
 
             // Stock Tab
             'tracking_type' => ['required', 'string', 'max:100'],
-            'warehouse_id' => ['required'],
-            'transaction_date' => ['required', 'date_format:'.implode(',', $this->getDateFormats())],
+            'warehouse_id' => ['nullable', Rule::requiredIf(fn () => (float) ($this->input('opening_quantity') ?? 0) > 0 && (int) ($this->input('is_service') ?? 0) === 0)],
+            'transaction_date' => ['nullable', Rule::requiredIf(fn () => (float) ($this->input('opening_quantity') ?? 0) > 0 && (int) ($this->input('is_service') ?? 0) === 0), 'date_format:'.implode(',', $this->getDateFormats())],
             'opening_quantity' => ['nullable', 'numeric'],
             'serial_number_json' => ['nullable'],
             'batch_details_json' => ['nullable'],
