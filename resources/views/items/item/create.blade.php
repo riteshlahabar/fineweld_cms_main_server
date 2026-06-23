@@ -223,7 +223,7 @@
                                                 <div class="col-md-4">
                                                     <x-label for="transaction_date" name="{{ __('app.as_of_date') }}" />
                                                     <div class="input-group mb-3">
-                                                        <x-input type="text" additionalClasses="datepicker" name="transaction_date" :required="true" value=""/>
+                                                        <x-input type="text" additionalClasses="datepicker" name="transaction_date" :required="true" value="{{ $todaysDate }}"/>
                                                         <span class="input-group-text" id="input-near-focus" role="button"><i class="fadeIn animated bx bx-calendar-alt"></i></span>
                                                     </div>
                                                 </div>

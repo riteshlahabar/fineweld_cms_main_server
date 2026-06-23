@@ -2,12 +2,15 @@
 
 namespace App\Http\Requests;
 
+use App\Traits\FormatsDateInputs;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
 class ItemRequest extends FormRequest
 {
+    use FormatsDateInputs;
+
     /**
      * Indicates if the validator should stop on the first rule failure.
      *
@@ -62,7 +65,7 @@ class ItemRequest extends FormRequest
             // Stock Tab
             'tracking_type' => ['required', 'string', 'max:100'],
             'warehouse_id' => ['required'],
-            'transaction_date' => ['required'],
+            'transaction_date' => ['required', 'date_format:'.implode(',', $this->getDateFormats())],
             'opening_quantity' => ['nullable', 'numeric'],
             'serial_number_json' => ['nullable'],
             'batch_details_json' => ['nullable'],
@@ -93,6 +96,16 @@ $rulesArray['item_code'] = ['required', 'string', 'max:100'];
 
         return $rulesArray;
 
+    }
+
+    /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'transaction_date' => $this->toSystemDateFormat($this->input('transaction_date')),
+        ]);
     }
 
     public function messages(): array
