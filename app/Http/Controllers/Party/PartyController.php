@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PartyRequest;
 use App\Models\Accounts\Account;
+use App\Models\Currency;
 use App\Models\Party\Party;
 use App\Services\AccountTransactionService;
 use App\Services\PartyService;
@@ -158,6 +159,11 @@ public function export($partyType, Request $request)
     try {
         DB::beginTransaction();
 
+        $defaultCurrencyId = $request->input('currency_id') ?: Currency::query()
+            ->orderByDesc('is_company_currency')
+            ->orderBy('id')
+            ->value('id');
+
         // 1. Prepare the data array
         $recordsToSave = [
             // ✅ COMPANY FIELDS
@@ -235,7 +241,9 @@ public function export($partyType, Request $request)
             
             // Only update party_type/currency if specifically passed, otherwise keep existing
             // (Usually these don't change on edit)
-            if($request->has('currency_id')) $recordsToSave['currency_id'] = 1;
+            if ($defaultCurrencyId) {
+                $recordsToSave['currency_id'] = $defaultCurrencyId;
+            }
             
             $partyModel->update($recordsToSave);
             $message = 'Vendor updated successfully!';
@@ -244,7 +252,9 @@ public function export($partyType, Request $request)
             // Add default fields that are needed only for new records
             $recordsToSave['party_type'] = 'vendor';
             $recordsToSave['status'] = 1; // Default Active
-            $recordsToSave['currency_id'] = 1;
+            if ($defaultCurrencyId) {
+                $recordsToSave['currency_id'] = $defaultCurrencyId;
+            }
 
             $partyModel = Party::create($recordsToSave);
             $message = 'Vendor created successfully!';

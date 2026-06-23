@@ -105,7 +105,7 @@
                                                 </div>
                                             </a>
                                         </li>
-                                        <li class="nav-item item-type-product d-none" role="presentation">
+                                        <li class="nav-item item-type-product" role="presentation">
                                             <a class="nav-link" data-bs-toggle="tab" href="#successprofile" role="tab" aria-selected="false">
                                                 <div class="d-flex align-items-center">
                                                     <div class="tab-icon"><i class='bx bx-box font-18 me-1'></i>
@@ -171,7 +171,7 @@
 
                                             </div>
                                         </div>
-                                        <div class="tab-pane fade d-none" id="successprofile" role="tabpanel">
+                                        <div class="tab-pane fade" id="successprofile" role="tabpanel">
 
                                            <div class="row">
                                                 <div class="col-md-4">
@@ -181,7 +181,7 @@
                                                 <div class="col-md-4">
                                                     <x-label for="transaction_date" name="{{ __('app.as_of_date') }}" />
                                                     <div class="input-group mb-3">
-                                                        <x-input type="text" additionalClasses="" name="transaction_date" :required="true" value="{{ $formatDate->toUserDateFormat(date('Y-m-d')) }}"/>
+                                                        <x-input type="text" additionalClasses="datepicker" name="transaction_date" :required="true" value="{{ $formatDate->toUserDateFormat(date('Y-m-d')) }}"/>
                                                         <span class="input-group-text" id="input-near-focus" role="button"><i class="fadeIn animated bx bx-calendar-alt"></i></span>
                                                     </div>
                                                 </div>

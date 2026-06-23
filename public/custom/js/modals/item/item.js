@@ -102,4 +102,18 @@ $(function() {
     $(document).on('click', '.auto-generate-code', function() {
         itemForm.find("input[name='item_code']").val(getRandomInt(1000000000, 9999999999));
     });
+
+    openModal.on('show.bs.modal', function() {
+        const modalWarehouse = itemForm.find('select[name="warehouse_id"]');
+        const parentWarehouse = $('select[name="warehouse_id"]').not(modalWarehouse).filter(':visible').first();
+        const modalTransactionDate = itemForm.find('input[name="transaction_date"]');
+
+        if (parentWarehouse.length && parentWarehouse.val()) {
+            modalWarehouse.val(parentWarehouse.val()).trigger('change');
+        }
+
+        if (modalTransactionDate.length && !modalTransactionDate.val() && modalTransactionDate[0]?._flatpickr) {
+            modalTransactionDate[0]._flatpickr.setDate(new Date());
+        }
+    });
 });//main function
