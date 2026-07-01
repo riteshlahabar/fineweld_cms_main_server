@@ -594,7 +594,7 @@ class PurchaseOrderController extends Controller
     public function datatableList(Request $request)
     {
 
-        $data = PurchaseOrder::with('user', 'party', 'itemTransaction.item')
+        $data = PurchaseOrder::with('user', 'party', 'itemTransaction.item', 'purchase.itemTransaction')
             ->when($request->party_id, function ($query) use ($request) {
                 return $query->where('party_id', $request->party_id);
             })
@@ -650,21 +650,26 @@ class PurchaseOrderController extends Controller
 })
             ->addColumn('actual_quantity', function ($row) {
                 return $row->itemTransaction->map(function ($transaction) {
-                    $metrics = $this->getOverallItemQuantityMetrics($transaction->item_id);
+                    return '<div>'.$this->getFormattedActualStockQuantity($transaction).'</div>';
+                })->implode('');
+            })
+            ->addColumn('purchase_order_quantity', function ($row) {
+                return $row->itemTransaction->map(function ($transaction) use ($row) {
+                    $metrics = $this->getPurchaseOrderItemQuantityMetrics($row, $transaction);
 
-                    return '<div>'.$metrics['actual_stock_formatted'].'</div>';
+                    return '<div>'.$metrics['order_quantity_formatted'].'</div>';
                 })->implode('');
             })
             ->addColumn('purchased_quantity', function ($row) {
-                return $row->itemTransaction->map(function ($transaction) {
-                    $metrics = $this->getOverallItemQuantityMetrics($transaction->item_id);
+                return $row->itemTransaction->map(function ($transaction) use ($row) {
+                    $metrics = $this->getPurchaseOrderItemQuantityMetrics($row, $transaction);
 
                     return '<div>'.$metrics['purchased_quantity_formatted'].'</div>';
                 })->implode('');
             })
             ->addColumn('pending_quantity', function ($row) {
-                return $row->itemTransaction->map(function ($transaction) {
-                    $metrics = $this->getOverallItemQuantityMetrics($transaction->item_id);
+                return $row->itemTransaction->map(function ($transaction) use ($row) {
+                    $metrics = $this->getPurchaseOrderItemQuantityMetrics($row, $transaction);
 
                     return '<div>'.$metrics['pending_purchase_quantity_formatted'].'</div>';
                 })->implode('');
@@ -755,8 +760,59 @@ class PurchaseOrderController extends Controller
 
                 return $actionBtn;
             })
-            ->rawColumns(['actual_quantity', 'purchased_quantity', 'pending_quantity', 'action'])
+            ->rawColumns(['actual_quantity', 'purchase_order_quantity', 'purchased_quantity', 'pending_quantity', 'action'])
             ->make(true);
+    }
+
+    private function getPurchaseOrderItemQuantityMetrics(PurchaseOrder $order, ItemTransaction $orderTransaction): array
+    {
+        $cacheKey = 'purchase-order-'.$order->id.'-'.$orderTransaction->id;
+        if (isset($this->itemQuantityMetricsCache[$cacheKey])) {
+            return $this->itemQuantityMetricsCache[$cacheKey];
+        }
+
+        $itemId = (int) $orderTransaction->item_id;
+        $purchaseOrderQuantity = (float) $orderTransaction->quantity;
+        $purchasedQuantity = $this->getCompletedPurchaseQuantity($order, $itemId);
+        $pendingPurchaseQuantity = max($purchaseOrderQuantity - $purchasedQuantity, 0);
+
+        $itemService = app(ItemService::class);
+
+        return $this->itemQuantityMetricsCache[$cacheKey] = [
+            'actual_stock_formatted' => $this->getFormattedActualStockQuantity($orderTransaction),
+            'order_quantity_formatted' => $itemService->getQuantityInUnit($purchaseOrderQuantity, $itemId),
+            'purchased_quantity_formatted' => $itemService->getQuantityInUnit($purchasedQuantity, $itemId),
+            'pending_purchase_quantity_formatted' => $itemService->getQuantityInUnit($pendingPurchaseQuantity, $itemId),
+        ];
+    }
+
+    private function getCompletedPurchaseQuantity(PurchaseOrder $order, int $itemId): float
+    {
+        $cacheKey = 'purchase-completed-'.$order->id.'-'.$itemId;
+        if (isset($this->itemQuantityMetricsCache[$cacheKey])) {
+            return $this->itemQuantityMetricsCache[$cacheKey];
+        }
+
+        $completedTransactions = $order->relationLoaded('purchase') && $order->purchase
+            ? $order->purchase->itemTransaction ?? collect()
+            : collect();
+
+        return $this->itemQuantityMetricsCache[$cacheKey] = (float) $completedTransactions
+            ->where('item_id', $itemId)
+            ->sum('quantity');
+    }
+
+    private function getFormattedActualStockQuantity(ItemTransaction $transaction): string
+    {
+        $cacheKey = 'actual-stock-'.$transaction->item_id;
+        if (isset($this->itemQuantityMetricsCache[$cacheKey])) {
+            return $this->itemQuantityMetricsCache[$cacheKey];
+        }
+
+        $actualStock = (float) ($transaction->item->current_stock ?? Item::whereKey($transaction->item_id)->value('current_stock'));
+
+        return $this->itemQuantityMetricsCache[$cacheKey] = app(ItemService::class)
+            ->getQuantityInUnit($actualStock, (int) $transaction->item_id);
     }
 
     private function getOverallItemQuantityMetrics(int $itemId): array

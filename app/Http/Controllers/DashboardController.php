@@ -114,6 +114,8 @@ $toDate = request('to_date');
         'user',
         'itemTransaction.item',
         'itemTransaction.unit',
+        'sale.itemTransaction',
+        'quotation.sale.itemTransaction',
     ])
     ->orderByDesc('id')
     ->limit(10)
@@ -130,6 +132,7 @@ $toDate = request('to_date');
         'user',
         'itemTransaction.item',
         'itemTransaction.unit',
+        'purchase.itemTransaction',
     ])
     ->orderByDesc('id')
     ->limit(10)
@@ -335,14 +338,11 @@ $supplierBalance = $this->partyService->getPartyBalance(
     private function appendPendingSaleOrderMetrics($orders): void
     {
         $orders->each(function ($order) {
-            $order->itemTransaction->each(function ($transaction) {
-                $metrics = $this->getOverallItemQuantityMetrics(
-                    $transaction->item_id,
-                    ItemTransactionUniqueCode::SALE_ORDER->value,
-                    ItemTransactionUniqueCode::SALE->value
-                );
+            $order->itemTransaction->each(function ($transaction) use ($order) {
+                $metrics = $this->getPendingSaleOrderItemMetrics($order, $transaction);
 
                 $transaction->setAttribute('dashboard_actual_quantity', $metrics['actual_stock_formatted']);
+                $transaction->setAttribute('dashboard_order_quantity', $metrics['order_quantity_formatted']);
                 $transaction->setAttribute('dashboard_completed_quantity', $metrics['completed_quantity_formatted']);
                 $transaction->setAttribute('dashboard_pending_quantity', $metrics['pending_quantity_formatted']);
             });
@@ -352,18 +352,112 @@ $supplierBalance = $this->partyService->getPartyBalance(
     private function appendPendingPurchaseOrderMetrics($orders): void
     {
         $orders->each(function ($order) {
-            $order->itemTransaction->each(function ($transaction) {
-                $metrics = $this->getOverallItemQuantityMetrics(
-                    $transaction->item_id,
-                    ItemTransactionUniqueCode::PURCHASE_ORDER->value,
-                    ItemTransactionUniqueCode::PURCHASE->value
-                );
+            $order->itemTransaction->each(function ($transaction) use ($order) {
+                $metrics = $this->getPendingPurchaseOrderItemMetrics($order, $transaction);
 
                 $transaction->setAttribute('dashboard_actual_quantity', $metrics['actual_stock_formatted']);
+                $transaction->setAttribute('dashboard_order_quantity', $metrics['order_quantity_formatted']);
                 $transaction->setAttribute('dashboard_completed_quantity', $metrics['completed_quantity_formatted']);
                 $transaction->setAttribute('dashboard_pending_quantity', $metrics['pending_quantity_formatted']);
             });
         });
+    }
+
+    private function getPendingSaleOrderItemMetrics(SaleOrder $order, ItemTransaction $orderTransaction): array
+    {
+        $cacheKey = 'dashboard-sale-order-'.$order->id.'-'.$orderTransaction->id;
+
+        if (isset($this->itemQuantityMetricsCache[$cacheKey])) {
+            return $this->itemQuantityMetricsCache[$cacheKey];
+        }
+
+        $itemId = (int) $orderTransaction->item_id;
+        $orderedQuantity = (float) $orderTransaction->quantity;
+        $completedQuantity = $this->getDashboardCompletedSaleQuantity($order, $itemId);
+        $pendingQuantity = max($orderedQuantity - $completedQuantity, 0);
+
+        $itemService = app(ItemService::class);
+
+        return $this->itemQuantityMetricsCache[$cacheKey] = [
+            'actual_stock_formatted' => $this->getFormattedDashboardActualStockQuantity($orderTransaction),
+            'order_quantity_formatted' => $itemService->getQuantityInUnit($orderedQuantity, $itemId),
+            'completed_quantity_formatted' => $itemService->getQuantityInUnit($completedQuantity, $itemId),
+            'pending_quantity_formatted' => $itemService->getQuantityInUnit($pendingQuantity, $itemId),
+        ];
+    }
+
+    private function getPendingPurchaseOrderItemMetrics(PurchaseOrder $order, ItemTransaction $orderTransaction): array
+    {
+        $cacheKey = 'dashboard-purchase-order-'.$order->id.'-'.$orderTransaction->id;
+
+        if (isset($this->itemQuantityMetricsCache[$cacheKey])) {
+            return $this->itemQuantityMetricsCache[$cacheKey];
+        }
+
+        $itemId = (int) $orderTransaction->item_id;
+        $orderedQuantity = (float) $orderTransaction->quantity;
+        $completedQuantity = $this->getDashboardCompletedPurchaseQuantity($order, $itemId);
+        $pendingQuantity = max($orderedQuantity - $completedQuantity, 0);
+
+        $itemService = app(ItemService::class);
+
+        return $this->itemQuantityMetricsCache[$cacheKey] = [
+            'actual_stock_formatted' => $this->getFormattedDashboardActualStockQuantity($orderTransaction),
+            'order_quantity_formatted' => $itemService->getQuantityInUnit($orderedQuantity, $itemId),
+            'completed_quantity_formatted' => $itemService->getQuantityInUnit($completedQuantity, $itemId),
+            'pending_quantity_formatted' => $itemService->getQuantityInUnit($pendingQuantity, $itemId),
+        ];
+    }
+
+    private function getDashboardCompletedSaleQuantity(SaleOrder $order, int $itemId): float
+    {
+        $cacheKey = 'dashboard-sale-completed-'.$order->id.'-'.$itemId;
+        if (isset($this->itemQuantityMetricsCache[$cacheKey])) {
+            return $this->itemQuantityMetricsCache[$cacheKey];
+        }
+
+        $completedTransactions = collect();
+
+        if ($order->relationLoaded('sale') && $order->sale) {
+            $completedTransactions = $completedTransactions->concat($order->sale->itemTransaction ?? collect());
+        }
+
+        if ($order->relationLoaded('quotation') && $order->quotation?->relationLoaded('sale') && $order->quotation->sale) {
+            $completedTransactions = $completedTransactions->concat($order->quotation->sale->itemTransaction ?? collect());
+        }
+
+        return $this->itemQuantityMetricsCache[$cacheKey] = (float) $completedTransactions
+            ->where('item_id', $itemId)
+            ->sum('quantity');
+    }
+
+    private function getDashboardCompletedPurchaseQuantity(PurchaseOrder $order, int $itemId): float
+    {
+        $cacheKey = 'dashboard-purchase-completed-'.$order->id.'-'.$itemId;
+        if (isset($this->itemQuantityMetricsCache[$cacheKey])) {
+            return $this->itemQuantityMetricsCache[$cacheKey];
+        }
+
+        $completedTransactions = $order->relationLoaded('purchase') && $order->purchase
+            ? $order->purchase->itemTransaction ?? collect()
+            : collect();
+
+        return $this->itemQuantityMetricsCache[$cacheKey] = (float) $completedTransactions
+            ->where('item_id', $itemId)
+            ->sum('quantity');
+    }
+
+    private function getFormattedDashboardActualStockQuantity(ItemTransaction $transaction): string
+    {
+        $cacheKey = 'dashboard-actual-stock-'.$transaction->item_id;
+        if (isset($this->itemQuantityMetricsCache[$cacheKey])) {
+            return $this->itemQuantityMetricsCache[$cacheKey];
+        }
+
+        $actualStock = (float) ($transaction->item->current_stock ?? Item::whereKey($transaction->item_id)->value('current_stock'));
+
+        return $this->itemQuantityMetricsCache[$cacheKey] = app(ItemService::class)
+            ->getQuantityInUnit($actualStock, (int) $transaction->item_id);
     }
 
     private function getOverallItemQuantityMetrics(

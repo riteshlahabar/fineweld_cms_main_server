@@ -73,6 +73,7 @@
                                             <th>{{ __('app.due_date') }}</th>
                                             <th>{{ __('customer.customer') }}</th>
                                             <th>Actual Quantity</th>
+                                            <th>Sale Order Quantity</th>
                                             <th>Sold Quantity</th>
                                             <th>Pending Quantity</th>
                                             <th>{{ __('app.status') }}</th>

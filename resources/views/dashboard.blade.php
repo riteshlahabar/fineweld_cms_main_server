@@ -384,6 +384,7 @@
                                     <th>{{ __('customer.customer') }}</th>
                                     <th>Pending Item</th>
                                     <th>Actual Quantity</th>
+                                    <th>Sale Order Quantity</th>
                                     <th>Sold Quantity</th>
                                     <th>Pending Quantity</th>
                                     <th>{{ __('app.status') }}</th>
@@ -418,6 +419,14 @@
 
 <td>
     @forelse($order->itemTransaction as $transaction)
+        <div>{{ $transaction->dashboard_order_quantity }}</div>
+    @empty
+        -
+    @endforelse
+</td>
+
+<td>
+    @forelse($order->itemTransaction as $transaction)
         <div>{{ $transaction->dashboard_completed_quantity }}</div>
     @empty
         -
@@ -435,7 +444,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8" class="text-center text-muted">{{ __('app.no_records_found') }}</td>
+                                        <td colspan="9" class="text-center text-muted">{{ __('app.no_records_found') }}</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -467,6 +476,7 @@
                                     <th>{{ __('supplier.supplier') }}</th>
                                     <th>Pending Item</th>
                                     <th>Actual Quantity</th>
+                                    <th>Purchase Order Quantity</th>
                                     <th>Purchased Quantity</th>
                                     <th>Pending Quantity</th>
                                     <th>{{ __('app.status') }}</th>
@@ -501,6 +511,14 @@
 
 <td>
     @forelse($order->itemTransaction as $transaction)
+        <div>{{ $transaction->dashboard_order_quantity }}</div>
+    @empty
+        -
+    @endforelse
+</td>
+
+<td>
+    @forelse($order->itemTransaction as $transaction)
         <div>{{ $transaction->dashboard_completed_quantity }}</div>
     @empty
         -
@@ -518,7 +536,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8" class="text-center text-muted">{{ __('app.no_records_found') }}</td>
+                                        <td colspan="9" class="text-center text-muted">{{ __('app.no_records_found') }}</td>
                                     </tr>
                                 @endforelse
                             </tbody>
