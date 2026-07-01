@@ -517,7 +517,7 @@ class ItemController extends Controller
             })
             ->when(! $warehouseId, function ($query) use ($zeroStockOnly) {
                 return $zeroStockOnly
-                    ? $query->where('current_stock', '=', 0)
+                    ? $query->where('current_stock', '<=', 0)
                     : $query->where('current_stock', '>', 0);
             });
 
@@ -535,6 +535,16 @@ class ItemController extends Controller
                 ->addSelect('items.*')
                 ->addSelect(DB::raw('COALESCE(igq.quantity, 0) as warehouse_quantity'))
                 ->orderBy('warehouse_quantity', $orderDir);
+        }
+
+        if ($zeroStockOnly) {
+            if ($warehouseId) {
+                $data->orderByRaw('CASE WHEN COALESCE(igq.quantity, 0) = 0 THEN 0 ELSE 1 END ASC')
+                    ->orderBy('warehouse_quantity', 'asc');
+            } else {
+                $data->orderByRaw('CASE WHEN current_stock = 0 THEN 0 ELSE 1 END ASC')
+                    ->orderBy('current_stock', 'asc');
+            }
         }
 
         return DataTables::of($data)
