@@ -371,6 +371,7 @@ return view('print.proforma-invoice.print', compact('isPdf', 'invoiceData', 'quo
                     'count_id' => $validatedData['count_id'],
                     'quotation_code' => $validatedData['quotation_code'],
                     'note' => $validatedData['note'],
+                    'shipping_charge' => $validatedData['shipping_charge'],
                     'round_off' => $validatedData['round_off'],
                     'grand_total' => $validatedData['grand_total'],
                     'state_id' => $validatedData['state_id'],

@@ -41,6 +41,7 @@ class SaleOrderRequest extends FormRequest
             'order_code' => ['required', 'string', 'max:50'],
             'order_status' => ['required', 'string', 'max:50'],
             'count_id' => ['required', 'numeric'],
+            'shipping_charge' => ['nullable', 'numeric', 'min:0'],
             'round_off' => ['nullable', Rule::requiredIf(fn () => empty($this->input('round_off'))), 'numeric'],
             'grand_total' => ['required', 'numeric'],
             'note' => ['nullable', 'string', 'max:250'],
@@ -76,6 +77,7 @@ class SaleOrderRequest extends FormRequest
             'order_date' => $this->toSystemDateFormat($orderDate),
             'due_date' => (! empty($dueDate)) ? $this->toSystemDateFormat($dueDate) : null,
             'order_code' => $this->getOrderCode(),
+            'shipping_charge' => $this->input('shipping_charge') ?? 0,
             'state_id' => (! empty($this->input('state_id'))) ? $this->input('state_id') : null,
         ]);
 

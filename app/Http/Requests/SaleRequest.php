@@ -40,6 +40,7 @@ class SaleRequest extends FormRequest
             'sale_code' => ['required', 'string', 'max:50'],
             'count_id' => ['required', 'numeric'],
             'reference_no' => ['nullable', 'string', 'max:50'],
+            'shipping_charge' => ['nullable', 'numeric', 'min:0'],
             'round_off' => ['nullable', Rule::requiredIf(fn () => empty($this->input('round_off'))), 'numeric'],
             'grand_total' => ['required', 'numeric'],
             'note' => ['nullable', 'string', 'max:250'],
@@ -85,6 +86,7 @@ class SaleRequest extends FormRequest
             'is_pos_form' => (bool) $this->has('is_pos_form'),
             'sale_date' => $this->toSystemDateFormat($saleDate),
             'sale_code' => $this->getSaleCode(),
+            'shipping_charge' => $this->input('shipping_charge') ?? 0,
             'state_id' => (! empty($this->input('state_id'))) ? $this->input('state_id') : null,
             'is_wholesale_customer' => Party::select('is_wholesale_customer')
                 ->find($this->input('party_id'))

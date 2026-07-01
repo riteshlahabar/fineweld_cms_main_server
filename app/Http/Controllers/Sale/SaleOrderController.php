@@ -302,6 +302,7 @@ class SaleOrderController extends Controller
                     'count_id' => $validatedData['count_id'],
                     'order_code' => $validatedData['order_code'],
                     'note' => $validatedData['note'],
+                    'shipping_charge' => $validatedData['shipping_charge'],
                     'round_off' => $validatedData['round_off'],
                     'grand_total' => $validatedData['grand_total'],
                     'state_id' => $validatedData['state_id'],
