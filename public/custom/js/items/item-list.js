@@ -68,7 +68,7 @@ $(function() {
                 {data: 'item_code', name: 'item_code'},
                 {data: 'item_location', name: 'item_location', orderable: false},
                 {data: 'warehouse_name', name: 'warehouse_name', orderable: false},
-                {data: 'sku', name: 'sku', visible:itemSettings.sku==1?true:false, orderable: false,},
+                {data: 'sku', name: 'sku', visible:itemSettings.show_sku==1?true:false, orderable: false,},
                 {data: 'brand_name', name: 'brand_name', orderable: false,},
                 {data: 'category_name', name: 'category_name', orderable: false,},
                 {data: 'sale_price', name: 'sale_price', className: 'text-end'},
