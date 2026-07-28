@@ -46,6 +46,11 @@
                                     <span class="input-group-text" role="button"><i class="fadeIn animated bx bx-calendar-alt"></i></span>
                                 </div>
                             </div>
+                            @can('expense.create')
+                            <div class="col-md-3 d-flex align-items-end">
+                                <x-anchor-tag href="{{ route('import.expenses') }}" text="Import Expenses" class="btn btn-outline-primary px-5" />
+                            </div>
+                            @endcan
                         </div>
                         <form class="row g-3 needs-validation" id="datatableForm" action="{{ route('expense.delete') }}" enctype="multipart/form-data">
                             {{-- CSRF Protection --}}

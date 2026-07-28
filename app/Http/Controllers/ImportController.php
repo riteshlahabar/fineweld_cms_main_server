@@ -2,15 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\App as AppEnums;
 use App\Enums\Item as ItemEnums;
 use App\Enums\ItemTransactionUniqueCode;
 use App\Models\Currency;
+use App\Models\Expenses\Expense;
+use App\Models\Expenses\ExpenseCategory;
+use App\Models\Expenses\ExpenseItem;
+use App\Models\Expenses\ExpenseItemMaster;
+use App\Models\Expenses\ExpenseSubcategory;
 use App\Models\Items\Brand;
 use App\Models\Items\Item;
 use App\Models\Items\ItemBatchTransaction;
 use App\Models\Items\ItemCategory;
 use App\Models\Items\ItemTransaction;
 use App\Models\Party\Party;
+use App\Models\PaymentTypes;
+use App\Models\Prefix;
 use App\Models\State;
 use App\Models\Tax;
 use App\Models\Unit;
@@ -18,6 +26,7 @@ use App\Services\AccountTransactionService;
 use App\Services\ItemService;
 use App\Services\ItemTransactionService;
 use App\Services\PartyTransactionService;
+use App\Services\PaymentTransactionService;
 use App\Traits\FormatNumber;
 use App\Traits\FormatsDateInputs;
 use Carbon\Carbon;
@@ -28,6 +37,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 
 class ImportController extends Controller
 {
@@ -48,7 +58,9 @@ class ImportController extends Controller
 
     public $itemTransactionService;
 
-    public function __construct(Xlsx $reader, Item $itemModel, ItemService $itemService, AccountTransactionService $accountTransactionService, ItemTransactionService $itemTransactionService)
+    public $paymentTransactionService;
+
+    public function __construct(Xlsx $reader, Item $itemModel, ItemService $itemService, AccountTransactionService $accountTransactionService, ItemTransactionService $itemTransactionService, PaymentTransactionService $paymentTransactionService)
     {
         $this->itemModel = $itemModel;
         $this->reader = $reader;
@@ -57,6 +69,7 @@ class ImportController extends Controller
         $this->itemService = $itemService;
         $this->accountTransactionService = $accountTransactionService;
         $this->itemTransactionService = $itemTransactionService;
+        $this->paymentTransactionService = $paymentTransactionService;
     }
 
     public function items(): View
@@ -67,6 +80,11 @@ class ImportController extends Controller
     public function parties(): View
     {
         return view('import.party');
+    }
+
+    public function expenses(): View
+    {
+        return view('import.expense');
     }
 
     /**
@@ -707,6 +725,200 @@ $itemType = $mapping[$itemType] ?? $itemType;  // required, "Product" or "Servic
 
     }
 
+    /**
+     * Import expense records from an Excel sheet.
+     */
+    public function importExpenses(Request $request): JsonResponse
+    {
+        $request->validate([
+            'excel_file' => ['required', 'file', 'mimes:xlsx'],
+        ]);
+
+        $file = $request->file('excel_file');
+        $this->reader->setReadDataOnly(true);
+        $spreadsheet = $this->reader->load($file->getPathname());
+        $data = $spreadsheet->getSheet(0)->toArray(null, true, true, true);
+
+        try {
+            DB::beginTransaction();
+
+            if (count($data) <= 1) {
+                throw new \Exception(__('app.records_not_found'));
+            }
+
+            $prefix = Prefix::findOrNew(AppEnums::APP_SETTINGS_RECORD_ID->value);
+            $prefixCode = $prefix->expense ?? '';
+            $countId = ((int) (Expense::select('count_id')->orderBy('id', 'desc')->first()?->count_id ?? 0)) + 1;
+            $importedCount = 0;
+
+            foreach ($data as $rowNumber => $row) {
+                if ((int) $rowNumber === 1 || $this->isEmptyImportRow($row)) {
+                    continue;
+                }
+
+                $recordDetails = 'Sheet:0, Row:'.$rowNumber;
+                $expenseDate = $this->parseExpenseImportDate($row['A'] ?? null, $recordDetails);
+                $categoryName = $this->cellValue($row['B'] ?? null);
+                $subcategoryName = $this->cellValue($row['C'] ?? null);
+                $itemName = $this->cellValue($row['D'] ?? null);
+                $description = $this->cellValue($row['E'] ?? null);
+                $quantity = $this->numericCellValue($row['F'] ?? null, 'Quantity', $recordDetails, mustBeGreaterThanZero: true);
+                $unitPrice = $this->numericCellValue($row['G'] ?? null, 'Unit Price', $recordDetails);
+                $paymentTypeName = $this->cellValue($row['H'] ?? null);
+                $note = $this->cellValue($row['I'] ?? null);
+
+                if ($categoryName === '') {
+                    throw new \Exception('Expense Category is required '.$recordDetails);
+                }
+                if ($itemName === '') {
+                    throw new \Exception('Expense Item is required '.$recordDetails);
+                }
+                if ($paymentTypeName === '') {
+                    throw new \Exception('Payment Type is required '.$recordDetails);
+                }
+
+                $category = ExpenseCategory::whereRaw('UPPER(name) = ?', [strtoupper($categoryName)])->first();
+                if (! $category) {
+                    throw new \Exception('Expense Category not found: '.$categoryName.' '.$recordDetails);
+                }
+
+                $subcategoryId = null;
+                if ($subcategoryName !== '') {
+                    $subcategoryId = ExpenseSubcategory::firstOrCreate(['name' => $subcategoryName])->id;
+                }
+
+                $paymentType = PaymentTypes::whereRaw('UPPER(name) = ?', [strtoupper($paymentTypeName)])->first();
+                if (! $paymentType) {
+                    throw new \Exception('Payment Type not found: '.$paymentTypeName.' '.$recordDetails);
+                }
+
+                $grandTotal = $quantity * $unitPrice;
+                $expense = Expense::create([
+                    'expense_category_id' => $category->id,
+                    'expense_subcategory_id' => $subcategoryId,
+                    'expense_date' => $expenseDate,
+                    'prefix_code' => $prefixCode,
+                    'count_id' => $countId,
+                    'expense_code' => $prefixCode.$countId,
+                    'note' => $note,
+                    'round_off' => 0,
+                    'grand_total' => $grandTotal,
+                ]);
+
+                $itemMaster = ExpenseItemMaster::firstOrCreate(
+                    ['name' => $itemName],
+                    ['unit_price' => $unitPrice]
+                );
+
+                ExpenseItem::create([
+                    'expense_id' => $expense->id,
+                    'expense_item_master_id' => $itemMaster->id,
+                    'description' => $description,
+                    'unit_price' => $unitPrice,
+                    'quantity' => $quantity,
+                    'total' => $grandTotal,
+                ]);
+
+                $paymentTransaction = $this->paymentTransactionService->recordPayment($expense, [
+                    'transaction_date' => $expenseDate,
+                    'payment_type_id' => $paymentType->id,
+                    'amount' => $grandTotal,
+                    'note' => $note,
+                ]);
+
+                if (! $paymentTransaction) {
+                    throw new \Exception(__('payment.failed_to_record_payment_transactions').' '.$recordDetails);
+                }
+
+                if (! $this->paymentTransactionService->updateTotalPaidAmountInModel($expense)) {
+                    throw new \Exception(__('payment.failed_to_update_paid_amount').' '.$recordDetails);
+                }
+
+                if (! $this->accountTransactionService->expenseAccountTransaction($expense)) {
+                    throw new \Exception(__('payment.failed_to_update_account').' '.$recordDetails);
+                }
+
+                $countId++;
+                $importedCount++;
+            }
+
+            if ($importedCount === 0) {
+                throw new \Exception(__('app.records_not_found'));
+            }
+
+            DB::commit();
+
+            session(['record' => [
+                'type' => 'success',
+                'status' => 'Success',
+                'message' => $importedCount.' expenses imported successfully!!',
+            ]]);
+
+            return response()->json([
+                'status' => true,
+                'message' => __('app.record_saved_successfully'),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 409);
+        }
+    }
+
+    private function isEmptyImportRow(array $row): bool
+    {
+        foreach ($row as $value) {
+            if ($this->cellValue($value) !== '') {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function parseExpenseImportDate($value, string $recordDetails): string
+    {
+        if ($value === null || $this->cellValue($value) === '') {
+            throw new \Exception('Expense Date is required '.$recordDetails);
+        }
+
+        if (is_numeric($value)) {
+            return ExcelDate::excelToDateTimeObject((float) $value)->format('Y-m-d');
+        }
+
+        $date = $this->toSystemDateFormat($this->cellValue($value));
+        if (! $date) {
+            throw new \Exception('Invalid Expense Date '.$recordDetails);
+        }
+
+        return $date;
+    }
+
+    private function numericCellValue($value, string $label, string $recordDetails, bool $mustBeGreaterThanZero = false): float
+    {
+        $value = $this->cellValue($value);
+        if ($value === '' || ! is_numeric($value)) {
+            throw new \Exception($label.' should be numeric '.$recordDetails);
+        }
+
+        $number = (float) $value;
+        if ($mustBeGreaterThanZero && $number <= 0) {
+            throw new \Exception($label.' should be greater than zero '.$recordDetails);
+        }
+        if (! $mustBeGreaterThanZero && $number < 0) {
+            throw new \Exception($label.' should not be negative '.$recordDetails);
+        }
+
+        return $number;
+    }
+
+    private function cellValue($value): string
+    {
+        return trim((string) ($value ?? ''));
+    }
     public function saveCategory($categoryName): array
     {
         if (empty($categoryName)) {

@@ -1412,6 +1412,11 @@ Route::middleware('auth')->group(function () {
             ->name('import.party'); // View
         Route::post('/party/upload', [ImportController::class, 'importParties'])->name('import.party.upload'); // Save operation
 
+        Route::get('/expenses', [ImportController::class, 'expenses'])
+            ->middleware('can:expense.create')
+            ->name('import.expenses'); // View
+        Route::post('/expenses/upload', [ImportController::class, 'importExpenses'])->name('import.expenses.upload'); // Save operation
+
     });
 
     /**
@@ -2085,6 +2090,46 @@ Route::get('/download-contact-sheet', function () {
     }
     abort(404);
 })->name('download-contact-sheet');
+
+Route::get('/download-expense-sheet', function () {
+    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+    $categoryName = \App\Models\Expenses\ExpenseCategory::query()->value('name') ?? 'Existing Expense Category';
+    $paymentTypeName = \App\Models\PaymentTypes::query()->value('name') ?? 'Cash';
+
+    $sheet->fromArray([
+        'Expense Date',
+        'Expense Category',
+        'Expense Subcategory',
+        'Expense Item',
+        'Description',
+        'Quantity',
+        'Unit Price',
+        'Payment Type',
+        'Note',
+    ], null, 'A1');
+    $sheet->fromArray([
+        now()->format('Y-m-d'),
+        'Office Expense',
+        '',
+        'Stationery',
+        'Paper and pens',
+        1,
+        500,
+        'Cash',
+        'Monthly office items',
+    ], null, 'A2');
+
+    foreach (range('A', 'I') as $column) {
+        $sheet->getColumnDimension($column)->setAutoSize(true);
+    }
+
+    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+
+    return response()->streamDownload(function () use ($writer) {
+        $writer->save('php://output');
+    }, 'Expenses-Import-Format.xlsx');
+})->name('download-expense-sheet');
 
 require __DIR__ . '/auth.php';
 require __DIR__ . '/module_routes.php';
